@@ -13,50 +13,50 @@ const imageAlt = "Our story together";
 
 <section
     class="py-24 px-6"
-    style="background-color: var(--color-primary); color: var(--color-surface);"
+    style="background-color: var(--color-background); color: var(--color-secondary);"
 >
     <div
         class="mx-auto flex max-w-6xl flex-col gap-12 md:flex-row md:items-center"
     >
         <div class="md:w-7/12 space-y-6">
             <p
-                class="text-sm uppercase tracking-[0.35em] font-[var(--font-sans)]"
-                style="color: var(--color-secondary); opacity: 0.7;"
+                class="text-sm uppercase tracking-[0.35em] font-(--font-sans)"
+                style="color: var(--color-primary); opacity: 0.7;"
             >
                 Chapter One
             </p>
             <h2
-                class="text-4xl sm:text-5xl font-semibold tracking-tight font-[var(--font-display)]"
-                style="color: var(--color-surface);"
+                class="text-4xl sm:text-5xl tracking-tight font-(--font-display)"
+                style="color: var(--color-primary);"
             >
                 Our Story
             </h2>
             <p
-                class="text-lg leading-relaxed whitespace-pre-line font-[var(--font-sans)]"
-                style="color: var(--color-surface); opacity: 0.8;"
+                class="text-lg leading-relaxed whitespace-pre-line font-(--font-sans)"
+                style="color: var(--color-primary); opacity: 0.8;"
             >
                 {story}
             </p>
 
             <div
-                class="mt-6 flex flex-wrap gap-3 text-sm font-[var(--font-sans)]"
-                style="color: var(--color-secondary); opacity: 0.7;"
+                class="mt-6 flex flex-wrap gap-3 text-sm font-(--font-sans)"
+                style="color: var(--color-primary); opacity: 0.7;"
             >
                 <span
                     class="inline-flex items-center gap-2 rounded-full border px-4 py-2"
-                    style="border-color: var(--color-muted);"
+                    style="border-color: var(--color-text-dark);"
                 >
                     💌 From friends to soulmates
                 </span>
                 <span
                     class="inline-flex items-center gap-2 rounded-full border px-4 py-2"
-                    style="border-color: var(--color-muted);"
+                    style="border-color: var(--color-text-dark);"
                 >
                     ✈️ Adventures across continents
                 </span>
                 <span
                     class="inline-flex items-center gap-2 rounded-full border px-4 py-2"
-                    style="border-color: var(--color-muted);"
+                    style="border-color: var(--color-text-dark);"
                 >
                     💍 Engaged under autumn skies
                 </span>
@@ -65,19 +65,11 @@ const imageAlt = "Our story together";
 
         <div class="md:w-5/12">
             <div class="relative">
-                <div
-                    class="absolute inset-4 rounded-[28px] blur-3xl"
-                    style="background: color-mix(in srgb, var(--color-surface) 20%, transparent);"
-                >
-                </div>
-                <div
-                    class="relative rounded-[32px] border p-4 shadow-2xl backdrop-blur"
-                    style="border-color: var(--color-muted); background: color-mix(in srgb, var(--color-surface) 10%, transparent);"
-                >
+                <div class="relative rounded-4xl border p-4 backdrop-blur">
                     <Image
                         src={heroImage}
                         alt={imageAlt}
-                        class="h-full w-full rounded-[24px] object-cover"
+                        class="h-full w-full rounded-3xl object-cover"
                         loading="lazy"
                         format="webp"
                     />

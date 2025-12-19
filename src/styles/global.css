@@ -15,17 +15,15 @@
 /* Color Palette */
 :root {
     color-scheme: light;
-    background-color: var(--color-background, #d6ccc2);
-    color: var(--color-text, #111111);
+    background-color: var(--color-background);
 
     /* Main */
     --color-primary: #6b705c;
-    --color-secondary: #cb997e;
-    --color-accent: #a5a58d;
+    --color-secondary: #a5a58d;
+    --color-accent: #540b0e;
     --color-background: #d6ccc2;
-    --color-surface: #ffe8d6;
-    --color-text: #111111;
-    --color-muted: #b7b7a4;
+    --color-text-dark: #111111;
+    --color-text-light: #d6ccc2;
 }
 
 @layer base {

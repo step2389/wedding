@@ -23,7 +23,7 @@ const galleryImages = [
 <section
     style="
         background-color: var(--color-primary);
-        color: var(--color-surface);
+        color: var(--color-secondary);
     "
 >
     <div class="mx-auto w-full max-w-6xl px-6 pt-24">
@@ -36,13 +36,13 @@ const galleryImages = [
             </p>
             <h2
                 class="mt-4 text-4xl font-semibold tracking-tight sm:text-5xl lg:text-6xl"
-                style="color: var(--color-surface);"
+                style="color: var(--color-secondary);"
             >
                 Scroll through the memories
             </h2>
             <p
                 class="mt-6 text-lg"
-                style="color: var(--color-surface); opacity: 0.75;"
+                style="color: var(--color-secondary); opacity: 0.75;"
             >
                 A curated strip of the moments we never want to forget—from the
                 first look to the final sparkler.
@@ -58,10 +58,9 @@ const galleryImages = [
             {
                 galleryImages.map((image) => (
                     <figure
-                        class="relative aspect-square w-[240px] sm:w-[300px] lg:w-[360px] flex-none overflow-hidden rounded-[32px] border shadow-[0_25px_60px_rgba(0,0,0,0.35)]"
+                        class="relative aspect-square w-60 sm:w-75 lg:w-100 flex-none overflow-hidden rounded-4xl"
                         style="
-                            border-color: var(--color-muted);
-                            background: color-mix(in srgb, var(--color-surface) 5%, transparent);
+                            background: color-mix(in srgb, var(--color-secondary) 5%, transparent);
                         "
                     >
                         <Image
@@ -73,13 +72,12 @@ const galleryImages = [
                             height={800}
                             fit="cover"
                             class="block h-full w-full"
-                            imgClass="h-full w-full object-cover object-center"
                         />
                         <figcaption
-                            class="absolute inset-x-0 bottom-0 bg-gradient-to-t px-6 py-4 text-sm"
+                            class="absolute inset-x-0 bottom-0 bg-linear-to-t px-6 py-4 text-sm"
                             style="
-                                background: linear-gradient(to top, var(--color-text) 70%, transparent);
-                                color: var(--color-surface);
+                                background: linear-gradient(to top, var(--color-text) 50%, transparent);
+                                color: var(--color-secondary);
                                 opacity: 0.8;
                             "
                         >
@@ -89,12 +87,6 @@ const galleryImages = [
                 ))
             }
         </div>
-    </div>
-
-    <div class="mx-auto w-full max-w-6xl px-6 pb-24">
-        <footer class="mt-24 text-center" style="color: var(--color-muted);">
-            <p>That’s our reel—thank you for walking through it with us.</p>
-        </footer>
     </div>
 </section>
 

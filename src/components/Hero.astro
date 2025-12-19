@@ -1,17 +1,11 @@
----
-import background from "../assets/background.svg?url";
----
-
 <section
     id="hero"
     class="hero relative overflow-hidden [&_.section__inner]:max-w-none [&_.section__inner]:p-0"
     style={`
-        background-image: url("${background}");
         background-size: cover;
         background-position: center;
         background-repeat: no-repeat;
         background-color: var(--color-primary);
-        color: var(--color-surface);
     `}
 >
     <div class="w-full px-6 py-20 md:py-28 lg:py-36">
@@ -28,31 +22,19 @@ import background from "../assets/background.svg?url";
                 <h1
                     class="font-display text-[clamp(3.5rem,8vw,6.5rem)] uppercase leading-[0.88] tracking-tight drop-shadow-md"
                     id="hero-heading"
-                    style="color: var(--color-surface);"
+                    style="color: var(--color-background);"
                 >
                     said yes!
                 </h1>
                 <p
                     class="max-w-2xl text-base leading-relaxed md:text-lg"
-                    style="color: var(--color-surface); opacity: 0.9;"
+                    style="color: var(--color-secondary); opacity: 0.9;"
                 >
                     An editorial soirée in the heart of the city — bold florals,
                     late-night vinyl, and a guest list filled with our favorite
                     people. Come for the vows, stay for the midnight espresso
                     martinis.
                 </p>
-                <a
-                    class="inline-flex items-center gap-3 border px-7 py-3 text-sm font-semibold uppercase tracking-[0.4em] transition"
-                    style="
-                        border-color: var(--color-muted);
-                        color: var(--color-surface);
-                    "
-                    href="#about"
-                    onmouseover="this.style.backgroundColor='var(--color-surface)';this.style.color='var(--color-text)'"
-                    onmouseout="this.style.backgroundColor='';this.style.color='var(--color-surface)'"
-                >
-                    Read our story <span aria-hidden="true">↘</span>
-                </a>
             </div>
 
             <div class="text-left md:text-right">
@@ -64,7 +46,7 @@ import background from "../assets/background.svg?url";
                 </p>
                 <p
                     class="font-display text-4xl uppercase tracking-[0.2em]"
-                    style="color: var(--color-surface);"
+                    style="color: var(--color-background);"
                 >
                     21 · 06 · 2026
                 </p>
