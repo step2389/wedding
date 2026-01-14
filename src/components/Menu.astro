@@ -45,13 +45,37 @@ const links = [
     const btn = document.getElementById("menu-btn");
     const menu = document.getElementById("menu");
 
+    function openMenu() {
+      menu.classList.remove("translate-x-full");
+    }
+
+    function closeMenu() {
+      menu.classList.add("translate-x-full");
+    }
+
     btn.addEventListener("click", () => {
-      menu.classList.toggle("translate-x-full");
+      // se è chiuso, apri; se è aperto, chiudi
+      if (menu.classList.contains("translate-x-full")) {
+        openMenu();
+      } else {
+        closeMenu();
+      }
     });
 
+    // Chiudi quando clicchi un link del menu
     menu.addEventListener("click", (e) => {
       if (e.target.tagName === "A") {
-        menu.classList.add("translate-x-full");
+        closeMenu();
+      }
+    });
+
+    // Chiudi quando clicchi fuori dal menu
+    document.addEventListener("click", (e) => {
+      const clickInsideMenu = menu.contains(e.target);
+      const clickOnButton = btn.contains(e.target);
+
+      if (!clickInsideMenu && !clickOnButton) {
+        closeMenu();
       }
     });
   });
