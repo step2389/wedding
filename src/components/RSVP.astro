@@ -1,0 +1,90 @@
+---
+const title = "RSVP";
+const subtitle = "Facci sapere se verrai al nostro matrimonio";
+---
+
+<section id="rsvp" class="py-16 px-4 max-w-2xl mx-auto">
+  <h2 class="text-3xl font-semibold text-center mb-2">
+    {title}
+  </h2>
+  <p class="text-center text-gray-500 mb-8">
+    {subtitle}
+  </p>
+
+  <form
+    action="https://api.web3forms.com/submit"
+    method="POST"
+    class="space-y-4"
+  >
+    <!-- incolla qui la tua access_key di Web3Forms -->
+    <input type="hidden" name="access_key" value="2bd3aa52-27fe-48ec-9180-a2679432af07" />
+
+    <!-- opzionale: soggetto e nome mittente -->
+    <input type="hidden" name="subject" value="Nuovo RSVP matrimonio" />
+    <input type="hidden" name="from_name" value="Wedding Site" />
+
+    <div>
+      <label class="block mb-1">Nome e cognome</label>
+      <input
+        name="name"
+        type="text"
+        required
+        class="w-full border rounded px-3 py-2"
+      />
+    </div>
+
+    <div>
+      <label class="block mb-1">Email</label>
+      <input
+        name="email"
+        type="email"
+        required
+        class="w-full border rounded px-3 py-2"
+      />
+    </div>
+
+    <div>
+      <label class="block mb-1">Parteciperai?</label>
+      <select
+        name="attending"
+        class="w-full border rounded px-3 py-2"
+      >
+        <option value="yes">Sì, ci sarò</option>
+        <option value="no">Purtroppo no</option>
+      </select>
+    </div>
+
+    <div>
+      <label class="block mb-1">Numero di persone</label>
+      <input
+        name="guests"
+        type="number"
+        min="1"
+        class="w-full border rounded px-3 py-2"
+      />
+    </div>
+
+    <div>
+      <label class="block mb-1">Allergie / Note</label>
+      <textarea
+        name="notes"
+        rows="3"
+        class="w-full border rounded px-3 py-2"
+      ></textarea>
+    </div>
+
+    <!-- pagina di "grazie" dopo l'invio -->
+    <input
+      type="hidden"
+      name="redirect"
+      value="https://wedding-anna-stefano.penz23.org/grazie"
+    />
+
+    <button
+      type="submit"
+      class="w-full bg-black text-white py-2 rounded"
+    >
+      Invia conferma
+    </button>
+  </form>
+</section>
