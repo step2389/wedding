@@ -2,114 +2,94 @@ hero:
   tagline: "Matrimonio di"
   title: "Anna & Stefano!"
   description: >
-    An editorial soirée in the heart of the city — bold florals, late-night vinyl,
-    and a guest list filled with our favorite people. Come for the vows, stay for
-    the midnight espresso martinis.
-  weekday: "Saturday"
+    Una serata dallo stile editoriale nel cuore della città — fiori scenografici,
+    vinili fino a tardi e una lista di invitati con tutte le persone che amiamo.
+    Venite per la cerimonia, restate per i cocktail di mezzanotte.
+  weekday: "Sabato"
   dateDisplay: "12 · 09 · 2026"
-  location: "Sabbia e Sale Feeling Beach• Chioggia"
+  location: "Sabbia e Sale Feeling Beach • Chioggia"
 
 story:
-  chapterLabel: "Chapter One"
-  heading: "Our Story"
-  body: |
-    We met on a crisp autumn afternoon, when a simple conversation blossomed into an inseparable friendship.
-    Over time, that friendship grew into love, and together we've shared adventures, dreams, and challenges.
-    Today, we celebrate not only our love, but also the family and friends who have joined us on this journey.
-  imageAsset: "wedshots/vadim-paripa-unsplash.jpg"
-  imageAlt: "Our story together"
-  highlights:
-    - "💌 From friends to soulmates"
-    - "✈️ Adventures across continents"
-    - "💍 Engaged under autumn skies"
 
 schedule:
-  eyebrow: "Our Celebration"
-  title: "Wedding Day Schedule"
+  eyebrow: "Il nostro giorno"
+  title: "Programma del matrimonio"
   description: >
-    Follow along to savor every cherished moment with us—from vows to the last sparkling toast.
+    Segui il programma per vivere con noi ogni momento speciale — dalle promesse
+    all’ultimo brindisi scintillante.
   events:
     - number: "01"
-      label: "Ceremony"
-      title: "Ceremony & Vows"
+      label: "Cerimonia"
+      title: "Cerimonia & Promesse"
       description: >
-        Gather on the chapel lawn for an intimate ceremony beneath the olive trees. Ushers are ready to guide you to your seat.
+        Ritrovo sul prato della cappella per una cerimonia intima sotto gli ulivi.
+        I nostri amici vi aiuteranno a trovare il posto assegnato.
       details:
-        - "Prelude music begins at 3:40 PM"
-        - "Rings & vows at golden hour"
-        - "Quiet shuttle service begins at 3:15 PM"
+        - "Musica di ingresso a partire dalle 15:40"
+        - "Scambio degli anelli e promesse all’ora d’oro"
+        - "Servizio navetta tranquillo dalle 15:15"
     - number: "02"
       label: "Welcome"
-      title: "Garden Cocktail Hour"
+      title: "Aperitivo in giardino"
       description: >
-        Sip seasonal cocktails, enjoy live jazz, and mingle beneath the café lights as we transition into the celebration.
+        Cocktail di stagione, musica dal vivo e chiacchiere sotto le luci del giardino
+        mentre inizia la festa.
       details:
-        - "Signature drink: Lavender Paloma"
-        - "String trio taking requests"
-        - "Canapés served throughout the garden"
+        - "Drink della serata: Lavender Paloma"
+        - "Trio d’archi che accoglie le vostre richieste"
+        - "Canapé serviti in tutto il giardino"
     - number: "03"
       label: "Dinner"
-      title: "Candlelit Reception"
+      title: "Ricevimento a lume di candela"
       description: >
-        Savor a farm-to-table feast paired with curated wines while heartfelt toasts and stories fill the room.
+        Un menù ispirato alla cucina di stagione abbinato a vini selezionati,
+        accompagnato da brindisi e racconti di famiglia.
       details:
-        - "Dinner call at 6:25 PM"
-        - "Toasts begin after the second course"
-        - "Dessert trio plated at 8:10 PM"
+        - "Chiamata a tavola alle 18:25"
+        - "I brindisi iniziano dopo il secondo piatto"
+        - "Tris di dessert servito alle 20:10"
     - number: "04"
       label: "Celebration"
-      title: "First Dance & Party"
+      title: "Primo ballo & Party"
       description: >
-        Kick off the dance floor with our first dance, then stay on your feet for live DJ sets, photo moments, and late-night bites.
+        Apriamo la pista con il nostro primo ballo, poi lasciatevi trasportare da DJ set,
+        angoli foto e sfizi di mezzanotte.
       details:
-        - "First dance at 8:50 PM"
-        - "Dessert lounge opens at 9:30 PM"
-        - "Photo booth until 11:30 PM"
+        - "Primo ballo alle 20:50"
+        - "Dessert lounge aperta dalle 21:30"
+        - "Photo booth attivo fino alle 23:30"
     - number: "05"
       label: "Farewell"
-      title: "Sparkler Send-Off"
+      title: "Saluto con le stelline"
       description: >
-        Close the night with a sparkling farewell and a final toast to forever. Shuttles depart every 20 minutes.
+        Chiudiamo la serata con un saluto scintillante e un ultimo brindisi al futuro.
+        Le navette partono a rotazione.
       details:
-        - "Grab a sparkler by the garden gate"
-        - "Final toast at 11:55 PM"
-        - "Last shuttle leaves at 12:30 AM"
+        - "Ritirate una stellina all’ingresso del giardino"
+        - "Ultimo brindisi alle 23:55"
+        - "Ultima navetta in partenza alle 00:30"
 
 gallery:
-  eyebrow: "Gallery"
-  title: "Scroll through the memories"
+  eyebrow: "Galleria"
+  title: "Scorri tra i ricordi"
   description: >
-    A curated strip of the moments we never want to forget—from the first look to the final sparkler.
+    Una selezione dei momenti che non vogliamo dimenticare — dal first look
+    all’ultima scintilla sotto le stelle.
   images:
     - asset: "wedshots/jakob-owens-unsplash.jpg"
-      alt: "First look on the veranda"
-    - asset: "wedshots/leonardo-miranda-unsplash.jpg"
-      alt: "Bridal bouquet close-up"
-    - asset: "wedshots/nathan-dumlao-2-unsplash.jpg"
-      alt: "Couple walking through the garden"
-    - asset: "wedshots/nathan-dumlao-unsplash.jpg"
-      alt: "Sunset toast with friends"
-    - asset: "wedshots/nikita-shirokov-unsplash.jpg"
-      alt: "First dance candid"
-    - asset: "wedshots/sandy-millar-unsplash.jpg"
-      alt: "Bridal party cheering"
-    - asset: "wedshots/vadim-paripa-unsplash.jpg"
-      alt: "Sparkler send-off moment"
+ 
 
 cards:
-  - imageAlt: "RSVP"
-    title: "RSVP"
-    description: "Let us know if you’ll be joining our special day!"
-    href: "/rsvp"
   - imageAlt: "Wishlist"
-    title: "Wishlist"
-    description: "See our gift wishlist and help us start our new chapter."
-    href: "/wishlist"
+    title: "Lista nozze"
+    description: "Scopri la nostra lista dei desideri e aiutaci a iniziare questo nuovo capitolo."
+    href: "/ListaNozze"
 
 countdown:
-  label: "Wedding Weekend Countdown"
-  heading: 'Countdown to "We Do"'
+  label: "Conto alla rovescia"
+  heading: 'Countdown al "Sì, lo voglio"'
   message: >
-    Every sunrise brings us closer to the moment we gather together. Save the date and get ready for an unforgettable celebration.
-  target: "2026-06-21T21:00:00Z"
-  location: "Mexico City • La Casa Azul"
+    Ogni alba ci avvicina al momento in cui saremo tutti insieme. Segna la data
+    e preparati a festeggiare con noi.
+  target: "2026-09-12T17:30:00Z"
+  location: "Sabbia & Sale • Chioggia"
