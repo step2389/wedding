@@ -1,6 +1,16 @@
 ---
 import { getEventData } from "../data/eventData";
-const { hero } = getEventData();
+const { hero, countdown } = getEventData();
+
+const heroData = hero;
+
+// dati per il countdown, riusando la stessa struttura di Count.astro
+const eventDate = countdown.target;
+const eventLabel = countdown.label;
+const eventHeading = countdown.heading;
+const eventMessage = countdown.message;
+const eventLocation = countdown.location;
+
 ---
 
 <section
@@ -62,28 +72,70 @@ const { hero } = getEventData();
             </div>
         </div>
     </div>
-<div
-  id="hero-countdown"
-  data-target="2026-09-12T17:30:00Z"
-  class="mt-8 flex justify-center gap-6 text-[11px] tracking-[0.2em] uppercase text-[#6c645b]"
+  
+</section>
+<!-- Countdown compatto dentro l'hero -->
+<section
+  class="mt-12 flex flex-col items-center gap-4 text-center"
+  data-countdown
+  data-countdown-target={eventDate}
 >
-  <div class="flex flex-col items-center">
-    <span id="cd-days" class="text-2xl font-semibold">00</span>
-    <span>Giorni</span>
+  <p
+    class="text-[11px] uppercase tracking-[0.35em]"
+    style="color: var(--color-accent);"
+  >
+    {eventLabel}
+  </p>
+
+  <div class="flex items-baseline gap-4 text-[13px] uppercase tracking-[0.25em]">
+    <div class="flex flex-col items-center">
+      <span
+        class="text-2xl font-semibold"
+        style="color: var(--color-primary);"
+        data-days
+      >
+        --
+      </span>
+      <span class="text-[10px]" style="color: var(--color-accent);">Giorni</span>
+    </div>
+    <div class="flex flex-col items-center">
+      <span
+        class="text-2xl font-semibold"
+        style="color: var(--color-primary);"
+        data-hours
+      >
+        --
+      </span>
+      <span class="text-[10px]" style="color: var(--color-accent);">Ore</span>
+    </div>
+    <div class="flex flex-col items-center">
+      <span
+        class="text-2xl font-semibold"
+        style="color: var(--color-primary);"
+        data-minutes
+      >
+        --
+      </span>
+      <span class="text-[10px]" style="color: var(--color-accent);">Min</span>
+    </div>
+    <div class="flex flex-col items-center">
+      <span
+        class="text-2xl font-semibold"
+        style="color: var(--color-primary);"
+        data-seconds
+      >
+        --
+      </span>
+      <span class="text-[10px]" style="color: var(--color-accent);">Sec</span>
+    </div>
   </div>
-  <div class="flex flex-col items-center">
-    <span id="cd-hours" class="text-2xl font-semibold">00</span>
-    <span>Ore</span>
-  </div>
-  <div class="flex flex-col items-center">
-    <span id="cd-mins" class="text-2xl font-semibold">00</span>
-    <span>Min</span>
-  </div>
-  <div class="flex flex-col items-center">
-    <span id="cd-secs" class="text-2xl font-semibold">00</span>
-    <span>Sec</span>
-  </div>
-</div>
+
+  <p
+    class="text-[11px] uppercase tracking-[0.25em] mt-2"
+    style="color: var(--color-accent);"
+  >
+    {eventLocation}
+  </p>
 </section>
 
 <script>
@@ -106,35 +158,55 @@ const { hero } = getEventData();
             overwrite: "auto",
             duration: 1,
         });
-    });
+    });   
+</script>
 
-document.addEventListener("DOMContentLoaded", () => {
-    const root = document.getElementById("hero-countdown");
-    if (!root) return;
-
-    const target = new Date(root.dataset.target);
-    const daysEl = document.getElementById("cd-days");
-    const hoursEl = document.getElementById("cd-hours");
-    const minsEl = document.getElementById("cd-mins");
-    const secsEl = document.getElementById("cd-secs");
-
-    function updateCountdown() {
-      const now = new Date();
-      let diff = target.getTime() - now.getTime();
-      if (diff < 0) diff = 0;
-
-      const seconds = Math.floor(diff / 1000) % 60;
-      const minutes = Math.floor(diff / (1000 * 60)) % 60;
-      const hours = Math.floor(diff / (1000 * 60 * 60)) % 24;
-      const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-
-      daysEl.textContent = String(days).padStart(2, "0");
-      hoursEl.textContent = String(hours).padStart(2, "0");
-      minsEl.textContent = String(minutes).padStart(2, "0");
-      secsEl.textContent = String(seconds).padStart(2, "0");
+<script type="module">
+  const initCountdown = () => {
+    const root = document.querySelector("[data-countdown]");
+    if (!root) {
+      return;
     }
 
+    const targetDate = root.dataset.countdownTarget;
+    if (!targetDate) {
+      return;
+    }
+
+    const pad = (value) => String(value).padStart(2, "0");
+    const targets = {
+      days: root.querySelector("[data-days]"),
+      hours: root.querySelector("[data-hours]"),
+      minutes: root.querySelector("[data-minutes]"),
+      seconds: root.querySelector("[data-seconds]"),
+    };
+
+    let timer;
+
+    const updateCountdown = () => {
+      const now = Date.now();
+      const eventTime = new Date(targetDate).getTime();
+      const remaining = Math.max(eventTime - now, 0);
+
+      const seconds = Math.floor(remaining / 1000);
+      const days = Math.floor(seconds / 86400);
+      const hours = Math.floor((seconds % 86400) / 3600);
+      const minutes = Math.floor((seconds % 3600) / 60);
+      const secs = seconds % 60;
+
+      if (targets.days) targets.days.textContent = pad(days);
+      if (targets.hours) targets.hours.textContent = pad(hours);
+      if (targets.minutes) targets.minutes.textContent = pad(minutes);
+      if (targets.seconds) targets.seconds.textContent = pad(secs);
+
+      if (remaining <= 0) {
+        clearInterval(timer);
+      }
+    };
+
     updateCountdown();
-    setInterval(updateCountdown, 1000);
-  });
+    timer = setInterval(updateCountdown, 1000);
+  };
+
+  initCountdown();
 </script>
