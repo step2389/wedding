@@ -16,7 +16,9 @@ const eventLocation = countdown.location;
 <section
     id="hero"
     class="hero relative overflow-hidden [&_.section__inner]:max-w-none [&_.section__inner]:p-0"
-    style={`
+    data-countdown
+    data-countdown-target={eventDate}
+style={`
         background-size: cover;
         background-position: center;
         background-repeat: no-repeat;
@@ -72,14 +74,6 @@ const eventLocation = countdown.location;
             </div>
         </div>
     </div>
-  
-</section>
-<!-- Countdown compatto dentro l'hero -->
-<section
-  class="mt-12 flex flex-col items-center gap-4 text-center"
-  data-countdown
-  data-countdown-target={eventDate}
->
   <p
     class="text-[11px] uppercase tracking-[0.35em]"
     style="color: var(--color-accent);"
