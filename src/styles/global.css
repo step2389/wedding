@@ -1,9 +1,17 @@
-@import url('https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400;1,700&display=swap');
 @import "@fontsource/playfair-display/latin.css";
 @import "tailwindcss";
 
 /* Custom Fonts */
-@import url('https://fonts.googleapis.com/css2?family=Great+Vibes&display=swap');
+@font-face {
+  font-family: 'TeX Gyre Termes';
+  src: url('/fonts/texgytermes-regular.otf') format('opentype');
+}
+
+@font-face {
+  font-family: 'Burgues Script';
+    src: url('/fonts/BurguesScriptRegular.otf') format('opentype');
+}
+
 @theme {
     --font-sans:
         "Inter Variable", "Inter", system-ui, -apple-system, BlinkMacSystemFont,
@@ -36,15 +44,15 @@
     }
 
     body {
-        font-family: 'Lora', 'Crimson Text', serif;
+        font-family: 'TeX Gyre Termes', serif;
         background-color: var(--color-background);
         color: var(--color-text);
     }
 
-    h1, h2, h3, h4, h5, h6 {
-    font-family: 'Great Vibes', cursive;
-  }
 
+h1,h2, h3, h4, h5 {
+  font-family: 'TeX Gyre Termes', serif;
+}
     .section {
         min-height: 100vh;
         padding: var(--section-padding);
