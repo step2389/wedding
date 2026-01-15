@@ -5,12 +5,12 @@ const subtitle = "Facci sapere se verrai al nostro matrimonio";
 
 <section id="rsvp" class="py-16 px-4 bg-[var(--color-background)]">
   
-  <div class="max-w-xl mx-auto border border-[#b89c86] rounded-[2rem] px-6 py-8
-              bg-[#f5e9db] shadow-sm">
-    <h2 class="text-center text-xl tracking-[0.2em] uppercase text-[#9a7f68] mb-4">
+  <div class="max-w-xl mx-auto border border-[var(--color-background)] rounded-[2rem] px-6 py-8
+              bg-[var(--color-primary)] shadow-sm">
+    <h2 class="text-center text-xl tracking-[0.2em] uppercase text-[var(--color-background)] mb-4">
       RSVP
     </h2>
-    <p class="text-center text-[15px] text-[#6c645b] mb-8">
+    <p class="text-center text-[15px] text-[var(--color-background)] mb-8">
       Facci sapere se sarai con noi nel nostro giorno speciale.
     </p>
 
@@ -18,7 +18,7 @@ const subtitle = "Facci sapere se verrai al nostro matrimonio";
     <form
       action="https://api.web3forms.com/submit"
       method="POST"
-      class="space-y-4 text-[15px] text-[#3c3a35]"
+      class="space-y-4 text-[15px] text-[var(--color-background)]"
     >
       <input type="hidden" name="access_key" value="2bd3aa52-27fe-48ec-9180-a2679432af07" />
       <input type="hidden" name="subject" value="Nuovo RSVP matrimonio" />
@@ -30,9 +30,9 @@ const subtitle = "Facci sapere se verrai al nostro matrimonio";
           name="name"
           type="text"
           required
-          class="w-full border border-[#c8b5a2] rounded-full px-4 py-2
-                 bg-transparent placeholder:text-[#b9a89a] focus:outline-none
-                 focus:border-[#8a6a51]"
+          class="w-full border border-[var(--color-background)] rounded-full px-4 py-2
+                 bg-transparent placeholder:text-[var(--color-background)] focus:outline-none
+                 focus:border-[var(--color-background)]"
         />
       </div>
 
@@ -41,9 +41,9 @@ const subtitle = "Facci sapere se verrai al nostro matrimonio";
         <input
           name="email"
           type="email"
-          class="w-full border border-[#c8b5a2] rounded-full px-4 py-2
-                 bg-transparent placeholder:text-[#b9a89a] focus:outline-none
-                 focus:border-[#8a6a51]"
+          class="w-full border border-[var(--color-background)] rounded-full px-4 py-2
+                 bg-transparent placeholder:text-[var(--color-background)] focus:outline-none
+                 focus:border-[var(--color-background)]"
           placeholder="(opzionale)"
         />
       </div>
@@ -53,8 +53,8 @@ const subtitle = "Facci sapere se verrai al nostro matrimonio";
     <select
       id="attending"
       name="attending"
-      class="w-full border border-[#c8b5a2] rounded-full px-4 py-2
-             bg-transparent focus:outline-none focus:border-[#8a6a51]"
+      class="w-full border border-[var(--color-background)] rounded-full px-4 py-2
+             bg-transparent focus:outline-none focus:border-[var(--color-background)]"
       required
     >
       <option value="yes">Sì, ci sarò</option>
@@ -69,9 +69,9 @@ const subtitle = "Facci sapere se verrai al nostro matrimonio";
       name="guests"
       type="number"
       min="1"
-      class="w-full border border-[#c8b5a2] rounded-full px-4 py-2
-             bg-transparent placeholder:text-[#b9a89a]
-             focus:outline-none focus:border-[#8a6a51]"
+      class="w-full border border-[var(--color-background)] rounded-full px-4 py-2
+             bg-transparent placeholder:text-[var(--color-background)]
+             focus:outline-none focus:border-[var(--color-background)]"
     />
   </div>
 </div>       
@@ -81,9 +81,9 @@ const subtitle = "Facci sapere se verrai al nostro matrimonio";
         <textarea
           name="notes"
           rows="3"
-          class="w-full border border-[#c8b5a2] rounded-2xl px-4 py-2
-                 bg-transparent placeholder:text-[#b9a89a] focus:outline-none
-                 focus:border-[#8a6a51]"
+          class="w-full border border-[var(--color-background)] rounded-2xl px-4 py-2
+                 bg-transparent placeholder:text-[var(--color-background)] focus:outline-none
+                 focus:border-[var(--color-background)]"
         ></textarea>
       </div>
 
@@ -95,9 +95,9 @@ const subtitle = "Facci sapere se verrai al nostro matrimonio";
 
       <button
         type="submit"
-        class="mt-4 w-full border border-[#b89c86] rounded-full py-3
+        class="mt-4 w-full border border-[var(--color-background)] rounded-full py-3
                text-center text-[15px] tracking-[0.15em] uppercase
-               text-[#3c3a35] bg-transparent hover:bg-[#d9c4af]
+               text-[#1f1410] bg-transparent hover:bg-[var(--color-background)]
                transition-colors"
       >
         Invia conferma
