@@ -91,4 +91,4 @@ countdown:
   message: >
     Ogni alba ci avvicina al momento in cui saremo tutti insieme. Segna la data
     e preparati a festeggiare con noi.
-  target: "2026-09-12T17:30:00:+02:00"
+  target: "2026-09-12T17:30:00+02:00"
