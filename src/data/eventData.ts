@@ -4,6 +4,7 @@ import eventSource from "./event.yml?raw";
 export interface HeroContent {
   tagline: string;
   title: string;
+  title1: string;
   description: string;
   description1: string;
   weekday: string;
