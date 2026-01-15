@@ -1,11 +1,12 @@
 ---
 import Card from "./Card.astro";
 import { getEventData } from "../data/eventData";
-
+import bgImage from '../assets/images/background.jpg';
 const { cards = [] } = getEventData();
 ---
 
-<section id="cards" class="max-w-4xl mx-auto my-16 px-4">
+<section id="cards" style={`background-image: url(${bgImage.src}); background-size: cover; background-position: center; position: relative;`}
+    class="hero relative overflow-hidden bg-[var(--color-primary) hero-with-bg-image]">
     <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
         {
             cards.map((card) => (

@@ -1,9 +1,11 @@
 ---
 const title = "RSVP";
 const subtitle = "Facci sapere se verrai al nostro matrimonio";
+import bgImage from '../assets/images/background.jpg';
 ---
 
-<section id="rsvp" class="py-16 px-4 bg-[var(--color-background)]">
+<section id="rsvp" style={`background-image: url(${bgImage.src}); background-size: cover; background-position: center; position: relative;`}
+    class="hero relative overflow-hidden bg-[var(--color-primary) hero-with-bg-image]">
   
   <div class="max-w-xl mx-auto border border-[var(--color-background)] rounded-[2rem] px-6 py-8
               bg-[var(--color-primary)] shadow-sm">
