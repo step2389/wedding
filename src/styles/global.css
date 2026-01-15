@@ -18,12 +18,14 @@
     background-color: var(--color-background);
 
     /* Main */
-    --color-primary: #2c4a54;
+    --color-primary: ##5b9db4;
     --color-secondary: ##d4a574;
     --color-accent: ##d97f5f;
-    --color-background: ##f5f1ed;
+    --color-background: ###e8f4fa;
     --color-text-dark: #111111;
     --color-text-light: ##e8dcc8;
+      --color-hero: ##3d8fb3;
+        --color-section: #5fa8d3;
 }
 
 @layer base {
