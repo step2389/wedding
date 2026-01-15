@@ -5,6 +5,7 @@ export interface HeroContent {
   tagline: string;
   title: string;
   description: string;
+  description1: string;
   weekday: string;
   dateDisplay: string;
   location: string;

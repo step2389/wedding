@@ -1,10 +1,10 @@
 hero:
   tagline: "Matrimonio di"
   title: "Anna & Stefano!"
-  description: >
+  description:
     HANNO DECISO DI DIRE "SÌ" DAVANTI AL MARE, TRA IL PROFUMO DELLA BREZZA E IL CALORE DEL TRAMONTO
-    
-    insieme alla loro piccola Giorgia, saranno felici di avervi accanto per trasformare questo sì in un ricordo indimenticabile
+  description1:    
+    Insieme alla loro piccola Giorgia, saranno felici di avervi accanto per trasformare questo sì in un ricordo indimenticabile
   weekday: "Sabato"
   dateDisplay: "12 · 09 · 2026"
   location: "Sabbia e Sale Feeling Beach • Chioggia"
@@ -30,11 +30,11 @@ schedule:
       title: "Rito civile in riva al mare"
       description: >
         Ritrovo sulla spiaggia per una cerimonia intima con vista sul mare.
-        Il profumo della brezza e il calore del tramonto accompagneranno i nostri voti.
+        Il profumo della brezza e il calore del tramonto accompagneranno la nostra promessa.
       details:
         - "Ritrovo a partire dalle 17:15"
         - "Cerimonia alle 17:30"
-        - "In riva al mare, spiaggia libera"
+        - "In riva al mare"
     - number: "02"
       label: "Aperitivo"
       title: "Aperitivo & Benvenuto"
@@ -49,7 +49,7 @@ schedule:
       title: "Cena sotto le stelle"
       description: >
         Una cena conviviale sotto le stelle, con specialità di mare e vini selezionati,
-        accompagnati da brindisi e racconti di famiglia.
+        accompagnati da brindisi e risate.
       details:
         - "Inizio cena alle 19:30"
         - "Menu a base di pesce fresco"
@@ -61,7 +61,7 @@ schedule:
         Rimaniamo insieme fino a tardi con musica dal vivo, danza e momenti speciali
         per continuare la celebrazione sotto le stelle.
       details:
-        - "Music live band"
+        - "Music live"
         - "Pista da ballo sulla spiaggia"
         - "Festa fino a mezzanotte e oltre"
 
