@@ -1,0 +1,72 @@
+hero:
+  tagline: "Matrimonio di"
+  title: "Anna & Stefano!"
+  description: >
+    Insieme alla loro piccola Giorgia, saranno felici di avervi accanto per trasformare
+    questo sì in un ricordo indimenticabile. Una cerimonia in riva al mare, tra il profumo
+    della brezza e il calore del tramonto.
+  weekday: "Sabato"
+  dateDisplay: "12 · 09 · 2026"
+  location: "Sabbia e Sale Feeling Beach • Chioggia"
+
+schedule:
+  eyebrow: "Il nostro giorno"
+  title: "Programma del matrimonio"
+  description: >
+    Segui il programma per vivere con noi ogni momento speciale — dalle promesse
+    all'ultimo brindisi sotto le stelle.
+  events:
+    - number: "01"
+      label: "Cerimonia"
+      title: "Rito civile in riva al mare"
+      description: >
+        Ritrovo sulla spiaggia per una cerimonia intima con vista sul mare.
+        Il profumo della brezza e il calore del tramonto accompagneranno i nostri voti.
+      details:
+        - "Ritrovo a partire dalle 17:15"
+        - "Cerimonia alle 17:30"
+        - "In riva al mare, spiaggia libera"
+    - number: "02"
+      label: "Aperitivo"
+      title: "Aperitivo & Benvenuto"
+      description: >
+        Brindisi sulla spiaggia per celebrare il nostro sì sotto il cielo che cambia colore.
+      details:
+        - "Subito dopo la cerimonia"
+        - "Cocktail e stuzzichini sulla spiaggia"
+        - "Musica e convivialità"
+    - number: "03"
+      label: "Cena"
+      title: "Cena sotto le stelle"
+      description: >
+        Una cena conviviale sotto le stelle, con specialità di mare e vini selezionati,
+        accompagnati da brindisi e racconti di famiglia.
+      details:
+        - "Inizio cena alle 19:30"
+        - "Menu a base di pesce fresco"
+        - "Tavoli con vista sul mare"
+    - number: "04"
+      label: "Festeggiamenti"
+      title: "Musica e festa"
+      description: >
+        Rimaniamo insieme fino a tardi con musica dal vivo, danza e momenti speciali
+        per continuare la celebrazione sotto le stelle.
+      details:
+        - "Music live band"
+        - "Pista da ballo sulla spiaggia"
+        - "Festa fino a mezzanotte e oltre"
+
+cards:
+  - imageAlt: "Wishlist"
+    title: "Lista nozze"
+    description: "Scopri la nostra lista dei desideri e aiutaci a iniziare questo nuovo capitolo."
+    href: "/ListaNozze"
+
+countdown:
+  label: "Conto alla rovescia"
+  heading: 'Countdown al "Sì, lo voglio"'
+  message: >
+    Ogni alba ci avvicina al momento in cui saremo tutti insieme sulla spiaggia.
+    Segna la data e preparati a festeggiare con noi.
+  target: "2026-09-12T17:30:00+02:00"
+  location: "Sabbia & Sale • Chioggia"
