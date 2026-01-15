@@ -7,10 +7,7 @@
   src: url('/fonts/texgytermes-regular.otf') format('opentype');
 }
 
-@font-face {
-  font-family: 'Burgues Script';
-    src: url('/fonts/BurguesScriptRegular.otf') format('opentype');
-}
+
 
 @theme {
     --font-sans:
