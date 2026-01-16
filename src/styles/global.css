@@ -24,14 +24,13 @@
 
 /* Color Palette */
 :root {
-    color-scheme: light;
-    background-color: var(--color-background);
-
-    /* Main */
-    --color-primary: #3d8fb3 ;
-    --color-secondary: #ebf9ff;
-    --color-accent: #1f1410;
-    --color-background: #cdebfc;
+    /*color-scheme: light;
+    background-color: var(--color-background);*/
+--color-primary: #FDF9F3;    /* Crema/Sabbia chiarissima per gli sfondi */
+  --color-secondary: #2C4A52;  /* Blu Ottanio scuro (Sea Glass) per i testi e titoli */
+  --color-accent: #D4A373;     /* Sabbia Dorata per bottoni o icone */
+  --color-background: #FDF9F3; 
+  --color-muted: #E2D1C3;      /* Per i bordi tratteggiati */
     --color-text-dark: #000000;
     --color-text-light: #cdebfc;
 }
