@@ -17,44 +17,13 @@ countdown:
     Ogni alba ci avvicina al momento in cui saremo tutti insieme sulla spiaggia.
     Segna la data e preparati a festeggiare con noi.
   target: "2026-09-12T17:30:00+02:00"
-  
+
 schedule:
   events:
-     - number:
-      label: "Cerimonia"
-      title: "Rito civile in riva al mare ore 17:30"
-      description: 
-      details:
-    - number: 
-      label:
-      title: "A seguire festa e cena sotto le stelle"
-      description: >
-        Brindisi sulla spiaggia per celebrare il nostro sì sotto il cielo che cambia colore.
-      details:
-        - "Subito dopo la cerimonia"
-        - "Cocktail e stuzzichini sulla spiaggia"
-        - "Musica e convivialità"
-    - number:
-      label: "Cena"
-      title: "Cena sotto le stelle"
-      description: >
-        Una cena conviviale sotto le stelle, con specialità di mare e vini selezionati,
-        accompagnati da brindisi e risate.
-      details:
-        - "Inizio cena alle 19:30"
-        - "Menu a base di pesce fresco"
-        - "Tavoli con vista sul mare"
-    - number: 
-      label: "Festeggiamenti"
-      title: "Musica e festa"
-      description: >
-        Rimaniamo insieme fino a tardi con musica dal vivo, danza e momenti speciali
-        per continuare la celebrazione sotto le stelle.
-      details:
-        - "Music live"
-        - "Pista da ballo sulla spiaggia"
-        - "Festa fino a mezzanotte e oltre"
+    - title: "Rito civile in riva al mare ore 17:30"
+    - title: "A seguire cena e festa sotto le stelle"
 
+      
 cards:
   - imageAlt: "Wishlist"
     title: "Lista nozze"
