@@ -11,13 +11,13 @@ const events = schedule.events ?? [];
         color: var(--color-secondary);
     "
 >
-    <div class="mx-auto w-full max-w-6xl px-4 pt-10 sm:px-6 lg:px-8">
+    <div class="mx-auto w-full max-w-6xl px-4 pt-0 sm:px-6 lg:px-8">
   
         <div class="flex flex-col">
             {
                 events.map((event) => (
                     <article
-                        class="sticky top-0 z-10 border-t border-dashed py-6 backdrop-blur"
+                        class="sticky top-0 z-10 border-t border-dashed pt-0 backdrop-blur first:border-t-0"
                         style="
                             border-color: var(--color-muted);
                             background: color-mix(in srgb, var(--color-primary) 95%, transparent);
