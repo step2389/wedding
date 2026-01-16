@@ -20,26 +20,40 @@ countdown:
   
 schedule:
   events:
-    - number:
+     - number:
       label: "Cerimonia"
-      title: "Rito civile in riva al mare ore 17:30. A seguire cena e festa sotto le stelle"
-      description: >
-        Ritrovo sulla spiaggia per una cerimonia intima con vista sul mare.
-        Il profumo della brezza e il calore del tramonto accompagneranno la nostra promessa.
+      title: "Rito civile in riva al mare ore 17:30"
+      description: 
+      details:
     - number: 
-      title: "Aperitivo & Benvenuto"
+      label:
+      title: "A seguire festa e cena sotto le stelle"
       description: >
         Brindisi sulla spiaggia per celebrare il nostro sì sotto il cielo che cambia colore.
+      details:
+        - "Subito dopo la cerimonia"
+        - "Cocktail e stuzzichini sulla spiaggia"
+        - "Musica e convivialità"
     - number:
+      label: "Cena"
       title: "Cena sotto le stelle"
       description: >
         Una cena conviviale sotto le stelle, con specialità di mare e vini selezionati,
         accompagnati da brindisi e risate.
+      details:
+        - "Inizio cena alle 19:30"
+        - "Menu a base di pesce fresco"
+        - "Tavoli con vista sul mare"
     - number: 
+      label: "Festeggiamenti"
       title: "Musica e festa"
       description: >
         Rimaniamo insieme fino a tardi con musica dal vivo, danza e momenti speciali
         per continuare la celebrazione sotto le stelle.
+      details:
+        - "Music live"
+        - "Pista da ballo sulla spiaggia"
+        - "Festa fino a mezzanotte e oltre"
 
 cards:
   - imageAlt: "Wishlist"
