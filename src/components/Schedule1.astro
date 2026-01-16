@@ -6,28 +6,18 @@ const { schedule } = getEventData();
 const events = schedule.events ?? [];
 ---
 
-<section id="schedule1" class="relative py-16 sm:py-24 overflow-hidden">
-  <!-- Sfondo Immagine -->
-  <div class="absolute inset-0 z-0"
-    style={`background-image: url(${bgImage.src}); background-size: cover; background-position: center; background-attachment: scroll;`}>
-    <div class="absolute inset-0 bg-black/10"></div>
-  </div>
-
-  <div class="relative z-10 mx-auto max-w-2xl px-4">
-    <div class="rounded-[2.5rem] p-8 sm:p-12 shadow-xl backdrop-blur-md border"
-      style="background-color: rgba(255, 255, 255, 0.4); border-color: rgba(255, 255, 255, 0.3);">
-      
-      <div class="space-y-0">
-        {events.map((event) => (
-          <div class="flex flex-col items-center py-8 border-b border-dashed last:border-0" 
-               style="border-color: var(--color-secondary); opacity: 0.8;">
-            <h3 class="text-2xl sm:text-3xl font-light tracking-tight text-center" 
-                style="color: var(--color-secondary);">
-              {event.title}
-            </h3>
-          </div>
-        ))}
-      </div>
+<<!-- Schedule1.astro - Versione Minimal-->
+<section id="schedule1" class="py-24" style="background-color: var(--color-primary);">
+  <div class="mx-auto max-w-2xl px-6">
+    <div class="space-y-0 text-center">
+      {events.map((event) => (
+        <div class="py-10 border-b border-dashed last:border-0" 
+             style="border-color: var(--color-muted);">
+          <h3 class="text-3xl font-light tracking-tight" style="color: var(--color-secondary);">
+            {event.title}
+          </h3>
+        </div>
+      ))}
     </div>
   </div>
 </section>
