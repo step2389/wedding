@@ -19,10 +19,6 @@ countdown:
   target: "2026-09-12T17:30:00+02:00"
   
 schedule:
-  title: "Cerimonia"
-  description: >
-    Segui il programma per vivere con noi ogni momento speciale — dalle promesse
-    all'ultimo brindisi sotto le stelle.
   events:
     - number:
       label: "Cerimonia"
@@ -43,7 +39,7 @@ schedule:
         - "Subito dopo la cerimonia"
         - "Cocktail e stuzzichini sulla spiaggia"
         - "Musica e convivialità"
-    - number: "03"
+    - number:
       label: "Cena"
       title: "Cena sotto le stelle"
       description: >
@@ -53,7 +49,7 @@ schedule:
         - "Inizio cena alle 19:30"
         - "Menu a base di pesce fresco"
         - "Tavoli con vista sul mare"
-    - number: "04"
+    - number: 
       label: "Festeggiamenti"
       title: "Musica e festa"
       description: >
