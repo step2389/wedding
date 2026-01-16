@@ -1,0 +1,57 @@
+---
+// src/components/WeddingList.astro
+import { getEventData } from "../data/eventData";
+const { weddingList } = getEventData();
+---
+
+<section id="wedding-list" class="py-24" style="background-color: var(--color-primary);">
+  <div class="mx-auto max-w-2xl px-6 text-center">
+    <h2 
+      class="text-3xl sm:text-4xl font-semibold tracking-[0.2em] uppercase mb-8"
+      style="color: var(--color-secondary); font-family: 'TeX Gyre Termes', serif;"
+    >
+      {weddingList.title}
+    </h2>
+    
+    <p 
+      class="text-base sm:text-lg leading-relaxed mb-12 opacity-80"
+      style="color: var(--color-secondary);"
+    >
+      {weddingList.message}
+    </p>
+
+    <div 
+      class="rounded-3xl p-8 border-2 border-dashed inline-block w-full max-w-lg"
+      style="border-color: var(--color-muted); background-color: rgba(255,255,255,0.3);"
+    >
+      <span class="block text-[10px] uppercase tracking-widest font-bold mb-2 opacity-60">IBAN</span>
+      <code id="iban-text" class="block text-sm sm:text-lg font-mono break-all mb-4 select-all" style="color: var(--color-secondary);">
+        {weddingList.iban}
+      </h2>
+      <p class="text-xs mb-6 opacity-60 italic">{weddingList.bank}</p>
+      
+      <button 
+        id="copy-btn"
+        class="px-6 py-2 rounded-full text-xs font-bold uppercase tracking-widest transition-all active:scale-95"
+        style="background-color: var(--color-secondary); color: #fff;"
+      >
+        Copia IBAN
+      </button>
+    </div>
+  </div>
+</section>
+
+<script>
+  const copyBtn = document.getElementById('copy-btn');
+  const ibanText = document.getElementById('iban-text');
+
+  if (copyBtn && ibanText) {
+    copyBtn.addEventListener('click', () => {
+      navigator.clipboard.writeText(ibanText.innerText.trim());
+      copyBtn.innerText = "Copiato!";
+      setTimeout(() => {
+        copyBtn.innerText = "Copia IBAN";
+      }, 2000);
+    });
+  }
+</script>
