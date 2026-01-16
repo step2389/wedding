@@ -6,7 +6,9 @@ import bgImage from '../assets/images/background.jpg';
 <section id="rsvp" class="relative py-16 sm:py-24 overflow-hidden">
   <!-- Sfondo Immagine coerente con Schedule -->
   <div class="absolute inset-0 z-0"
-    style={`background-image: url(${bgImage.src}); background-size: cover; background-position: center; background-attachment: scroll;`}>
+    style={`background: linear-gradient(to bottom, var(--color-primary) 0%, transparent 20%), url(${bgImage.src});
+      background-size: cover;
+      background-position: center;`}>
     <div class="absolute inset-0 bg-black/5"></div>
   </div>
 
@@ -146,14 +148,42 @@ import bgImage from '../assets/images/background.jpg';
 </section>
 
 <script>
-  document.addEventListener("DOMContentLoaded", () => {
-    const attending = document.getElementById("attending");
-    const guests = document.getElementById("guests");
-    if (attending && guests) {
-      attending.addEventListener("change", () => {
-        // @ts-ignore
-        guests.required = (attending.value === "yes");
-      });
-    }
-  });
+  // Funzione per inizializzare il comportamento del form
+  const setupRSVP = () => {
+    const attendingSelect = document.getElementById("attending") as HTMLSelectElement;
+    const guestsInput = document.getElementById("guests") as HTMLInputElement;
+
+    if (!attendingSelect || !guestsInput) return;
+
+    const updateValidation = () => {
+      // Controlliamo se il valore è "yes"
+      if (attendingSelect.value === "yes") {
+        guestsInput.required = true;
+        guestsInput.disabled = false;
+        guestsInput.placeholder = "Esempio: 2";
+        // Effetto visivo: campo attivo
+        guestsInput.style.opacity = "1";
+        guestsInput.style.cursor = "text";
+      } else {
+        // Se non partecipa, il campo ospiti non è richiesto e viene pulito
+        guestsInput.required = false;
+        guestsInput.disabled = true;
+        guestsInput.value = "";
+        guestsInput.placeholder = "N/A";
+        // Effetto visivo: campo "spento"
+        guestsInput.style.opacity = "0.4";
+        guestsInput.style.cursor = "not-allowed";
+      }
+    };
+
+    // Ascolta il cambiamento
+    attendingSelect.addEventListener("change", updateValidation);
+    
+    // Esegui al caricamento per impostare lo stato iniziale
+    updateValidation();
+  };
+
+  // Importante per Astro: esegui lo script anche dopo la navigazione se usi ViewTransitions
+  setupRSVP();
+  document.addEventListener('astro:after-swap', setupRSVP);
 </script>
