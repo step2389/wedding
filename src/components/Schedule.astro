@@ -12,27 +12,7 @@ const events = schedule.events ?? [];
     "
 >
     <div class="mx-auto w-full max-w-6xl px-4 py-24 sm:px-6 lg:px-8">
-        <div class="max-w-4xl">
-            <p
-                class="text-sm uppercase tracking-[0.35em]"
-                style="color: var(--color-muted);"
-            >
-                {schedule.eyebrow}
-            </p>
-            <h2
-                class="mt-4 text-4xl font-semibold tracking-tight sm:text-5xl lg:text-6xl"
-                style="color: var(--color-secondary);"
-            >
-                {schedule.title}
-            </h2>
-            <p
-                class="mt-6 text-lg"
-                style="color: var(--color-secondary); opacity: 0.8;"
-            >
-                {schedule.description}
-            </p>
-        </div>
-
+  
         <div class="mt-16 flex flex-col">
             {
                 events.map((event) => (
