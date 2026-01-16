@@ -3,8 +3,8 @@
 import bgImage from '../assets/images/background.jpg';
 ---
 
-<section id="rsvp" class="relative overflow-hidden py-20 min-h-[700px]">
-  <!-- Sfondo ottimizzato: rimosso 'position: fixed' che rompeva il layout -->
+<section id="rsvp" class="relative py-12 sm:py-20">
+  <!-- Sfondo che non scatta e non copre il sito -->
   <div 
     class="absolute inset-0 z-0"
     style={`
@@ -14,138 +14,85 @@ import bgImage from '../assets/images/background.jpg';
       background-attachment: scroll;
     `}
   >
-  <!-- Overlay per migliorare la leggibilità sopra l'immagine -->
-  <div class="absolute inset-0 bg-black/30 pointer-events-none"></div>
+    <div class="absolute inset-0 bg-black/20"></div>
+  </div>
 
-  <div class="relative z-10 max-w-xl mx-auto px-4 sm:px-6">
+  <div class="relative z-10 max-w-xl mx-auto px-4">
     <div 
-      class="rounded-[2.5rem] p-8 sm:p-12 shadow-2xl backdrop-blur-md"
+      class="rounded-[2rem] p-6 sm:p-10 shadow-2xl backdrop-blur-md"
       style="
-        background-color: color-mix(in srgb, var(--color-primary) 90%, white);
-        border: 1px solid color-mix(in srgb, var(--color-background), transparent 50%);
+        background-color: var(--color-primary);
+        border: 1px solid color-mix(in srgb, var(--color-secondary), transparent 80%);
       "
     >
-      <header class="text-center mb-10">
+      <header class="text-center mb-6">
         <h2 
-          class="text-3xl sm:text-4xl font-semibold tracking-widest uppercase mb-4"
+          class="text-2xl sm:text-3xl font-semibold tracking-widest uppercase mb-2"
           style="color: var(--color-secondary); font-family: 'TeX Gyre Termes', serif;"
         >
-          Conferma la tua presenza
+          Presenza
         </h2>
+        <p class="text-xs sm:text-sm" style="color: var(--color-secondary); opacity: 0.8;">
+          Conferma la tua partecipazione
+        </p>
       </header>
 
       <form
         action="https://api.web3forms.com/submit"
         method="POST"
-        class="space-y-5"
+        class="flex flex-col gap-4"
       >
         <input type="hidden" name="access_key" value="2bd3aa52-27fe-48ec-9180-a2679432af07" />
-        <input type="hidden" name="subject" value="Nuovo RSVP matrimonio" />
-        <input type="hidden" name="from_name" value="Wedding Site" />
 
-        <div class="space-y-1">
-          <label class="block text-xs uppercase tracking-wider font-medium ml-1" style="color: var(--color-secondary);">
-            Nome e cognome
-          </label>
-          <input
-            name="name"
-            type="text"
-            required
-            class="w-full rounded-2xl border-2 px-4 py-3 bg-white/10 text-white placeholder:text-white/50 focus:outline-none focus:border-[var(--color-secondary)] transition-all"
-            style="border-color: color-mix(in srgb, var(--color-secondary), transparent 70%);"
-          />
+        <div class="flex flex-col gap-1">
+          <label class="text-[10px] uppercase tracking-widest font-bold" style="color: var(--color-secondary);">Nome e cognome</label>
+          <input name="name" type="text" required class="w-full rounded-xl border border-white/20 px-4 py-2 bg-white/10 text-white focus:outline-none focus:border-white" />
         </div>
 
-        <div class="space-y-1">
-          <label class="block text-xs uppercase tracking-wider font-medium ml-1" style="color: var(--color-secondary);">
-            Email (opzionale)
-          </label>
-          <input
-            name="email"
-            type="email"
-            class="w-full rounded-2xl border-2 px-4 py-3 bg-white/10 text-white placeholder:text-white/50 focus:outline-none focus:border-[var(--color-secondary)] transition-all"
-            style="border-color: color-mix(in srgb, var(--color-secondary), transparent 70%);"
-          />
+        <div class="flex flex-col gap-1">
+          <label class="text-[10px] uppercase tracking-widest font-bold" style="color: var(--color-secondary);">Email (opzionale)</label>
+          <input name="email" type="email" class="w-full rounded-xl border border-white/20 px-4 py-2 bg-white/10 text-white focus:outline-none focus:border-white" />
         </div>
 
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div class="space-y-1">
-            <label class="block text-xs uppercase tracking-wider font-medium ml-1" style="color: var(--color-secondary);">
-              Parteciperai?
-            </label>
-            <select
-              id="attending"
-              name="attending"
-              required
-              class="w-full rounded-2xl border-2 px-4 py-3 bg-white/10 text-white focus:outline-none focus:border-[var(--color-secondary)] transition-all appearance-none"
-              style="border-color: color-mix(in srgb, var(--color-secondary), transparent 70%);"
-            >
-              <option value="yes" class="text-black">Sì, ci sarò</option>
-              <option value="no" class="text-black">Purtroppo no</option>
+        <div class="grid grid-cols-2 gap-3">
+          <div class="flex flex-col gap-1">
+            <label class="text-[10px] uppercase tracking-widest font-bold" style="color: var(--color-secondary);">Parteciperai?</label>
+            <select id="attending" name="attending" required class="w-full rounded-xl border border-white/20 px-4 py-2 bg-white/10 text-white appearance-none">
+              <option value="yes" class="text-black">Sì</option>
+              <option value="no" class="text-black">No</option>
             </select>
           </div>
-
-          <div class="space-y-1">
-            <label class="block text-xs uppercase tracking-wider font-medium ml-1" style="color: var(--color-secondary);">
-              Numero persone
-            </label>
-            <input
-              id="guests"
-              name="guests"
-              type="number"
-              min="1"
-              class="w-full rounded-2xl border-2 px-4 py-3 bg-white/10 text-white placeholder:text-white/50 focus:outline-none focus:border-[var(--color-secondary)] transition-all"
-              style="border-color: color-mix(in srgb, var(--color-secondary), transparent 70%);"
-            />
+          <div class="flex flex-col gap-1">
+            <label class="text-[10px] uppercase tracking-widest font-bold" style="color: var(--color-secondary);">Ospiti</label>
+            <input id="guests" name="guests" type="number" min="1" class="w-full rounded-xl border border-white/20 px-4 py-2 bg-white/10 text-white" />
           </div>
-        </div>       
-
-        <div class="space-y-1">
-          <label class="block text-xs uppercase tracking-wider font-medium ml-1" style="color: var(--color-secondary);">
-            Allergie o Note
-          </label>
-          <textarea
-            name="notes"
-            rows="3"
-            placeholder="Es: intolleranze alimentari..."
-            class="w-full rounded-2xl border-2 px-4 py-3 bg-white/10 text-white placeholder:text-white/50 focus:outline-none focus:border-[var(--color-secondary)] transition-all"
-            style="border-color: color-mix(in srgb, var(--color-secondary), transparent 70%);"
-          ></textarea>
         </div>
 
-        <input type="hidden" name="redirect" value="https://wedding-anna-stefano.penz23.org/grazie" />
+        <div class="flex flex-col gap-1">
+          <label class="text-[10px] uppercase tracking-widest font-bold" style="color: var(--color-secondary);">Note</label>
+          <textarea name="notes" rows="2" class="w-full rounded-xl border border-white/20 px-4 py-2 bg-white/10 text-white"></textarea>
+        </div>
 
         <button
           type="submit"
-          class="mt-6 w-full py-4 rounded-full text-sm font-bold uppercase tracking-[0.2em] shadow-xl hover:scale-[1.02] active:scale-[0.98] transition-all"
-          style="
-            background-color: var(--color-secondary);
-            color: var(--color-primary);
-          "
+          class="mt-2 w-full py-3 rounded-full text-xs font-bold uppercase tracking-widest transition-transform active:scale-95 shadow-lg"
+          style="background-color: var(--color-secondary); color: var(--color-primary);"
         >
           Invia conferma
         </button>
+
+        <input type="hidden" name="redirect" value="https://wedding-anna-stefano.penz23.org/grazie" />
       </form>
     </div>
   </div>
-
-  <script>
-    const attending = document.getElementById("attending");
-    const guests = document.getElementById("guests");
-
-    function updateGuestsRequirement() {
-      if (attending.value === "yes") {
-        guests.required = true;
-        guests.min = 1;
-        guests.parentElement.style.opacity = "1";
-      } else {
-        guests.required = false;
-        guests.value = "";
-        guests.parentElement.style.opacity = "0.5";
-      }
-    }
-
-    attending.addEventListener("change", updateGuestsRequirement);
-    updateGuestsRequirement();
-  </script>
 </section>
+
+<script>
+  const attending = document.getElementById("attending");
+  const guests = document.getElementById("guests");
+  if (attending && guests) {
+    attending.addEventListener("change", () => {
+      guests.required = (attending.value === "yes");
+    });
+  }
+</script>
