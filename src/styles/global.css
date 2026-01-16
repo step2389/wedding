@@ -44,7 +44,7 @@
     }
 
     body {
-        */font-family: 'TeX Gyre Termes', serif;*/
+        /*font-family: 'TeX Gyre Termes', serif;*/
          font-family: "Montserrat", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
         background-color: var(--color-background);
         color: var(--color-text);
