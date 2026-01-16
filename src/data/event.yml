@@ -22,10 +22,9 @@ schedule:
   events:
     - title: "Rito civile in riva al mare ore 17:30"
     - title: "A seguire cena e festa sotto le stelle"
-
-      
-cards:
-  - imageAlt: "Wishlist"
-    title: "Lista nozze"
-    description: "Scopri la nostra lista dei desideri e aiutaci a iniziare questo nuovo capitolo."
-    href: "/ListaNozze"
+     
+weddingList:
+  title: "Lista Nozze"
+  message: "La vostra presenza è per noi il dono più grande. Se però desiderate contribuire al nostro inizio insieme o al nostro viaggio, potete farlo qui:"
+  iban: "IT 00 X 00000 00000 000000000000"
+  bank: "BCC"
