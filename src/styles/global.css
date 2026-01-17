@@ -50,7 +50,7 @@
 
     body {
         /*font-family: 'TeX Gyre Termes', serif;*/
-         font-family: "Playfair Display", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+         font-family: sans-serif, "Playfair Display", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
         background-color: var(--color-background);
         color: var(--color-text);
     }
@@ -58,7 +58,7 @@
 
 h1,h2, h3, h4, h5 {
   /*font-family: 'TeX Gyre Termes', serif;*/
-font-family: "Playfair Display", "Times New Roman", serif;
+font-family: sans-serif,"Playfair Display", "Times New Roman", serif;
 }
     .section {
         min-height: 100vh;
