@@ -1,0 +1,72 @@
+---
+// src/pages/location.astro
+import Layout from "../layouts/Layout.astro";
+import Menu from "../components/Menu.astro";
+import Footer from "../components/Footer.astro";
+
+const beachName = "Sabbia e Sale Feeling Beach";
+const address = "Via Atlantico, 36, 30015 Isola Verde, Chioggia (VE)";
+const mapsLink = "https://maps.app.goo.gl/rSsUfWzTDyMiEFTTA";
+const siteLink = "https://www.sabbiaesale.it/isolaverde-chioggia/";
+---
+
+<Layout title="Location - Anna & Stefano">
+  <Menu />
+  
+  <main class="py-24" style="background: linear-gradient(to bottom, var(--color-primary) 50%, var(--color-watercolor) 100%);">
+    <section class="max-w-4xl mx-auto px-6 space-y-12 pt-10">
+      
+      <header class="text-center space-y-3">
+        <p class="text-[10px] uppercase tracking-[0.4em] opacity-60" style="color: var(--color-secondary);">
+          La Location
+        </p>
+        <h1 class="text-4xl md:text-5xl font-semibold tracking-tight" style="color: var(--color-secondary); font-family: 'TeX Gyre Termes', serif;">
+          Sabbia e Sale
+        </h1>
+        <p class="text-sm opacity-80 italic" style="color: var(--color-secondary);">
+          Feeling Beach — Isola Verde di Chioggia
+        </p>
+          
+      </header>
+
+      <!-- Box Indirizzo e Pulsanti -->
+      <section
+        class="rounded-[2.5rem] p-8 md:p-12 shadow-2xl backdrop-blur-md border flex flex-col items-center gap-8"
+        style="
+          background: color-mix(in srgb, var(--color-primary) 50%, transparent);
+          border-color: rgba(255,255,255,0.3);
+        "
+      >
+        <div class="space-y-2 text-center">
+          <p class="text-base md:text-xl font-medium" style="color: var(--color-secondary);">
+            {address}
+          </p>
+          <p class="text-sm  font-medium" style="color: var(--color-secondary);">
+          Ampio parcheggio fronte spiaggia per tutti gli invitati
+          </p>          
+        </div>
+
+        <div class="flex flex-col sm:flex-row gap-4 w-full justify-center">
+          <a
+            href={mapsLink}
+            target="_blank"
+            class="px-10 py-4 rounded-full text-[10px] font-bold uppercase tracking-[0.2em] text-center shadow-lg transition-transform active:scale-95"
+            style="background-color: var(--color-secondary); color: #ffffff;"
+          >
+            Apri in Google Maps
+          </a>
+          <a
+            href={siteLink}
+            target="_blank"
+            class="px-10 py-4 rounded-full text-[10px] font-bold uppercase tracking-[0.2em] text-center border transition-all hover:bg-white/10"
+            style="border-color: var(--color-secondary); color: var(--color-secondary);"
+          >
+            Sito Web Ufficiale
+          </a>
+        </div>
+      </section>
+
+
+    </section>
+  </main>
+</Layout>

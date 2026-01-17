@@ -4,70 +4,82 @@ import { getEventData } from "../data/eventData";
 const { weddingList } = getEventData();
 ---
 
-<section id="wedding-list" class="py-24" style="background: linear-gradient(to bottom, var(--color-primary) 50%, var(--color-watercolor) 100%);">
-  <div class="mx-auto max-w-2xl px-6 text-center">
+<section id="wedding-list" class="relative py-24 overflow-hidden" 
+  style="background: linear-gradient(to bottom, var(--color-primary) 40%, var(--color-watercolor) 100%);">
+  
+  <div class="mx-auto max-w-3xl px-6 text-center">
+    
+    <!-- Icona Simbolica: Aeroplanino di Carta -->
+    <div class="mb-8 flex justify-center opacity-40">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="0.8" stroke="currentColor" class="size-14">
+        <path stroke-linecap="round" stroke-linejoin="round" d="m20.893 13.393-1.135-1.135a2.252 2.252 0 0 1-.421-.585l-1.08-2.16a.414.414 0 0 0-.663-.107.827.827 0 0 1-.812.21l-1.273-.363a.89.89 0 0 0-.738 1.595l.587.39c.59.395.674 1.23.172 1.732l-.2.2c-.212.212-.33.498-.33.796v.41c0 .409-.11.809-.32 1.158l-1.315 2.191a2.11 2.11 0 0 1-1.81 1.025 1.055 1.055 0 0 1-1.055-1.055v-1.172c0-.92-.56-1.747-1.414-2.089l-.655-.261a2.25 2.25 0 0 1-1.383-2.46l.007-.042a2.25 2.25 0 0 1 .29-.787l.09-.15a2.25 2.25 0 0 1 2.37-1.048l1.178.236a1.125 1.125 0 0 0 1.302-.795l.208-.73a1.125 1.125 0 0 0-.578-1.315l-.665-.332-.091.091a2.25 2.25 0 0 1-1.591.659h-.18c-.249 0-.487.1-.662.274a.931.931 0 0 1-1.458-1.137l1.411-2.353a2.25 2.25 0 0 0 .286-.76m11.928 9.869A9 9 0 0 0 8.965 3.525m11.928 9.868A9 9 0 1 1 8.965 3.525" />
+      </svg>
+    </div>
+
     <h2 
-      class="text-3xl sm:text-4xl font-semibold tracking-[0.2em] uppercase mb-8"
+      class="text-3xl sm:text-4xl font-semibold tracking-[0.2em] uppercase mb-6"
       style="color: var(--color-secondary); font-family: 'TeX Gyre Termes', serif;"
     >
       {weddingList.title}
     </h2>
     
-    <p 
-      class="text-base sm:text-lg leading-relaxed mb-12 opacity-80"
-      style="color: var(--color-secondary);"
-    >
-      {weddingList.message}
-    </p>
+    <div class="max-w-xl mx-auto mb-12">
+      <p class="text-base sm:text-lg italic leading-relaxed mb-4" style="color: var(--color-secondary); font-family: 'TeX Gyre Termes', serif;">
+        "Il viaggio è l'unica cosa che compri e ti rende più ricco"
+      </p>
+      <p class="text-sm leading-relaxed opacity-80" style="color: var(--color-secondary);">
+        {weddingList.message}
+      </p>
+    </div>
 
+    <!-- Box IBAN Stile Cartolina -->
     <div 
-    class="rounded-3xl p-8 border-2 border-dashed inline-block w-full max-w-lg"
-    style="border-color: var(--color-muted); background-color: rgba(255,255,255,0.2);"
-  >
-      <span class="block text-[10px] uppercase tracking-widest font-bold mb-2 opacity-60">IBAN</span>
-      
-      <!-- Usiamo uno span dedicato solo al testo dell'IBAN -->
-      <code class="block text-sm sm:text-lg font-mono break-all mb-4" style="color: var(--color-secondary);">
-        <span id="iban-to-copy">{weddingList.iban}</span>
-      </code>
-      
-      <p class="text-xs mb-6 opacity-60 italic">{weddingList.name}</p>
-      
-      <button 
-        id="copy-btn"
-        class="px-8 py-3 rounded-full text-[10px] font-bold uppercase tracking-widest transition-all active:scale-95 shadow-md"
-        style="background-color: var(--color-secondary); color: #fff;"
-      >
-        Copia IBAN
-      </button>
+      class="rounded-[2.5rem] p-10 shadow-2xl backdrop-blur-md border border-white/30 transition-transform hover:scale-[1.01]"
+      style="
+        background-color: rgba(255, 255, 255, 0.4); 
+        display: inline-block; 
+        width: 100%; 
+        max-width: 500px;
+      "
+    >
+      <div class="flex flex-col items-center">
+        <span class="text-[9px] uppercase tracking-[0.4em] mb-4 opacity-50" style="color: var(--color-secondary);">Coordinate Bancarie</span>
+        
+        <div class="bg-white/40 rounded-2xl px-4 py-6 mb-6 w-full border border-dashed border-[var(--color-muted)]">
+          <code class="block text-sm sm:text-base font-mono tracking-tighter" style="color: var(--color-secondary);">
+            <span id="iban-to-copy">{weddingList.iban}</span>
+          </code>
+          <p class="mt-2 text-[10px] uppercase tracking-widest opacity-60" style="color: var(--color-secondary);">{weddingList.name}</p>
+        </div>
+
+        <button 
+          id="copy-btn"
+          class="group relative px-10 py-4 rounded-full text-[10px] font-bold uppercase tracking-[0.2em] overflow-hidden transition-all shadow-lg active:scale-95"
+          style="background-color: var(--color-secondary); color: #fff;"
+        >
+          <span class="relative z-10">Copia IBAN</span>
+          <div class="absolute inset-0 bg-white/10 translate-y-full group-hover:translate-y-0 transition-transform"></div>
+        </button>
+      </div>
     </div>
   </div>
 </section>
 
 <script>
-  // Funzione isolata per evitare interferenze
   const setupCopy = () => {
     const btn = document.getElementById('copy-btn');
     const text = document.getElementById('iban-to-copy');
 
     if (btn && text) {
       btn.onclick = () => {
-        const iban = text.innerText.trim();
-        navigator.clipboard.writeText(iban).then(() => {
-          const originalText = btn.innerText;
+        navigator.clipboard.writeText(text.innerText.trim()).then(() => {
+          const originalText = btn.innerHTML;
           btn.innerText = "Copiato!";
-          btn.style.backgroundColor = "#4ade80"; // Diventa verde temporaneamente
-          
-          setTimeout(() => {
-            btn.innerText = originalText;
-            btn.style.backgroundColor = "var(--color-secondary)";
-          }, 2000);
+          setTimeout(() => { btn.innerHTML = originalText; }, 2000);
         });
       };
     }
   };
-
   setupCopy();
-  // Necessario se usi ViewTransitions di Astro
   document.addEventListener('astro:after-swap', setupCopy);
 </script>

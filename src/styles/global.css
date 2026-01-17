@@ -151,6 +151,24 @@ font-family: "Playfair Display", "Times New Roman", serif;
     }
 }
 
+/* Stile per i numeri del countdown */
+.countdown-value {
+  font-family: var(--font-sans), sans-serif; /* Usiamo Inter o un sans-serif pulito */
+  font-variant-numeric: tabular-nums; /* Mantiene i numeri allineati */
+  font-weight: 300; /* Più sottile per un look elegante */
+  letter-spacing: -0.02em;
+  transition: all 0.3s ease;
+}
+
+/* Animazione di cambio numero */
+@keyframes pulse-change {
+  0% { opacity: 0.4; transform: translateY(-2px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+.number-animate {
+  animation: pulse-change 0.4s ease-out;
+}
 
 /* Gradient Overlay - Reusable */
 .hero-with-bg-image {

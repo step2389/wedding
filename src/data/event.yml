@@ -8,7 +8,7 @@ hero:
     Insieme alla loro piccola Giorgia, saranno felici di avervi accanto per trasformare questo giorno in un ricordo indimenticabile
   weekday: Sabato
   dateDisplay: 12 SETTEMBRE 2026
-  location: "Sabbia e Sale Feeling Beach Chioggia"
+  location: "Sabbia & Sale Feeling Beach Chioggia"
 
 countdown:
   label: "Conto alla rovescia"
@@ -24,7 +24,7 @@ schedule:
     - title: "A seguire cena e festa sotto le stelle"
      
 weddingList:
-  title: "Lista Nozze"
-  message: "La vostra presenza è per noi il regalo più grande. Se però desiderate contribuire al nostro inizio insieme o al nostro viaggio, potete farlo qui:"
+  title: "Viaggio di Nozze"
+  message: "La vostra presenza è per noi il regalo più grande. Se però desiderate contribuire al nostro viaggio, potete farlo qui:"
   iban: "IT30A0880720901000000046944"
   name: "Penzo Stefano, Nericcio Anna"

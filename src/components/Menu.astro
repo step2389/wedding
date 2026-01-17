@@ -1,88 +1,85 @@
 ---
 // src/components/Menu.astro
 const links = [
-  { href: "#hero", label: "Home" },
-  { href: "#schedule1", label: "Programma" },
-  { href: "#rsvp", label: "Partecipa" },
-  { href: "#wedding-list", label: "Lista Nozze" },
+  { href: "/", label: "Home" },
+  { href: "/#schedule1", label: "Evento" },
+  { href: "/#rsvp", label: "Partecipa" },
+  { href: "/location", label: "Location" },
+  { href: "/#wedding-list", label: "Viaggio di nozze" },
 ];
 ---
 
-<!-- Bottone Hamburger più piccolo e defilato -->
-<div class="fixed top-4 right-4 z-[100]">
-  <button id="menu-open" 
-          class="p-2.5 rounded-full backdrop-blur-md shadow-md transition-all active:scale-90 border border-white/30" 
-          style="background: linear-gradient(135deg, rgba(253, 249, 243, 0.8) 0%, rgba(185, 216, 235, 0.8) 100%);"
-          aria-label="Apri Menu">
-    <div class="flex flex-col gap-1 w-5">
-      <span class="w-full h-0.5 rounded-full" style="background-color: var(--color-secondary);"></span>
-      <span class="w-full h-0.5 rounded-full" style="background-color: var(--color-secondary);"></span>
-      <span class="w-full h-0.5 rounded-full" style="background-color: var(--color-secondary);"></span>
-    </div>
-  </button>
-</div>
+<!-- Tasto Hamburger Fluttuante -->
+<button 
+  id="menu-open" 
+  class="fixed top-6 right-6 z-[999] p-3 rounded-full backdrop-blur-md shadow-lg border border-white/30"
+  style="background: linear-gradient(135deg, rgba(253, 249, 243, 0.9) 0%, rgba(185, 216, 235, 0.9) 100%);"
+>
+  <div class="flex flex-col gap-1.5 w-6 pointer-events-none">
+    <span class="w-full h-0.5 rounded-full" style="background-color: var(--color-secondary);"></span>
+    <span class="w-full h-0.5 rounded-full" style="background-color: var(--color-secondary);"></span>
+    <span class="w-full h-0.5 rounded-full" style="background-color: var(--color-secondary);"></span>
+  </div>
+</button>
 
-<!-- Overlay (Invariato) -->
-<div id="menu-overlay" class="fixed inset-0 bg-black/5 z-[110] hidden backdrop-blur-sm transition-opacity"></div>
+<!-- Overlay e Sidebar -->
+<div id="menu-overlay" class="fixed inset-0 bg-black/20 z-[1000] hidden backdrop-blur-sm"></div>
 
-<!-- Sidebar (Invariata) -->
-<div id="side-menu" 
-     class="fixed top-0 right-0 h-full w-[260px] z-[120] translate-x-full transition-transform duration-500 ease-out shadow-2xl border-l border-white/20"
-     style="background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-watercolor) 100%);">
-  
+<div 
+  id="side-menu" 
+  class="fixed top-0 right-0 h-full w-[280px] z-[1001] translate-x-full transition-transform duration-500 ease-in-out shadow-2xl"
+  style="background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-watercolor) 100%);"
+>
   <div class="flex flex-col h-full">
     <div class="flex justify-end p-6">
-      <button id="menu-close" class="p-2 text-3xl font-light" style="color: var(--color-secondary); line-height: 1;">&times;</button>
+      <button id="menu-close" class="p-2 text-4xl font-light cursor-pointer" style="color: var(--color-secondary);">&times;</button>
     </div>
 
-    <nav class="flex flex-col px-8 gap-7 mt-2">
-      <div class="mb-2 opacity-40 uppercase tracking-[0.4em] text-[8px]" style="color: var(--color-secondary);">Navigazione</div>
+    <nav class="flex flex-col px-8 gap-8 mt-4">
       {links.map((link) => (
-        <a href={link.href} 
-           class="menu-link text-[11px] uppercase tracking-[0.2em] font-bold py-1 border-b" 
-           style="color: var(--color-secondary); border-color: color-mix(in srgb, var(--color-secondary), transparent 90%);">
+        <a href={link.href} class="menu-link text-[11px] uppercase tracking-[0.2em] font-bold border-b pb-4" style="color: var(--color-secondary); border-color: color-mix(in srgb, var(--color-muted), transparent 50%);">
           {link.label}
         </a>
       ))}
     </nav>
-
-    <div class="mt-auto p-10 text-center">
-      <span class="text-3xl uppercase tracking-widest block mb-1" style="font-family: 'Burgues Script', cursive; color: var(--color-secondary);">
-        A • S
-      </span>
-      <p class="text-[7px] uppercase tracking-[0.3em] opacity-40" style="color: var(--color-secondary);">12 . 09 . 26</p>
-    </div>
   </div>
 </div>
 
-<script>
-  const initMenu = () => {
-    const openBtn = document.getElementById('menu-open');
-    const closeBtn = document.getElementById('menu-close');
+<script is:inline>
+  // Funzione unica di chiusura
+  function closeWeddingMenu() {
     const sideMenu = document.getElementById('side-menu');
     const overlay = document.getElementById('menu-overlay');
-    const links = document.querySelectorAll('.menu-link');
+    if (sideMenu) sideMenu.classList.add('translate-x-full');
+    if (overlay) overlay.classList.add('hidden');
+    document.body.style.overflow = '';
+  }
 
-    const toggleMenu = (isOpen: boolean) => {
-      if (sideMenu && overlay) {
-        if (isOpen) {
-          sideMenu.classList.remove('translate-x-full');
-          overlay.classList.remove('hidden');
-          document.body.style.overflow = 'hidden';
-        } else {
-          sideMenu.classList.add('translate-x-full');
-          overlay.classList.add('hidden');
-          document.body.style.overflow = '';
-        }
-      }
-    };
+  // Funzione unica di apertura
+  function openWeddingMenu() {
+    const sideMenu = document.getElementById('side-menu');
+    const overlay = document.getElementById('menu-overlay');
+    if (sideMenu) sideMenu.classList.remove('translate-x-full');
+    if (overlay) overlay.classList.remove('hidden');
+    document.body.style.overflow = 'hidden';
+  }
 
-    openBtn?.addEventListener('click', () => toggleMenu(true));
-    closeBtn?.addEventListener('click', () => toggleMenu(false));
-    overlay?.addEventListener('click', () => toggleMenu(false));
-    links.forEach(link => link.addEventListener('click', () => toggleMenu(false)));
-  };
+  // Delegazione degli eventi: ascoltiamo tutto il documento una sola volta
+  document.addEventListener('click', (event) => {
+    const target = event.target;
 
-  initMenu();
-  document.addEventListener('astro:after-swap', initMenu);
+    // Se clicco il tasto apri
+    if (target.closest('#menu-open')) {
+      openWeddingMenu();
+      return;
+    }
+
+    // Se clicco il tasto chiudi, l'overlay o un link del menu
+    if (target.closest('#menu-close') || target.closest('#menu-overlay') || target.closest('.menu-link')) {
+      closeWeddingMenu();
+    }
+  });
+
+  // Per sicurezza, assicuriamoci che il menu sia chiuso al cambio pagina
+  document.addEventListener('astro:after-swap', closeWeddingMenu);
 </script>

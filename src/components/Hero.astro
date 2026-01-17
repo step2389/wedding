@@ -1,4 +1,4 @@
-s---
+---
 import { getEventData } from "../data/eventData";
 const { hero, countdown } = getEventData();
 import bgImage from '../assets/Background.jpg';
@@ -48,7 +48,7 @@ const eventLocation = countdown.location;
             </div>
 
             <!-- COUNTDOWN -->
-            <div class="mt-6 flex flex-col items-center justify-center md:items-center gap-4 pt-10">
+            <div class="mt-4 flex flex-col items-center justify-center md:items-center gap-4 pt-10">
                 <p class="text-[11px] uppercase tracking-[0.35em] text-[var(--color-text-dark)] opacity-80">
                     {eventLabel}
                 </p>
@@ -77,32 +77,30 @@ const eventLocation = countdown.location;
                 </p>
             </div>
 
+            <div class="mt-2 flex flex-col items-center gap-4">
+                
+                <a 
+                    href="https://calendar.google.com/calendar/render?action=TEMPLATE&text=Matrimonio+Anna+%26+Stefano&dates=20260912T153000Z/20260912T233000Z&details=Non+vediamo+l%27ora+di+festeggiare+con+voi%21&location=Sabbia+%26+Sale+Feeling+Beach%2C+Chioggia"
+                    target="_blank"
+                    class="inline-flex items-center gap-2 px-6 py-3 rounded-full border transition-all hover:bg-white/10 active:scale-95"
+                    style="border-color: var(--color-muted); color: var(--color-secondary);"
+                >
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                    <line x1="16" y1="2" x2="16" y2="6"></line>
+                    <line x1="8" y1="2" x2="8" y2="6"></line>
+                    <line x1="3" y1="10" x2="21" y2="10"></line>
+                    </svg>
+                    <span class="text-[10px] uppercase tracking-widest font-bold">Salva l'evento</span>
+                </a>
+                </div>
+
         </div>
     </div>
 </section>
 
-<script>
-   /* import gsap from "gsap";
-    import { ScrambleTextPlugin } from "gsap/ScrambleTextPlugin";
-    gsap.registerPlugin(ScrambleTextPlugin);
-
-        requestAnimationFrame(() => {
-                    const heading = document.querySelector("#hero-heading");
-                            if (!heading) return;
-                                    const targetText =
-                                                heading.dataset.heroTitle ?? heading.textContent ?? "";
-                                                        gsap.to(heading, {
-                                                                    scrambleText: {
-                                                                                    text: targetText,
-                                                                                                    revealDelay: 0.2,
-                                                                                                                    tweenLength: true,
-                                                                                                                                },
-                                                                                                                                            ease: "power2.inOut",
-                                                                                                                                                        overwrite: "auto",
-                                                                                                                                                                    duration: 1,
-                                                                                                                                                                            });
-  */                                                                                                                                                                  
-
+<script type="module">
+                                                                                                                                                                
     // LOGICA COUNTDOWN
     const initCountdown = () => {
         const root = document.querySelector("[data-countdown]");
