@@ -63,6 +63,13 @@ export interface CountdownContent {
   location: string;
 }
 
+export interface WeddingListContent {
+  title: string;
+  message: string;
+  iban: string;
+  name: string;
+}
+
 export interface EventContent {
   hero: HeroContent;
   story: StoryContent;
@@ -70,6 +77,7 @@ export interface EventContent {
   gallery: GalleryContent;
   cards: CardContent[];
   countdown: CountdownContent;
+  weddingList: WeddingListContent;
 }
 
 const parsedEventData = yaml.parse(eventSource) as EventContent;

@@ -26,11 +26,17 @@
 :root {
     /*color-scheme: light;
     background-color: var(--color-background);*/
---color-primary: #f2e9e1; /* Un beige più caldo e naturale, simile alla sabbia dell'Hero */
-  --color-muted: #d9c8ba;   /* Bordi leggermente più scuri per farli risaltare sul nuovo sabbia */
-  --color-secondary: #2C4A52;  /* Blu Ottanio scuro (Sea Glass) per i testi e titoli */
-  --color-accent: #D4A373;     /* Sabbia Dorata per bottoni o icone */
-  --color-background: #FDF9F3; 
+   /* --color-primary: #f2e9e1; /* Un beige più caldo e naturale, simile alla sabbia dell'Hero */
+   /*  --color-muted: #d9c8ba;   /* Bordi leggermente più scuri per farli risaltare sul nuovo sabbia */
+   /*  --color-secondary: #2C4A52;  /* Blu Ottanio scuro (Sea Glass) per i testi e titoli */
+   /*  --color-background: #FDF9F3; */
+   /*   --color-primary: #EDE4D8;      /* Sabbia più calda e dorata */
+  --color-secondary: #3A5A5C;    /* Ottanio leggermente più chiaro */
+  --color-muted: #D4C4B0;        /* Bordi tortora */
+  --color-background: #F5EDE3;   /* Sfondo generale ancora più avvolgente */
+    --color-accent: #D4A373;     /* Sabbia Dorata per bottoni o icone */
+  --color-primary: #f2e9e1; /* Sabbia */
+  --color-watercolor: #b9d8eb; /* Azzurro acquerello dall'invito */
     --color-text-dark: #000000;
     --color-text-light: #cdebfc;
 }

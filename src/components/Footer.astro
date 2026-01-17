@@ -1,33 +1,30 @@
-<footer
-    class="border-t px-6 py-16"
-    style="
-        border-color: var(--color-secondary);
-        background-color: var(--color-primary);
-        color: var(--color-background);
-    "
-        <div
-            class="text-sm font-semibold uppercase tracking-[0.35em]"
-            style="color: var(--color-secondary);"
-        >
-            Made with love — see you on the dance floor 💍
-        </div>
-</footer>
+---
+// src/components/Footer.astro
+const year = new Date().getFullYear();
+---
 
-<style>
-    .scrolling-text {
-        overflow: hidden;
-        display: flex;
-        align-items: center;
-    }
-    .scrolling-text .rail {
-        display: flex;
-    }
-    .scrolling-text .rail h4 {
-        white-space: nowrap;
-        font-size: 100px;
-        font-weight: 900;
-        letter-spacing: ls(120);
-        line-height: 1em;
-        margin: 0 30px 0 0;
-    }
-</style>
+<footer class="py-10 border-t" style="background: linear-gradient(135deg, var(--color-primary) 30%, var(--color-watercolor) 100%);
+    border-color: var(--color-muted);">
+  <div class="max-w-4xl mx-auto px-6 text-center">
+    
+    <!-- Iniziali e Data (tutto su una riga per risparmiare spazio) -->
+    <div class="flex flex-col items-center gap-2 mb-6">
+      <span class="text-4xl uppercase tracking-widest" style="font-family: 'Burgues Script', cursive; color: var(--color-secondary);">
+        A & S
+      </span>
+      <p class="text-[9px] uppercase tracking-[0.3em] opacity-50" style="color: var(--color-secondary);">
+        12.09.2026 — Chioggia
+      </p>
+    </div>
+
+    <!-- Frase e Credits compatti -->
+    <div class="space-y-1">
+      <p class="text-[10px] uppercase tracking-widest font-bold opacity-70" style="color: var(--color-secondary);">
+         Ci vediamo tra la sabbia e il sole
+      </p>
+      <p class="text-[8px] opacity-30 uppercase tracking-tighter" style="color: var(--color-secondary);">
+        &copy; {year} Anna & Stefano
+      </p>
+    </div>
+  </div>
+</footer>

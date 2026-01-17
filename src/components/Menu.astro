@@ -1,80 +1,88 @@
 ---
+// src/components/Menu.astro
 const links = [
   { href: "#hero", label: "Home" },
-  { href: "#schedule", label: "Cerimonia" },
-  { href: "#rsvp", label: "RSVP" },
-  { href: "#cards", label: "Lista nozze" },
+  { href: "#schedule1", label: "Programma" },
+  { href: "#rsvp", label: "Partecipa" },
+  { href: "#wedding-list", label: "Lista Nozze" },
 ];
 ---
 
-<header class="fixed top-0 left-0 right-0 z-50 px-4 py-2 flex items-center justify-between bg-[var(--color-background)]/90 backdrop-blur">
-    <div class="text-sm tracking-[0.25em] uppercase text-[#6c645b]" style="font-family: 'Burgues Script', cursive; font-size: 1.5rem">
-        A & S    
+<!-- Bottone Hamburger più piccolo e defilato -->
+<div class="fixed top-4 right-4 z-[100]">
+  <button id="menu-open" 
+          class="p-2.5 rounded-full backdrop-blur-md shadow-md transition-all active:scale-90 border border-white/30" 
+          style="background: linear-gradient(135deg, rgba(253, 249, 243, 0.8) 0%, rgba(185, 216, 235, 0.8) 100%);"
+          aria-label="Apri Menu">
+    <div class="flex flex-col gap-1 w-5">
+      <span class="w-full h-0.5 rounded-full" style="background-color: var(--color-secondary);"></span>
+      <span class="w-full h-0.5 rounded-full" style="background-color: var(--color-secondary);"></span>
+      <span class="w-full h-0.5 rounded-full" style="background-color: var(--color-secondary);"></span>
+    </div>
+  </button>
+</div>
+
+<!-- Overlay (Invariato) -->
+<div id="menu-overlay" class="fixed inset-0 bg-black/5 z-[110] hidden backdrop-blur-sm transition-opacity"></div>
+
+<!-- Sidebar (Invariata) -->
+<div id="side-menu" 
+     class="fixed top-0 right-0 h-full w-[260px] z-[120] translate-x-full transition-transform duration-500 ease-out shadow-2xl border-l border-white/20"
+     style="background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-watercolor) 100%);">
+  
+  <div class="flex flex-col h-full">
+    <div class="flex justify-end p-6">
+      <button id="menu-close" class="p-2 text-3xl font-light" style="color: var(--color-secondary); line-height: 1;">&times;</button>
     </div>
 
-  <button id="menu-btn" class="w-8 h-8 flex flex-col justify-between">
-    <span class="h-[2px] bg-[#3c3a35] rounded"></span>
-    <span class="h-[2px] bg-[#3c3a35] rounded"></span>
-    <span class="h-[2px] bg-[#3c3a35] rounded"></span>
-  </button>
-</header>
-
-<nav
-  id="menu"
-  class="fixed inset-y-0 right-0 w-64 bg-[var(--color-background)]/90 shadow-lg
-         transform translate-x-full transition-transform z-40 pt-20 px-6"
->
-  <ul class="space-y-4 text-[15px]">
-    {links.map((link) => (
-      <li>
-        <a
-          href={link.href}
-          class="block py-2 text-[#3c3a35] tracking-[0.15em] uppercase"
-        >
+    <nav class="flex flex-col px-8 gap-7 mt-2">
+      <div class="mb-2 opacity-40 uppercase tracking-[0.4em] text-[8px]" style="color: var(--color-secondary);">Navigazione</div>
+      {links.map((link) => (
+        <a href={link.href} 
+           class="menu-link text-[11px] uppercase tracking-[0.2em] font-bold py-1 border-b" 
+           style="color: var(--color-secondary); border-color: color-mix(in srgb, var(--color-secondary), transparent 90%);">
           {link.label}
         </a>
-      </li>
-    ))}
-  </ul>
-</nav>
+      ))}
+    </nav>
+
+    <div class="mt-auto p-10 text-center">
+      <span class="text-3xl uppercase tracking-widest block mb-1" style="font-family: 'Burgues Script', cursive; color: var(--color-secondary);">
+        A & S
+      </span>
+      <p class="text-[7px] uppercase tracking-[0.3em] opacity-40" style="color: var(--color-secondary);">12 . 09 . 26</p>
+    </div>
+  </div>
+</div>
 
 <script>
-  document.addEventListener("DOMContentLoaded", () => {
-    const btn = document.getElementById("menu-btn");
-    const menu = document.getElementById("menu");
+  const initMenu = () => {
+    const openBtn = document.getElementById('menu-open');
+    const closeBtn = document.getElementById('menu-close');
+    const sideMenu = document.getElementById('side-menu');
+    const overlay = document.getElementById('menu-overlay');
+    const links = document.querySelectorAll('.menu-link');
 
-    function openMenu() {
-      menu.classList.remove("translate-x-full");
-    }
-
-    function closeMenu() {
-      menu.classList.add("translate-x-full");
-    }
-
-    btn.addEventListener("click", () => {
-      // se è chiuso, apri; se è aperto, chiudi
-      if (menu.classList.contains("translate-x-full")) {
-        openMenu();
-      } else {
-        closeMenu();
+    const toggleMenu = (isOpen: boolean) => {
+      if (sideMenu && overlay) {
+        if (isOpen) {
+          sideMenu.classList.remove('translate-x-full');
+          overlay.classList.remove('hidden');
+          document.body.style.overflow = 'hidden';
+        } else {
+          sideMenu.classList.add('translate-x-full');
+          overlay.classList.add('hidden');
+          document.body.style.overflow = '';
+        }
       }
-    });
+    };
 
-    // Chiudi quando clicchi un link del menu
-    menu.addEventListener("click", (e) => {
-      if (e.target.tagName === "A") {
-        closeMenu();
-      }
-    });
+    openBtn?.addEventListener('click', () => toggleMenu(true));
+    closeBtn?.addEventListener('click', () => toggleMenu(false));
+    overlay?.addEventListener('click', () => toggleMenu(false));
+    links.forEach(link => link.addEventListener('click', () => toggleMenu(false)));
+  };
 
-    // Chiudi quando clicchi fuori dal menu
-    document.addEventListener("click", (e) => {
-      const clickInsideMenu = menu.contains(e.target);
-      const clickOnButton = btn.contains(e.target);
-
-      if (!clickInsideMenu && !clickOnButton) {
-        closeMenu();
-      }
-    });
-  });
+  initMenu();
+  document.addEventListener('astro:after-swap', initMenu);
 </script>
