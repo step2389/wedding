@@ -4,7 +4,7 @@
 /* Custom Fonts */
 @font-face {
   font-family: 'TeX Gyre Termes';
-  src: url('/fonts/texgytermes-regular.otf') format('opentype');
+  src: url('/fonts/texgyretermes-regular.otf') format('opentype');
 }
 
 @font-face {
