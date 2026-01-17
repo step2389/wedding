@@ -66,6 +66,8 @@ export interface CountdownContent {
 export interface WeddingListContent {
   title: string;
   message: string;
+  message1: string;
+  message2: string;
   iban: string;
   name: string;
 }
