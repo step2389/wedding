@@ -1,13 +1,20 @@
 ---
 // src/components/WeddingList.astro
 import { getEventData } from "../data/eventData";
+import backgroundImage from "../assets/images/ocean.jpg"; 
 const { weddingList } = getEventData();
 ---
 
-<section id="wedding-list" class="relative py-24 overflow-hidden" 
+<section id="wedding-list"
+  style={`background-image: url(${backgroundImage.src}); background-size: cover; background-position: center; position: relative;`}
+  class="relative py-24 overflow-hidden" 
   style="background: linear-gradient(to bottom, var(--color-primary) 40%, var(--color-watercolor) 100%);">
   
-  <div class="mx-auto max-w-3xl px-6 text-center">
+  <div class="mx-auto max-w-3xl px-6 text-center rounded-[2.5rem] p-10 shadow-2xl backdrop-blur-md border border-white/30 transition-transform hover:scale-[1.01]"
+      style="
+        background-color: rgba(255, 255, 255, 0.4); 
+        width: 100%;"
+        >
     
     <!-- Icona Simbolica: Aeroplanino di Carta -->
     <div class="mb-8 flex justify-center opacity-40">
@@ -39,8 +46,7 @@ const { weddingList } = getEventData();
         background-color: rgba(255, 255, 255, 0.4); 
         display: inline-block; 
         width: 100%; 
-        max-width: 500px;
-      "
+        max-width: 500px;"
     >
       <div class="flex flex-col items-center">
         <span class="text-[9px] uppercase tracking-[0.4em] mb-4 opacity-50" style="color: var(--color-secondary);">Coordinate Bancarie</span>
