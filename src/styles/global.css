@@ -1,4 +1,6 @@
 @import "@fontsource/playfair-display/latin.css";
+@import "@fontsource/lora";
+@import "@fontsource/montserrat";
 @import "tailwindcss";
 
 /* Custom Fonts */
@@ -18,7 +20,9 @@
         "Segoe UI", sans-serif;
     --font-display: "Playfair Display", serif;
     --font-termes: "TeX Gyre Termes", serif;
+    --font-lora: "Lora", serif;
     --section-padding: clamp(2rem, 7vw, 6rem);
+    --font-montserrat: "Montserrat", sans-serif;
     --section-max-width: 1000px;
     --shadow-card: 0 12px 35px rgba(0, 0, 0, 0.08);
 }
