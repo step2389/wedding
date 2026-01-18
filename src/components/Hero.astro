@@ -10,7 +10,7 @@ const eventLocation = countdown.location;
 
 <section
     id="hero" style={`background-image: url(${bgImage.src}); background-size: cover; background-position: center; position: relative;`}
-    class="font-termes hero relative overflow-hidden bg-[var(--color-primary) hero-with-bg-image]"
+    class="font-montserrat hero relative overflow-hidden bg-[var(--color-primary) hero-with-bg-image]"
     data-countdown
     data-countdown-target={eventDate}
 >
@@ -25,7 +25,7 @@ const eventLocation = countdown.location;
                     data-hero-title={`${hero.title} & ${hero.title1}`}
                 >
                     {hero.title} <br /> 
-                        <span class="block normal-case font-sans text-2xl tracking-normal my-0 italic">&</span> {hero.title1}
+                        <span class="block normal-case text-2xl tracking-normal my-0 italic">&</span> {hero.title1}
                 </h1>
 
                 <p class="text-center leading-relaxed md:text-lg opacity-90 text-[var(--color-text-dark)]">
@@ -39,7 +39,7 @@ const eventLocation = countdown.location;
                     <p class="text-2xl tracking-tight uppercase opacity-90 text-black">
                         {hero.weekday}
                     </p>
-                    <p class="text-[clamp(1.8rem,7.5vw,3rem)] uppercase tracking-tight text-[var(--color-text-dark)] whitespace-nowrap font-medium">
+                    <p class="text-[clamp(1.8rem,7.5vw,3rem)] uppercase tracking-tight text-[var(--color-text-dark)] whitespace-nowrap font-semibold">
                         {hero.dateDisplay}
                     </p>
                     <p class="text-1xl  tracking-0.2em uppercase opacity-90 text-[var(--color-text-dark)]">
