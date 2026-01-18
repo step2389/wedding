@@ -17,6 +17,7 @@
         "Inter Variable", "Inter", system-ui, -apple-system, BlinkMacSystemFont,
         "Segoe UI", sans-serif;
     --font-display: "Playfair Display", serif;
+    --font-termes: "TeX Gyre Termes", serif;
     --section-padding: clamp(2rem, 7vw, 6rem);
     --section-max-width: 1000px;
     --shadow-card: 0 12px 35px rgba(0, 0, 0, 0.08);
