@@ -20,7 +20,7 @@ const eventLocation = countdown.location;
             <!-- TESTI PRINCIPALI -->
             <div class="flex flex-col gap-6 text-center">
                 <h1
-                    class="font-display text-[clamp(3.5rem,8vw,6.5rem)] uppercase leading-[0.8] tracking-tight drop-shadow-md text-[var(--color-text-dark)]"
+                    class="text-[clamp(3.5rem,8vw,6.5rem)] uppercase leading-[0.8] tracking-tight drop-shadow-md text-[var(--color-text-dark)]"
                     id="hero-heading"
                     data-hero-title={`${hero.title} & ${hero.title1}`}
                 >
@@ -28,21 +28,21 @@ const eventLocation = countdown.location;
                         <span class="block normal-case font-sans text-2xl tracking-normal my-0 italic">&</span> {hero.title1}
                 </h1>
 
-                <p class="font-display text-center leading-relaxed md:text-lg opacity-90 text-[var(--color-text-dark)]">
+                <p class="text-center leading-relaxed md:text-lg opacity-90 text-[var(--color-text-dark)]">
                     {hero.description}
-                <p class="font-display text-center leading-relaxed md:text-lg opacity-90 text-[var(--color-text-dark)]">
+                <p class="text-center leading-relaxed md:text-lg opacity-90 text-[var(--color-text-dark)]">
                     <em>{hero.description1}</em>
                 </p>        
             </div>
 
             <div class="flex flex-col gap-2 text-center md:text-center">
-                    <p class="font-display text-2xl tracking-tight uppercase opacity-90 text-black">
+                    <p class="text-2xl tracking-tight uppercase opacity-90 text-black">
                         {hero.weekday}
                     </p>
                     <p class="text-[clamp(1.8rem,7.5vw,3rem)] uppercase tracking-tight text-[var(--color-text-dark)] whitespace-nowrap font-medium">
                         {hero.dateDisplay}
                     </p>
-                    <p class="font-display text-1xl  tracking-0.2em uppercase opacity-90 text-[var(--color-text-dark)]">
+                    <p class="text-1xl  tracking-0.2em uppercase opacity-90 text-[var(--color-text-dark)]">
                         {hero.location}
                     </p>
             </div>
