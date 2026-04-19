@@ -1,4 +1,4 @@
-# Said Yes!
+# wedding anna e Step!
 
 This is a simple Astro project that demonstrates how to create a basic wedding invitation using GSAP.
 
