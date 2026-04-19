@@ -68,7 +68,7 @@ export interface WeddingListContent {
   message: string;
   message1: string;
   message2: string;
-  iban: string;
+  code: string;
   name: string;
 }
 
