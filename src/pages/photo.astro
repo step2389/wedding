@@ -1,6 +1,5 @@
 ---
 const workerBase = "https://wedding-worker.stefano-penzo23.workers.dev";
-const publicGalleryPage = "https://wedding-stefano-anna.penz23.org/photo";
 ---
 
 <html lang="it">
@@ -17,15 +16,18 @@ const publicGalleryPage = "https://wedding-stefano-anna.penz23.org/photo";
           <p class="eyebrow">Album condiviso</p>
           <h1>Carica le tue foto del matrimonio</h1>
           <p class="intro">
-            Scatta, carica e guarda in tempo reale i momenti più belli della giornata.
+            Scegli le immagini dal telefono, poi premi il pulsante di upload per aggiungerle alla galleria condivisa.
           </p>
 
           <div class="hero-actions">
             <label for="photo-input" class="btn btn-primary">Scegli le foto</label>
+            <button id="upload-btn" class="btn btn-accent" type="button" disabled>Carica adesso</button>
             <a href="#gallery" class="btn btn-secondary">Guarda la galleria</a>
           </div>
 
           <input id="photo-input" class="sr-only" type="file" accept="image/*" multiple />
+
+          <p id="selected-files" class="selected-files">Nessuna foto selezionata.</p>
 
           <div class="status-grid">
             <div class="status-card">
@@ -38,21 +40,6 @@ const publicGalleryPage = "https://wedding-stefano-anna.penz23.org/photo";
             </div>
           </div>
         </header>
-
-        <section class="panel upload-panel">
-          <div>
-            <p class="panel-kicker">Come funziona</p>
-            <h2>Scansiona e condividi</h2>
-            <p>
-              Apri questa pagina dal QR code, seleziona una o più immagini e le foto compariranno nella galleria comune.
-            </p>
-          </div>
-
-          <div class="qr-box">
-            <div id="qrcode" aria-label="QR code pagina foto"></div>
-            <p class="qr-text">Inquadra il codice per aprire direttamente questa pagina.</p>
-          </div>
-        </section>
 
         <section id="gallery" class="gallery-section">
           <div class="section-head">
@@ -70,32 +57,35 @@ const publicGalleryPage = "https://wedding-stefano-anna.penz23.org/photo";
     </section>
 
     <script type="module">
-      import QRCode from "qrcode";
-
       const workerBase = "https://wedding-worker.stefano-penzo23.workers.dev";
-      const publicGalleryPage = "https://wedding-stefano-anna.penz23.org/photo";
 
       const input = document.getElementById("photo-input");
+      const uploadBtn = document.getElementById("upload-btn");
+      const selectedFilesText = document.getElementById("selected-files");
       const gallery = document.getElementById("gallery-grid");
       const message = document.getElementById("message");
       const uploadStatus = document.getElementById("upload-status");
       const photoCount = document.getElementById("photo-count");
       const refreshBtn = document.getElementById("refresh-btn");
-      const qrContainer = document.getElementById("qrcode");
 
-      async function renderQr() {
-        const canvas = document.createElement("canvas");
-        await QRCode.toCanvas(canvas, publicGalleryPage, {
-          width: 220,
-          margin: 1,
-          color: { dark: "#1f2937", light: "#ffffff" }
-        });
-        qrContainer.replaceChildren(canvas);
-      }
+      let selectedFiles = [];
 
       function showMessage(text, isError = false) {
         message.textContent = text;
         message.dataset.error = isError ? "true" : "false";
+      }
+
+      function updateSelectedFilesUI() {
+        if (!selectedFiles.length) {
+          selectedFilesText.textContent = "Nessuna foto selezionata.";
+          uploadBtn.disabled = true;
+          return;
+        }
+
+        const names = selectedFiles.slice(0, 2).map((file) => file.name).join(", ");
+        const extra = selectedFiles.length > 2 ? ` +${selectedFiles.length - 2} altre` : "";
+        selectedFilesText.textContent = `${selectedFiles.length} foto selezionate: ${names}${extra}`;
+        uploadBtn.disabled = false;
       }
 
       function createPhotoCard(photo) {
@@ -143,15 +133,16 @@ const publicGalleryPage = "https://wedding-stefano-anna.penz23.org/photo";
         }
       }
 
-      async function uploadFiles(files) {
-        if (!files?.length) return;
+      async function uploadFiles() {
+        if (!selectedFiles.length) return;
 
+        uploadBtn.disabled = true;
         uploadStatus.textContent = "Caricamento...";
-        showMessage(`Sto caricando ${files.length} foto...`);
+        showMessage(`Sto caricando ${selectedFiles.length} foto...`);
 
         try {
           const fd = new FormData();
-          [...files].forEach((file) => fd.append("photos", file));
+          selectedFiles.forEach((file) => fd.append("photos", file));
 
           const res = await fetch(`${workerBase}/upload`, {
             method: "POST",
@@ -172,21 +163,26 @@ const publicGalleryPage = "https://wedding-stefano-anna.penz23.org/photo";
               : `Caricate ${uploadedCount} foto con successo.`
           );
 
+          selectedFiles = [];
           input.value = "";
+          updateSelectedFilesUI();
           await loadPhotos();
         } catch {
           uploadStatus.textContent = "Errore";
           showMessage("Upload non riuscito. Riprova tra qualche secondo.", true);
+          uploadBtn.disabled = false;
         }
       }
 
       input?.addEventListener("change", (event) => {
-        uploadFiles(event.target.files);
+        selectedFiles = Array.from(event.target.files || []);
+        updateSelectedFilesUI();
       });
 
+      uploadBtn?.addEventListener("click", uploadFiles);
       refreshBtn?.addEventListener("click", loadPhotos);
 
-      renderQr();
+      updateSelectedFilesUI();
       loadPhotos();
       setInterval(loadPhotos, 20000);
     </script>
@@ -203,6 +199,7 @@ const publicGalleryPage = "https://wedding-stefano-anna.penz23.org/photo";
     --line: rgba(34, 27, 24, 0.1);
     --accent: #9f6f5a;
     --accent-dark: #7f5644;
+    --accent-soft: #efe3db;
     --shadow: 0 20px 60px rgba(70, 44, 34, 0.12);
     --radius: 24px;
   }
@@ -223,7 +220,7 @@ const publicGalleryPage = "https://wedding-stefano-anna.penz23.org/photo";
     gap: 1.5rem;
   }
 
-  .hero, .panel, .gallery-section {
+  .hero, .gallery-section {
     background: var(--surface);
     backdrop-filter: blur(12px);
     border: 1px solid var(--line);
@@ -241,25 +238,28 @@ const publicGalleryPage = "https://wedding-stefano-anna.penz23.org/photo";
   }
 
   h1 {
-    font-size: clamp(2.3rem, 5vw, 4.6rem);
+    font-size: clamp(2.3rem, 5vw, 4.4rem);
     line-height: 1.02;
     margin: .75rem auto 1rem;
     max-width: 12ch;
   }
 
   h2 {
-    font-size: clamp(1.5rem, 3vw, 2.35rem);
+    font-size: clamp(1.5rem, 3vw, 2.2rem);
     line-height: 1.1;
     margin: .35rem 0 .75rem;
   }
 
-  .intro, .panel p, .qr-text, .message, .photo-meta {
+  .intro, .message, .photo-meta, .selected-files {
     color: var(--muted);
     font-size: 1rem;
     line-height: 1.65;
   }
 
-  .intro { max-width: 620px; margin: 0 auto; }
+  .intro {
+    max-width: 620px;
+    margin: 0 auto;
+  }
 
   .hero-actions, .section-head, .status-grid {
     display: flex;
@@ -290,7 +290,13 @@ const publicGalleryPage = "https://wedding-stefano-anna.penz23.org/photo";
 
   .btn-primary { background: var(--accent); color: white; }
   .btn-primary:hover { background: var(--accent-dark); }
+  .btn-accent { background: var(--accent-soft); border-color: rgba(159,111,90,.24); }
   .btn-secondary, .btn-ghost { border-color: var(--line); }
+  .btn:disabled { opacity: .5; cursor: not-allowed; }
+
+  .selected-files {
+    margin-top: 1rem;
+  }
 
   .status-card {
     min-width: 155px;
@@ -307,29 +313,8 @@ const publicGalleryPage = "https://wedding-stefano-anna.penz23.org/photo";
     margin-top: .35rem;
   }
 
-  .panel, .gallery-section { padding: 1.4rem; }
-
-  .upload-panel {
-    display: grid;
-    grid-template-columns: 1.3fr .8fr;
-    gap: 1.25rem;
-    align-items: center;
-  }
-
-  .qr-box {
-    background: var(--surface-strong);
-    border: 1px solid var(--line);
-    border-radius: 20px;
-    padding: 1rem;
-    display: grid;
-    justify-items: center;
-    gap: .9rem;
-  }
-
-  #qrcode canvas { width: min(220px, 100%); height: auto; border-radius: 18px; }
-
+  .gallery-section { padding: 1.4rem; }
   .section-head { justify-content: space-between; margin-bottom: 1rem; }
-
   .message[data-error="true"] { color: #a04242; }
 
   .gallery-grid {
@@ -372,6 +357,5 @@ const publicGalleryPage = "https://wedding-stefano-anna.penz23.org/photo";
     .photo-page { padding: 1rem .85rem 4rem; }
     .hero { padding: 1.4rem; text-align: left; }
     .hero-actions > *, .section-head > *, .btn { width: 100%; }
-    .upload-panel { grid-template-columns: 1fr; }
   }
 </style>
