@@ -56,12 +56,6 @@ const workerBase = "https://wedding-worker.stefano-penzo23.workers.dev";
       </div>
     </section>
 
-    <dialog id="lightbox" class="lightbox">
-      <button id="lightbox-close" class="lightbox-close" type="button" aria-label="Chiudi foto">×</button>
-      <img id="lightbox-image" src="" alt="Anteprima foto" />
-      <p id="lightbox-caption" class="lightbox-caption"></p>
-    </dialog>
-
     <script type="module">
       const workerBase = "https://wedding-worker.stefano-penzo23.workers.dev";
 
@@ -73,10 +67,6 @@ const workerBase = "https://wedding-worker.stefano-penzo23.workers.dev";
       const uploadStatus = document.getElementById("upload-status");
       const photoCount = document.getElementById("photo-count");
       const refreshBtn = document.getElementById("refresh-btn");
-      const lightbox = document.getElementById("lightbox");
-      const lightboxImage = document.getElementById("lightbox-image");
-      const lightboxCaption = document.getElementById("lightbox-caption");
-      const lightboxClose = document.getElementById("lightbox-close");
 
       let selectedFiles = [];
 
@@ -98,31 +88,16 @@ const workerBase = "https://wedding-worker.stefano-penzo23.workers.dev";
         uploadBtn.disabled = false;
       }
 
-      function openLightbox(photo) {
-        lightboxImage.src = photo.url;
-        lightboxImage.alt = "Foto caricata dagli invitati";
-        const date = photo.uploaded ? new Date(photo.uploaded) : null;
-        lightboxCaption.textContent =
-          date && !Number.isNaN(date.getTime())
-            ? `Caricata il ${date.toLocaleString("it-IT", { dateStyle: "medium", timeStyle: "short" })}`
-            : "Foto caricata dagli invitati";
-        lightbox.showModal();
-      }
-
-      function closeLightbox() {
-        lightbox.close();
-        lightboxImage.src = "";
-      }
-
       function createPhotoCard(photo) {
         const article = document.createElement("article");
         article.className = "photo-card";
 
-        const button = document.createElement("button");
-        button.type = "button";
-        button.className = "photo-trigger";
-        button.setAttribute("aria-label", "Apri foto ingrandita");
-        button.addEventListener("click", () => openLightbox(photo));
+        const link = document.createElement("a");
+        link.href = photo.url;
+        link.target = "_blank";
+        link.rel = "noopener noreferrer";
+        link.className = "photo-trigger";
+        link.setAttribute("aria-label", "Apri foto intera");
 
         const img = document.createElement("img");
         img.src = photo.url;
@@ -139,8 +114,8 @@ const workerBase = "https://wedding-worker.stefano-penzo23.workers.dev";
             ? date.toLocaleString("it-IT", { dateStyle: "short", timeStyle: "short" })
             : "Appena caricata";
 
-        button.appendChild(img);
-        article.append(button, meta);
+        link.appendChild(img);
+        article.append(link, meta);
         return article;
       }
 
@@ -214,12 +189,6 @@ const workerBase = "https://wedding-worker.stefano-penzo23.workers.dev";
 
       uploadBtn?.addEventListener("click", uploadFiles);
       refreshBtn?.addEventListener("click", loadPhotos);
-      lightboxClose?.addEventListener("click", closeLightbox);
-      lightbox?.addEventListener("click", (event) => {
-        const rect = lightbox.getBoundingClientRect();
-        const inside = rect.top <= event.clientY && event.clientY <= rect.bottom && rect.left <= event.clientX && event.clientX <= rect.right;
-        if (!inside) closeLightbox();
-      });
 
       updateSelectedFilesUI();
       loadPhotos();
@@ -244,7 +213,12 @@ const workerBase = "https://wedding-worker.stefano-penzo23.workers.dev";
   }
 
   * { box-sizing: border-box; }
-  body { margin: 0; font-family: system-ui, sans-serif; background: var(--bg); color: var(--text); }
+  body {
+    margin: 0;
+    font-family: system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+  }
 
   .photo-page {
     background: radial-gradient(circle at top, rgba(159,111,90,.12), transparent 30%), var(--bg);
@@ -259,7 +233,8 @@ const workerBase = "https://wedding-worker.stefano-penzo23.workers.dev";
     gap: 1.5rem;
   }
 
-  .hero, .gallery-section {
+  .hero,
+  .gallery-section {
     background: var(--surface);
     backdrop-filter: blur(12px);
     border: 1px solid var(--line);
@@ -267,9 +242,14 @@ const workerBase = "https://wedding-worker.stefano-penzo23.workers.dev";
     box-shadow: var(--shadow);
   }
 
-  .hero { padding: 2rem; text-align: center; }
+  .hero {
+    padding: 2rem;
+    text-align: center;
+  }
 
-  .eyebrow, .panel-kicker, .status-label {
+  .eyebrow,
+  .panel-kicker,
+  .status-label {
     text-transform: uppercase;
     letter-spacing: .14em;
     font-size: .78rem;
@@ -289,7 +269,10 @@ const workerBase = "https://wedding-worker.stefano-penzo23.workers.dev";
     margin: .35rem 0 .75rem;
   }
 
-  .intro, .message, .photo-meta, .selected-files, .lightbox-caption {
+  .intro,
+  .message,
+  .photo-meta,
+  .selected-files {
     color: var(--muted);
     font-size: 1rem;
     line-height: 1.65;
@@ -300,14 +283,17 @@ const workerBase = "https://wedding-worker.stefano-penzo23.workers.dev";
     margin: 0 auto;
   }
 
-  .hero-actions, .section-head, .status-grid {
+  .hero-actions,
+  .section-head,
+  .status-grid {
     display: flex;
     gap: .9rem;
     flex-wrap: wrap;
     align-items: center;
   }
 
-  .hero-actions, .status-grid {
+  .hero-actions,
+  .status-grid {
     justify-content: center;
     margin-top: 1.5rem;
   }
@@ -327,11 +313,29 @@ const workerBase = "https://wedding-worker.stefano-penzo23.workers.dev";
     cursor: pointer;
   }
 
-  .btn-primary { background: var(--accent); color: white; }
-  .btn-primary:hover { background: var(--accent-dark); }
-  .btn-accent { background: var(--accent-soft); border-color: rgba(159,111,90,.24); }
-  .btn-secondary, .btn-ghost { border-color: var(--line); }
-  .btn:disabled { opacity: .5; cursor: not-allowed; }
+  .btn-primary {
+    background: var(--accent);
+    color: white;
+  }
+
+  .btn-primary:hover {
+    background: var(--accent-dark);
+  }
+
+  .btn-accent {
+    background: var(--accent-soft);
+    border-color: rgba(159,111,90,.24);
+  }
+
+  .btn-secondary,
+  .btn-ghost {
+    border-color: var(--line);
+  }
+
+  .btn:disabled {
+    opacity: .5;
+    cursor: not-allowed;
+  }
 
   .selected-files {
     margin-top: 1rem;
@@ -352,35 +356,45 @@ const workerBase = "https://wedding-worker.stefano-penzo23.workers.dev";
     margin-top: .35rem;
   }
 
-  .gallery-section { padding: 1.4rem; }
-  .section-head { justify-content: space-between; margin-bottom: 1rem; }
-  .message[data-error="true"] { color: #a04242; }
+  .gallery-section {
+    padding: 1.4rem;
+  }
+
+  .section-head {
+    justify-content: space-between;
+    margin-bottom: 1rem;
+  }
+
+  .message[data-error="true"] {
+    color: #a04242;
+  }
 
   .gallery-grid {
     margin-top: 1.1rem;
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-    gap: .9rem;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: .75rem;
+    align-items: start;
   }
 
   .photo-card {
     overflow: hidden;
-    border-radius: 20px;
+    border-radius: 18px;
     background: var(--surface-strong);
     border: 1px solid var(--line);
+    min-width: 0;
   }
 
   .photo-trigger {
     display: block;
     width: 100%;
-    padding: 0;
-    background: transparent;
-    border: 0;
-    cursor: zoom-in;
+    text-decoration: none;
+    line-height: 0;
   }
 
   .photo-card img {
     width: 100%;
+    height: auto;
     aspect-ratio: 4 / 5;
     object-fit: cover;
     object-position: center;
@@ -388,46 +402,9 @@ const workerBase = "https://wedding-worker.stefano-penzo23.workers.dev";
     background: #efe7df;
   }
 
-  .photo-meta { padding: .8rem .9rem 1rem; font-size: .92rem; }
-
-  .lightbox {
-    width: min(92vw, 980px);
-    border: 0;
-    border-radius: 24px;
-    padding: 1rem;
-    background: rgba(255,255,255,.98);
-    box-shadow: 0 24px 80px rgba(0,0,0,.25);
-  }
-
-  .lightbox::backdrop {
-    background: rgba(16, 12, 10, .72);
-    backdrop-filter: blur(4px);
-  }
-
-  .lightbox img {
-    width: 100%;
-    max-height: 78vh;
-    object-fit: contain;
-    border-radius: 16px;
-    background: #f3ede8;
-  }
-
-  .lightbox-close {
-    margin-left: auto;
-    display: block;
-    width: 42px;
-    height: 42px;
-    border-radius: 999px;
-    border: 1px solid var(--line);
-    background: white;
-    font-size: 1.8rem;
-    line-height: 1;
-    cursor: pointer;
-  }
-
-  .lightbox-caption {
-    margin: .85rem 0 .25rem;
-    text-align: center;
+  .photo-meta {
+    padding: .8rem .9rem 1rem;
+    font-size: .92rem;
   }
 
   .sr-only {
@@ -443,16 +420,28 @@ const workerBase = "https://wedding-worker.stefano-penzo23.workers.dev";
   }
 
   @media (max-width: 760px) {
-    .photo-page { padding: 1rem .85rem 4rem; }
-    .hero { padding: 1.4rem; text-align: left; }
-    .hero-actions > *, .section-head > *, .btn { width: 100%; }
+    .photo-page {
+      padding: 1rem .85rem 4rem;
+    }
+
+    .hero {
+      padding: 1.4rem;
+      text-align: left;
+    }
+
+    .hero-actions > *,
+    .section-head > *,
+    .btn {
+      width: 100%;
+    }
+
     .gallery-grid {
       grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: .6rem;
     }
-    .lightbox {
-      width: calc(100vw - 1rem);
-      padding: .8rem;
-      border-radius: 20px;
+
+    .photo-card img {
+      aspect-ratio: 3 / 4;
     }
   }
 </style>
