@@ -13,17 +13,16 @@ const workerBase = "https://wedding-worker.stefano-penzo23.workers.dev";
   <body>
     <main class="photo-page">
       <div class="photo-wrap">
-
         <section class="photo-box">
           <p class="photo-kicker">Album condiviso</p>
           <h1 class="photo-title">Carica le tue foto del matrimonio</h1>
           <p class="photo-text">
-            Puoi scattare una foto al momento oppure scegliere immagini già presenti sul telefono. Poi premi "Carica adesso".
+            Scatta una foto oppure scegli immagini dal telefono, poi condividile nella galleria del matrimonio.
           </p>
 
           <div class="photo-actions">
-            <label for="camera-input" class="photo-btn photo-btn-primary">📷 Scatta una foto</label>
-            <label for="gallery-input" class="photo-btn photo-btn-secondary">🖼 Scegli dalla galleria</label>
+            <label for="camera-input" class="photo-btn photo-btn-primary">Scatta una foto</label>
+            <label for="gallery-input" class="photo-btn">Scegli dalla galleria</label>
             <button id="upload-btn" class="photo-btn photo-btn-soft" type="button" disabled>Carica adesso</button>
           </div>
 
@@ -39,7 +38,7 @@ const workerBase = "https://wedding-worker.stefano-penzo23.workers.dev";
             </div>
             <div class="photo-stat">
               <span>Foto visibili</span>
-              <strong id="photo-count">—</strong>
+              <strong id="photo-count">0</strong>
             </div>
           </div>
         </section>
@@ -50,229 +49,288 @@ const workerBase = "https://wedding-worker.stefano-penzo23.workers.dev";
               <p class="photo-kicker">Galleria live</p>
               <h2 class="photo-subtitle">Tutte le foto degli invitati</h2>
             </div>
-            <button id="refresh-btn" class="photo-btn photo-btn-secondary" type="button">Aggiorna</button>
           </div>
 
-          <p id="message" class="photo-message" role="status" aria-live="polite">
-            Sto caricando la galleria...
-          </p>
-
+          <p class="photo-hint">Tocca una foto per vederla più grande.</p>
+          <p id="message" class="photo-message" role="status" aria-live="polite">Sto caricando la galleria...</p>
           <div id="gallery-grid" class="photo-grid"></div>
         </section>
-
       </div>
     </main>
+
+    <dialog id="lightbox" class="photo-lightbox" aria-label="Foto ingrandita">
+      <div class="photo-lightbox-inner">
+        <button id="lightbox-close" class="photo-lightbox-close" type="button" aria-label="Chiudi immagine">Chiudi</button>
+        <img id="lightbox-image" class="photo-lightbox-image" alt="Foto ingrandita" />
+      </div>
+    </dialog>
 
     <script type="module">
       const workerBase = "https://wedding-worker.stefano-penzo23.workers.dev";
 
-      const cameraInput  = document.getElementById("camera-input");
+      const cameraInput = document.getElementById("camera-input");
       const galleryInput = document.getElementById("gallery-input");
-      const uploadBtn    = document.getElementById("upload-btn");
-      const selText      = document.getElementById("selected-files");
-      const grid         = document.getElementById("gallery-grid");
-      const msg          = document.getElementById("message");
-      const statusEl     = document.getElementById("upload-status");
-      const countEl      = document.getElementById("photo-count");
-      const refreshBtn   = document.getElementById("refresh-btn");
+      const uploadBtn = document.getElementById("upload-btn");
+      const selectedFilesText = document.getElementById("selected-files");
+      const gallery = document.getElementById("gallery-grid");
+      const message = document.getElementById("message");
+      const uploadStatus = document.getElementById("upload-status");
+      const photoCount = document.getElementById("photo-count");
+      const lightbox = document.getElementById("lightbox");
+      const lightboxImage = document.getElementById("lightbox-image");
+      const lightboxClose = document.getElementById("lightbox-close");
 
       let selectedFiles = [];
 
-      function showMsg(text, err = false) {
-        msg.textContent = text;
-        msg.dataset.error = err ? "true" : "false";
+      function showMessage(text, isError = false) {
+        message.textContent = text;
+        message.dataset.error = isError ? "true" : "false";
       }
 
-      function updateSelUI() {
+      function updateSelectedFilesUI() {
         if (!selectedFiles.length) {
-          selText.textContent = "Nessuna foto selezionata.";
+          selectedFilesText.textContent = "Nessuna foto selezionata.";
           uploadBtn.disabled = true;
           return;
         }
-        const names = selectedFiles.slice(0, 2).map(f => f.name).join(", ");
+
+        const names = selectedFiles.slice(0, 2).map((file) => file.name).join(", ");
         const extra = selectedFiles.length > 2 ? ` +${selectedFiles.length - 2} altre` : "";
-        selText.textContent = `${selectedFiles.length} foto: ${names}${extra}`;
+        selectedFilesText.textContent = `${selectedFiles.length} foto selezionate: ${names}${extra}`;
         uploadBtn.disabled = false;
       }
 
-      function addFiles(list) {
-        const files = Array.from(list || []);
+      function addFiles(fileList) {
+        const files = Array.from(fileList || []);
         if (!files.length) return;
         selectedFiles = [...selectedFiles, ...files];
-        updateSelUI();
+        updateSelectedFilesUI();
       }
 
-      /* ── card builder ─────────────────────────────────────────── */
-      function makeCard(photo) {
+      function openLightbox(url, alt = "Foto ingrandita") {
+        lightboxImage.src = url;
+        lightboxImage.alt = alt;
+        lightbox.showModal();
+      }
+
+      function closeLightbox() {
+        lightbox.close();
+        lightboxImage.src = "";
+      }
+
+      function createPhotoCard(photo) {
         const card = document.createElement("article");
         card.className = "photo-card";
 
-        const link = document.createElement("a");
-        link.href = photo.url;
-        link.target = "_blank";
-        link.rel = "noopener noreferrer";
-        link.className = "photo-card-link";
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "photo-card-button";
+        button.setAttribute("aria-label", "Apri foto ingrandita");
+        button.addEventListener("click", () => openLightbox(photo.url, "Foto caricata dagli invitati"));
 
-        const frame = document.createElement("div");
-        frame.className = "photo-card-frame";
+        const media = document.createElement("div");
+        media.className = "photo-media";
 
         const img = document.createElement("img");
         img.src = photo.url;
-        img.alt = "Foto degli invitati";
+        img.alt = "Foto caricata dagli invitati";
         img.loading = "lazy";
         img.decoding = "async";
-        img.className = "photo-card-img";
 
-        const meta = document.createElement("p");
-        meta.className = "photo-card-meta";
-        const d = photo.uploaded ? new Date(photo.uploaded) : null;
-        meta.textContent = d && !isNaN(d)
-          ? d.toLocaleString("it-IT", { dateStyle: "short", timeStyle: "short" })
-          : "Appena caricata";
+        const meta = document.createElement("div");
+        meta.className = "photo-meta";
 
-        frame.appendChild(img);
-        link.appendChild(frame);
-        card.appendChild(link);
+        const date = photo.uploaded ? new Date(photo.uploaded) : null;
+        meta.textContent =
+          date && !Number.isNaN(date.getTime())
+            ? date.toLocaleString("it-IT", { dateStyle: "short", timeStyle: "short" })
+            : "Appena caricata";
+
+        media.appendChild(img);
+        button.appendChild(media);
+        card.appendChild(button);
         card.appendChild(meta);
+
         return card;
       }
 
-      /* ── load photos ──────────────────────────────────────────── */
       async function loadPhotos() {
-        showMsg("Caricamento in corso...");
         try {
+          showMessage("Sto caricando la galleria...");
           const res = await fetch(`${workerBase}/photos`, { cache: "no-store" });
-          if (!res.ok) throw new Error();
+          if (!res.ok) throw new Error("Errore");
           const photos = await res.json();
 
-          grid.innerHTML = "";
-          countEl.textContent = String(photos.length);
+          gallery.innerHTML = "";
+          photoCount.textContent = String(photos.length);
 
           if (!photos.length) {
-            showMsg("Nessuna foto ancora. Sii il primo a condividere uno scatto!");
+            showMessage("Nessuna foto caricata per ora.");
             return;
           }
 
           const frag = document.createDocumentFragment();
-          photos.forEach(p => frag.appendChild(makeCard(p)));
-          grid.appendChild(frag);
-          showMsg(`${photos.length} foto disponibili.`);
+          photos.forEach((photo) => frag.appendChild(createPhotoCard(photo)));
+          gallery.appendChild(frag);
+          showMessage(`Galleria aggiornata: ${photos.length} foto disponibili.`);
         } catch {
-          showMsg("Impossibile caricare la galleria.", true);
+          showMessage("Non riesco a caricare la galleria.", true);
         }
       }
 
-      /* ── upload ───────────────────────────────────────────────── */
-      async function doUpload() {
+      async function uploadFiles() {
         if (!selectedFiles.length) return;
+
         uploadBtn.disabled = true;
-        statusEl.textContent = "Caricamento...";
-        showMsg(`Carico ${selectedFiles.length} foto...`);
+        uploadStatus.textContent = "Caricamento...";
+        showMessage(`Sto caricando ${selectedFiles.length} foto...`);
 
         try {
           const fd = new FormData();
-          selectedFiles.forEach(f => fd.append("photos", f));
-          const res  = await fetch(`${workerBase}/upload`, { method: "POST", body: fd });
+          selectedFiles.forEach((file) => fd.append("photos", file));
+
+          const res = await fetch(`${workerBase}/upload`, {
+            method: "POST",
+            body: fd
+          });
+
           const data = await res.json();
           if (!res.ok || data.error) throw new Error(data.error || "Upload fallito");
 
-          statusEl.textContent = "Completato ✓";
-          const n = data.uploaded?.length || 0;
-          const s = data.skipped?.length  || 0;
-          showMsg(s ? `${n} caricate, ${s} saltate.` : `${n} foto caricate con successo.`);
-
+          uploadStatus.textContent = "Completato";
           selectedFiles = [];
-          cameraInput.value  = "";
+          cameraInput.value = "";
           galleryInput.value = "";
-          updateSelUI();
+          updateSelectedFilesUI();
           await loadPhotos();
         } catch {
-          statusEl.textContent = "Errore";
-          showMsg("Upload non riuscito. Riprova.", true);
+          uploadStatus.textContent = "Errore";
+          showMessage("Upload non riuscito. Riprova.", true);
           uploadBtn.disabled = false;
         }
       }
 
-      cameraInput?.addEventListener("change",  e => addFiles(e.target.files));
-      galleryInput?.addEventListener("change", e => addFiles(e.target.files));
-      uploadBtn?.addEventListener("click",  doUpload);
-      refreshBtn?.addEventListener("click", loadPhotos);
+      cameraInput?.addEventListener("change", (event) => addFiles(event.target.files));
+      galleryInput?.addEventListener("change", (event) => addFiles(event.target.files));
+      uploadBtn?.addEventListener("click", uploadFiles);
+      lightboxClose?.addEventListener("click", closeLightbox);
 
-      updateSelUI();
+      lightbox?.addEventListener("click", (event) => {
+        const rect = lightbox.getBoundingClientRect();
+        const inside =
+          event.clientX >= rect.left &&
+          event.clientX <= rect.right &&
+          event.clientY >= rect.top &&
+          event.clientY <= rect.bottom;
+
+        if (!inside) {
+          closeLightbox();
+        }
+      });
+
+      lightbox?.addEventListener("close", () => {
+        lightboxImage.src = "";
+      });
+
+      updateSelectedFilesUI();
       loadPhotos();
     </script>
   </body>
 </html>
 
 <style is:global>
-  /* ── reset locale ───────────────────────────────────────────── */
-  .photo-page,
-  .photo-page *,
-  .photo-page *::before,
-  .photo-page *::after {
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: #faf7f2;
+  }
+
+  body {
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    color: #221b18;
+  }
+
+  *, *::before, *::after {
     box-sizing: border-box;
   }
 
-  /* ── layout ─────────────────────────────────────────────────── */
   .photo-page {
     min-height: 100vh;
-    padding: 16px 12px 48px;
+    padding: 14px 10px 40px;
     background: #faf7f2;
-    font-family: system-ui, -apple-system, sans-serif;
-    color: #221b18;
   }
 
   .photo-wrap {
     width: min(100%, 980px);
     margin: 0 auto;
-    display: grid;
-    gap: 16px;
   }
 
   .photo-box {
     background: rgba(255, 255, 255, 0.96);
     border: 1px solid rgba(34, 27, 24, 0.1);
     border-radius: 24px;
-    padding: 20px;
+    padding: 18px;
+    margin-bottom: 16px;
     overflow: hidden;
   }
 
-  /* ── typography ─────────────────────────────────────────────── */
   .photo-kicker {
     margin: 0 0 6px;
-    font-size: 11px;
-    letter-spacing: 0.15em;
+    font-size: 12px;
+    letter-spacing: 0.14em;
     text-transform: uppercase;
     color: #6e625c;
   }
 
-  .photo-title {
-    margin: 0 0 12px;
-    font-size: clamp(1.9rem, 5vw, 3.4rem);
+  .photo-title,
+  .photo-subtitle {
+    margin: 0 0 10px;
     line-height: 1.05;
+    font-family: Georgia, "Times New Roman", serif;
+    color: #221b18;
+  }
+
+  .photo-title {
+    font-size: clamp(2rem, 5vw, 3.6rem);
   }
 
   .photo-subtitle {
-    margin: 0 0 12px;
-    font-size: clamp(1.3rem, 3vw, 1.9rem);
-    line-height: 1.1;
+    font-size: clamp(1.45rem, 3.2vw, 2rem);
   }
 
   .photo-text,
+  .photo-hint,
+  .photo-message,
   .photo-selected,
-  .photo-message {
+  .photo-meta {
     margin: 0;
-    font-size: 15px;
-    line-height: 1.65;
     color: #6e625c;
+    line-height: 1.6;
+    font-size: 16px;
   }
 
-  /* ── buttons ─────────────────────────────────────────────────── */
-  .photo-actions {
+  .photo-hint {
+    margin-bottom: 10px;
+    font-size: 14px;
+  }
+
+  .photo-actions,
+  .photo-stats,
+  .photo-head {
     display: flex;
     flex-wrap: wrap;
-    gap: 10px;
-    margin-top: 18px;
+    gap: 12px;
+    align-items: center;
+  }
+
+  .photo-actions,
+  .photo-stats {
+    margin-top: 16px;
+  }
+
+  .photo-head {
+    justify-content: space-between;
+    margin-bottom: 8px;
   }
 
   .photo-btn {
@@ -280,124 +338,190 @@ const workerBase = "https://wedding-worker.stefano-penzo23.workers.dev";
     align-items: center;
     justify-content: center;
     min-height: 48px;
-    padding: 10px 18px;
+    padding: 12px 18px;
     border-radius: 999px;
-    border: 1px solid rgba(34, 27, 24, 0.12);
+    border: 1px solid rgba(34, 27, 24, 0.1);
     background: #fff;
     color: #221b18;
-    font: 600 15px/1 inherit;
+    font: inherit;
+    font-weight: 600;
     text-decoration: none;
     cursor: pointer;
-    white-space: nowrap;
   }
 
-  .photo-btn-primary  { background: #9f6f5a; border-color: #9f6f5a; color: #fff; }
-  .photo-btn-secondary{ border-color: rgba(34,27,24,.15); }
-  .photo-btn-soft     { background: #efe3db; border-color: rgba(159,111,90,.2); }
-  .photo-btn:disabled { opacity: .5; cursor: not-allowed; }
+  .photo-btn-primary {
+    background: #9f6f5a;
+    border-color: #9f6f5a;
+    color: #fff;
+  }
 
-  .photo-selected { margin-top: 12px; word-break: break-word; }
+  .photo-btn-soft {
+    background: #efe3db;
+    border-color: rgba(159, 111, 90, 0.2);
+  }
 
-  /* ── stats ───────────────────────────────────────────────────── */
-  .photo-stats {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    margin-top: 18px;
+  .photo-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  .photo-selected {
+    margin-top: 12px;
+    word-break: break-word;
   }
 
   .photo-stat {
-    flex: 1 1 150px;
+    flex: 1 1 160px;
+    min-width: 0;
     background: #fff;
-    border: 1px solid rgba(34,27,24,.1);
-    border-radius: 16px;
+    border: 1px solid rgba(34, 27, 24, 0.1);
+    border-radius: 18px;
     padding: 14px 16px;
   }
 
-  .photo-stat span   { display: block; font-size: 11px; letter-spacing:.12em; text-transform:uppercase; color:#6e625c; }
-  .photo-stat strong { display: block; margin-top: 5px; font-size: 1.15rem; }
-
-  /* ── gallery head ────────────────────────────────────────────── */
-  .photo-head {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    justify-content: space-between;
-    gap: 10px;
-    margin-bottom: 14px;
+  .photo-stat span {
+    display: block;
+    font-size: 12px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #6e625c;
   }
 
-  .photo-message[data-error="true"] { color: #a04242; }
+  .photo-stat strong {
+    display: block;
+    margin-top: 6px;
+    font-size: 1.15rem;
+  }
 
-  /* ── THE GRID ────────────────────────────────────────────────── */
+  .photo-message[data-error="true"] {
+    color: #a04242;
+  }
+
   .photo-grid {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 10px;
+    grid-template-columns: 1fr;
+    gap: 12px;
+    width: 100%;
+    margin-top: 14px;
   }
 
-  @media (min-width: 640px)  { .photo-grid { grid-template-columns: repeat(3, 1fr); } }
-  @media (min-width: 1024px) { .photo-grid { grid-template-columns: repeat(4, 1fr); } }
-
-  /* ── THE CARD ────────────────────────────────────────────────── */
   .photo-card {
-    display: block;
+    width: 100%;
     min-width: 0;
     overflow: hidden;
-    border-radius: 16px;
+    border-radius: 18px;
     background: #fff;
-    border: 1px solid rgba(34,27,24,.08);
+    border: 1px solid rgba(34, 27, 24, 0.1);
   }
 
-  .photo-card-link {
+  .photo-card-button {
     display: block;
     width: 100%;
-    text-decoration: none;
-    color: inherit;
+    padding: 0;
+    margin: 0;
+    border: 0;
+    background: transparent;
+    cursor: pointer;
+    text-align: left;
   }
 
-  /* contenitore con altezza fissa → l'immagine NON può sfondare */
-  .photo-card-frame {
+  .photo-media {
     position: relative;
     width: 100%;
-    padding-top: 125%; /* aspect ratio 4:5 */
+    aspect-ratio: 4 / 5;
     overflow: hidden;
-    background: #e8dfd7;
+    background: #ece5dd;
   }
 
-  /* l'immagine riempie il frame al 100%, ritagliata */
-  .photo-card-img {
+  .photo-media img {
     position: absolute;
     inset: 0;
+    display: block;
     width: 100%;
     height: 100%;
     object-fit: cover;
     object-position: center;
-    display: block;
-  }
-
-  .photo-card-meta {
     margin: 0;
-    padding: 8px 12px 12px;
-    font-size: 13px;
-    color: #6e625c;
-    line-height: 1.4;
   }
 
-  /* ── mobile tweaks ───────────────────────────────────────────── */
-  @media (max-width: 600px) {
-    .photo-btn { width: 100%; }
-    .photo-head .photo-btn { width: auto; }
+  .photo-meta {
+    padding: 10px 12px 12px;
+    font-size: 14px;
   }
 
-  /* ── sr-only ─────────────────────────────────────────────────── */
+  .photo-lightbox {
+    width: min(92vw, 960px);
+    max-width: 960px;
+    padding: 0;
+    border: 0;
+    background: transparent;
+  }
+
+  .photo-lightbox::backdrop {
+    background: rgba(0, 0, 0, 0.72);
+    backdrop-filter: blur(4px);
+  }
+
+  .photo-lightbox-inner {
+    position: relative;
+  }
+
+  .photo-lightbox-close {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    z-index: 2;
+    min-height: 42px;
+    padding: 10px 14px;
+    border: 0;
+    border-radius: 999px;
+    background: rgba(34, 27, 24, 0.82);
+    color: #fff;
+    font: inherit;
+    cursor: pointer;
+  }
+
+  .photo-lightbox-image {
+    display: block;
+    width: 100%;
+    max-height: 82vh;
+    object-fit: contain;
+    border-radius: 18px;
+    background: #111;
+  }
+
   .sr-only {
     position: absolute;
-    width: 1px; height: 1px;
-    padding: 0; margin: -1px;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
     overflow: hidden;
     clip: rect(0,0,0,0);
     white-space: nowrap;
     border: 0;
+  }
+
+  @media (min-width: 700px) {
+    .photo-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .photo-grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+
+  @media (max-width: 760px) {
+    .photo-actions > *,
+    .photo-btn {
+      width: 100%;
+    }
+
+    .photo-lightbox {
+      width: calc(100vw - 20px);
+    }
   }
 </style>
