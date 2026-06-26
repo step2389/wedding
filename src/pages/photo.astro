@@ -15,7 +15,7 @@
 
           <div class="photo-actions">
             <label for="camera-input" class="photo-btn photo-btn-primary">Scatta una foto</label>
-            <label for="gallery-input" class="photo-btn">Scegli dalla galleria</label>
+            <label for="gallery-input" class="photo-btn photo-btn-secondary">Scegli dalla galleria</label>
             <button id="upload-btn" class="photo-btn photo-btn-soft" type="button" disabled>Carica adesso</button>
           </div>
 
@@ -23,28 +23,20 @@
           <input id="gallery-input" class="sr-only" type="file" accept="image/*" multiple />
 
           <p id="selected-files" class="photo-selected">Nessuna foto selezionata.</p>
-
-          <div class="photo-stats">
-            <div class="photo-stat">
-              <span>Stato upload</span>
-              <strong id="upload-status">In attesa</strong>
-            </div>
-            <div class="photo-stat">
-              <span>Foto visibili</span>
-              <strong id="photo-count">0</strong>
-            </div>
-          </div>
         </section>
 
         <section class="photo-box photo-box-gallery">
           <div class="photo-head photo-head-gallery">
             <p class="photo-kicker photo-kicker-inline">Galleria live</p>
-            <button id="refresh-btn" class="photo-refresh-icon" type="button" aria-label="Aggiorna galleria" title="Aggiorna galleria">
-              <svg viewBox="0 0 24 24" aria-hidden="true">
-                <path d="M21 12a9 9 0 1 1-2.64-6.36" />
-                <path d="M21 3v6h-6" />
-              </svg>
-            </button>
+            <div class="photo-gallery-tools">
+              <span id="photo-count" class="photo-count-badge" aria-label="Numero foto visibili">0</span>
+              <button id="refresh-btn" class="photo-refresh-icon" type="button" aria-label="Aggiorna galleria" title="Aggiorna galleria">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M21 12a9 9 0 1 1-2.64-6.36" />
+                  <path d="M21 3v6h-6" />
+                </svg>
+              </button>
+            </div>
           </div>
 
           <p id="message" class="photo-message" role="status" aria-live="polite"></p>
@@ -73,7 +65,6 @@
       const selectedFilesText = document.getElementById("selected-files");
       const gallery = document.getElementById("gallery-grid");
       const message = document.getElementById("message");
-      const uploadStatus = document.getElementById("upload-status");
       const photoCount = document.getElementById("photo-count");
       const lightbox = document.getElementById("lightbox");
       const lightboxImage = document.getElementById("lightbox-image");
@@ -95,14 +86,12 @@
         galleryInput.disabled = nextUploading;
         refreshBtn.disabled = nextUploading;
         uploadBtn.disabled = nextUploading || !selectedFiles.length;
-        uploadStatus.textContent = nextUploading ? "Caricamento..." : "In attesa";
       }
 
       function updateSelectedFilesUI() {
         if (!selectedFiles.length) {
           selectedFilesText.textContent = "Nessuna foto selezionata.";
           uploadBtn.disabled = true;
-          if (!isUploading) uploadStatus.textContent = "In attesa";
           return;
         }
 
@@ -232,11 +221,9 @@
           cameraInput.value = "";
           galleryInput.value = "";
           updateSelectedFilesUI();
-          uploadStatus.textContent = "Upload completato";
           showMessage("");
           await loadPhotos();
         } catch {
-          uploadStatus.textContent = "Errore upload";
           showMessage("Upload non riuscito. Riprova.", true);
         } finally {
           setUploadingState(false);
@@ -289,8 +276,7 @@
   .photo-page {
     min-height: 100vh;
     padding: 14px 10px 40px;
-    background:
-      linear-gradient(180deg, rgba(215, 227, 232, 0.92) 0%, rgba(239, 243, 245, 0.98) 100%);
+    background: linear-gradient(180deg, rgba(215, 227, 232, 0.94) 0%, rgba(236, 242, 245, 0.98) 100%);
   }
 
   .photo-wrap {
@@ -306,14 +292,10 @@
     backdrop-filter: blur(4px);
   }
 
-  .photo-box-upload {
-    background: rgba(255, 255, 255, 0.18);
-    border: 1px solid rgba(255, 255, 255, 0.32);
-  }
-
+  .photo-box-upload,
   .photo-box-gallery {
-    background: rgba(118, 106, 101, 0.76);
-    border: 1px solid rgba(255, 255, 255, 0.12);
+    background: rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.34);
   }
 
   .photo-kicker {
@@ -327,11 +309,6 @@
 
   .photo-kicker-inline {
     margin: 0;
-  }
-
-  .photo-box-gallery .photo-kicker {
-    color: #f4eeea;
-    opacity: 0.88;
   }
 
   .photo-title {
@@ -355,13 +332,13 @@
   }
 
   .photo-text,
-  .photo-selected {
+  .photo-selected,
+  .photo-meta {
     color: var(--color-text-dark, #221b18);
     opacity: 0.88;
   }
 
   .photo-actions,
-  .photo-stats,
   .photo-head {
     display: flex;
     flex-wrap: wrap;
@@ -369,14 +346,19 @@
     align-items: center;
   }
 
-  .photo-actions,
-  .photo-stats {
+  .photo-actions {
     margin-top: 16px;
   }
 
   .photo-head {
     justify-content: space-between;
     margin-bottom: 8px;
+  }
+
+  .photo-gallery-tools {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
   }
 
   .photo-btn {
@@ -386,9 +368,7 @@
     min-height: 46px;
     padding: 12px 18px;
     border-radius: 999px;
-    border: 1px solid var(--color-muted, rgba(255, 255, 255, 0.45));
-    background: rgba(255, 255, 255, 0.08);
-    color: var(--color-secondary, #ffffff);
+    border: 1px solid rgba(255, 255, 255, 0.55);
     font: inherit;
     font-size: 10px;
     font-weight: 700;
@@ -399,13 +379,16 @@
   }
 
   .photo-btn-primary {
-    background: rgba(255, 255, 255, 0.14);
-    color: var(--color-text-dark, #221b18);
+    background: rgba(34, 27, 24, 0.9);
+    border-color: rgba(34, 27, 24, 0.9);
+    color: #ffffff;
   }
 
+  .photo-btn-secondary,
   .photo-btn-soft {
-    background: rgba(255, 255, 255, 0.08);
-    color: var(--color-secondary, #ffffff);
+    background: rgba(255, 255, 255, 0.92);
+    border-color: rgba(34, 27, 24, 0.08);
+    color: var(--color-text-dark, #221b18);
   }
 
   .photo-btn:disabled {
@@ -417,7 +400,7 @@
   .photo-card-button:focus-visible,
   .photo-lightbox-close:focus-visible,
   .photo-refresh-icon:focus-visible {
-    outline: 3px solid rgba(255, 255, 255, 0.24);
+    outline: 3px solid rgba(34, 27, 24, 0.18);
     outline-offset: 3px;
   }
 
@@ -426,30 +409,21 @@
     word-break: break-word;
   }
 
-  .photo-stat {
-    flex: 1 1 160px;
-    min-width: 0;
-    background: rgba(255, 255, 255, 0.1);
-    border: 1px solid rgba(255, 255, 255, 0.18);
-    border-radius: 18px;
-    padding: 14px 16px;
-  }
-
-  .photo-stat span {
-    display: block;
-    font-size: 10px;
-    letter-spacing: 0.22em;
-    text-transform: uppercase;
+  .photo-count-badge {
+    min-width: 34px;
+    height: 34px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 10px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.92);
+    border: 1px solid rgba(34, 27, 24, 0.08);
     color: var(--color-text-dark, #221b18);
-    opacity: 0.72;
-  }
-
-  .photo-stat strong {
-    display: block;
-    margin-top: 6px;
-    font-size: 1.05rem;
-    color: var(--color-text-dark, #221b18);
-    font-weight: 600;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    line-height: 1;
   }
 
   .photo-refresh-icon {
@@ -459,9 +433,9 @@
     align-items: center;
     justify-content: center;
     border-radius: 999px;
-    border: 1px solid rgba(255, 255, 255, 0.18);
-    background: rgba(255, 255, 255, 0.1);
-    color: #f4eeea;
+    border: 1px solid rgba(34, 27, 24, 0.08);
+    background: rgba(255, 255, 255, 0.92);
+    color: var(--color-text-dark, #221b18);
     cursor: pointer;
     flex: 0 0 auto;
   }
@@ -478,8 +452,8 @@
 
   .photo-message {
     margin-bottom: 8px;
-    color: #f4eeea;
-    opacity: 0.9;
+    color: var(--color-text-dark, #221b18);
+    opacity: 0.82;
   }
 
   .photo-message:empty,
@@ -488,7 +462,7 @@
   }
 
   .photo-message[data-error="true"] {
-    color: #ffd6d1;
+    color: #a04242;
     opacity: 1;
   }
 
@@ -505,8 +479,8 @@
     min-width: 0;
     overflow: hidden;
     border-radius: 16px;
-    background: rgba(255, 255, 255, 0.06);
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: rgba(255, 255, 255, 0.42);
+    border: 1px solid rgba(255, 255, 255, 0.5);
   }
 
   .photo-card-button {
@@ -525,7 +499,7 @@
     width: 100%;
     aspect-ratio: 1 / 1;
     overflow: hidden;
-    background: rgba(255, 255, 255, 0.08);
+    background: rgba(255, 255, 255, 0.35);
   }
 
   .photo-media img {
@@ -544,8 +518,6 @@
     font-size: 10px;
     letter-spacing: 0.14em;
     text-transform: uppercase;
-    color: #f4eeea;
-    opacity: 0.74;
   }
 
   .photo-lightbox {
