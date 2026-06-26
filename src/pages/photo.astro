@@ -5,57 +5,54 @@ const workerBase = "https://wedding-worker.stefano-penzo23.workers.dev";
 <html lang="it">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <title>Foto matrimonio</title>
   </head>
-
   <body>
-    <section class="wedding-photo-page">
-      <div class="wedding-photo-shell">
-        <header class="wedding-photo-hero">
-          <p class="wedding-photo-eyebrow">Album condiviso</p>
-          <h1 class="wedding-photo-title">Carica le tue foto del matrimonio</h1>
-          <p class="wedding-photo-intro">
-            Puoi scattare una foto al momento oppure scegliere immagini già presenti sul telefono. Poi premi il pulsante di upload per aggiungerle alla galleria condivisa.
-          </p>
+    <main class="wp-page">
+      <section class="wp-box wp-hero">
+        <p class="wp-kicker">Album condiviso</p>
+        <h1>Carica le tue foto del matrimonio</h1>
+        <p class="wp-intro">
+          Puoi scattare una foto al momento oppure scegliere immagini già presenti sul telefono.
+        </p>
 
-          <div class="wedding-photo-actions">
-            <label for="camera-input" class="wedding-photo-btn wedding-photo-btn-primary">Scatta una foto</label>
-            <label for="gallery-input" class="wedding-photo-btn wedding-photo-btn-secondary">Scegli dalla galleria</label>
-            <button id="upload-btn" class="wedding-photo-btn wedding-photo-btn-accent" type="button" disabled>Carica adesso</button>
+        <div class="wp-actions">
+          <label for="camera-input" class="wp-btn wp-btn-primary">Scatta una foto</label>
+          <label for="gallery-input" class="wp-btn wp-btn-secondary">Scegli dalla galleria</label>
+          <button id="upload-btn" class="wp-btn wp-btn-soft" type="button" disabled>Carica adesso</button>
+        </div>
+
+        <input id="camera-input" class="wp-sr-only" type="file" accept="image/*" capture="environment" />
+        <input id="gallery-input" class="wp-sr-only" type="file" accept="image/*" multiple />
+
+        <p id="selected-files" class="wp-selected">Nessuna foto selezionata.</p>
+
+        <div class="wp-stats">
+          <div class="wp-stat">
+            <span>Stato upload</span>
+            <strong id="upload-status">Pronto</strong>
           </div>
-
-          <input id="camera-input" class="wedding-photo-sr-only" type="file" accept="image/*" capture="environment" />
-          <input id="gallery-input" class="wedding-photo-sr-only" type="file" accept="image/*" multiple />
-
-          <p id="selected-files" class="wedding-photo-selected">Nessuna foto selezionata.</p>
-
-          <div class="wedding-photo-status-grid">
-            <div class="wedding-photo-status-card">
-              <span class="wedding-photo-status-label">Stato upload</span>
-              <strong id="upload-status">Pronto</strong>
-            </div>
-            <div class="wedding-photo-status-card">
-              <span class="wedding-photo-status-label">Foto visibili</span>
-              <strong id="photo-count">0</strong>
-            </div>
+          <div class="wp-stat">
+            <span>Foto visibili</span>
+            <strong id="photo-count">0</strong>
           </div>
-        </header>
+        </div>
+      </section>
 
-        <section id="gallery" class="wedding-photo-gallery-section">
-          <div class="wedding-photo-section-head">
-            <div>
-              <p class="wedding-photo-eyebrow">Galleria live</p>
-              <h2 class="wedding-photo-subtitle">Tutte le foto degli invitati</h2>
-            </div>
-            <button id="refresh-btn" class="wedding-photo-btn wedding-photo-btn-ghost" type="button">Aggiorna</button>
+      <section class="wp-box wp-gallery-section">
+        <div class="wp-gallery-head">
+          <div>
+            <p class="wp-kicker">Galleria live</p>
+            <h2>Tutte le foto degli invitati</h2>
           </div>
+          <button id="refresh-btn" class="wp-btn wp-btn-secondary" type="button">Aggiorna</button>
+        </div>
 
-          <p id="message" class="wedding-photo-message" role="status" aria-live="polite">Sto caricando la galleria...</p>
-          <div id="gallery-grid" class="wedding-photo-grid"></div>
-        </section>
-      </div>
-    </section>
+        <p id="message" class="wp-message" role="status" aria-live="polite">Sto caricando la galleria...</p>
+        <div id="gallery-grid" class="wp-grid"></div>
+      </section>
+    </main>
 
     <script type="module">
       const workerBase = "https://wedding-worker.stefano-penzo23.workers.dev";
@@ -90,32 +87,25 @@ const workerBase = "https://wedding-worker.stefano-penzo23.workers.dev";
         uploadBtn.disabled = false;
       }
 
-      function setSelectedFiles(files, mode = "append") {
-        const next = Array.from(files || []);
-        if (!next.length) return;
-
-        if (mode === "append") {
-          selectedFiles = [...selectedFiles, ...next];
-        } else {
-          selectedFiles = next;
-        }
-
+      function addFiles(fileList) {
+        const files = Array.from(fileList || []);
+        if (!files.length) return;
+        selectedFiles = [...selectedFiles, ...files];
         updateSelectedFilesUI();
       }
 
       function createPhotoCard(photo) {
         const card = document.createElement("article");
-        card.className = "wedding-photo-card";
+        card.className = "wp-card";
 
         const link = document.createElement("a");
         link.href = photo.url;
         link.target = "_blank";
         link.rel = "noopener noreferrer";
-        link.className = "wedding-photo-card-link";
-        link.setAttribute("aria-label", "Apri foto intera");
+        link.className = "wp-card-link";
 
         const media = document.createElement("div");
-        media.className = "wedding-photo-card-media";
+        media.className = "wp-card-media";
 
         const img = document.createElement("img");
         img.src = photo.url;
@@ -127,7 +117,7 @@ const workerBase = "https://wedding-worker.stefano-penzo23.workers.dev";
         link.appendChild(media);
 
         const meta = document.createElement("div");
-        meta.className = "wedding-photo-card-meta";
+        meta.className = "wp-card-meta";
 
         const date = photo.uploaded ? new Date(photo.uploaded) : null;
         meta.textContent =
@@ -143,23 +133,23 @@ const workerBase = "https://wedding-worker.stefano-penzo23.workers.dev";
         try {
           showMessage("Sto caricando la galleria...");
           const res = await fetch(`${workerBase}/photos`, { cache: "no-store" });
-          if (!res.ok) throw new Error("Errore nel caricamento");
+          if (!res.ok) throw new Error("Errore");
           const photos = await res.json();
 
           gallery.innerHTML = "";
           photoCount.textContent = String(photos.length);
 
           if (!photos.length) {
-            showMessage("Nessuna foto caricata per ora. Sii il primo a condividere uno scatto.");
+            showMessage("Nessuna foto caricata per ora.");
             return;
           }
 
-          const fragment = document.createDocumentFragment();
-          photos.forEach((photo) => fragment.appendChild(createPhotoCard(photo)));
-          gallery.appendChild(fragment);
+          const frag = document.createDocumentFragment();
+          photos.forEach((photo) => frag.appendChild(createPhotoCard(photo)));
+          gallery.appendChild(frag);
           showMessage(`Galleria aggiornata: ${photos.length} foto disponibili.`);
         } catch {
-          showMessage("Non riesco a caricare la galleria in questo momento.", true);
+          showMessage("Non riesco a caricare la galleria.", true);
         }
       }
 
@@ -183,16 +173,6 @@ const workerBase = "https://wedding-worker.stefano-penzo23.workers.dev";
           if (!res.ok || data.error) throw new Error(data.error || "Upload fallito");
 
           uploadStatus.textContent = "Completato";
-
-          const uploadedCount = data.uploaded?.length || 0;
-          const skippedCount = data.skipped?.length || 0;
-
-          showMessage(
-            skippedCount
-              ? `Caricate ${uploadedCount} foto. ${skippedCount} file sono stati saltati.`
-              : `Caricate ${uploadedCount} foto con successo.`
-          );
-
           selectedFiles = [];
           cameraInput.value = "";
           galleryInput.value = "";
@@ -200,292 +180,246 @@ const workerBase = "https://wedding-worker.stefano-penzo23.workers.dev";
           await loadPhotos();
         } catch {
           uploadStatus.textContent = "Errore";
-          showMessage("Upload non riuscito. Riprova tra qualche secondo.", true);
+          showMessage("Upload non riuscito. Riprova.", true);
           uploadBtn.disabled = false;
         }
       }
 
-      cameraInput?.addEventListener("change", (event) => {
-        setSelectedFiles(event.target.files, "append");
-      });
-
-      galleryInput?.addEventListener("change", (event) => {
-        setSelectedFiles(event.target.files, "append");
-      });
-
+      cameraInput?.addEventListener("change", (event) => addFiles(event.target.files));
+      galleryInput?.addEventListener("change", (event) => addFiles(event.target.files));
       uploadBtn?.addEventListener("click", uploadFiles);
       refreshBtn?.addEventListener("click", loadPhotos);
 
       updateSelectedFilesUI();
       loadPhotos();
-      setInterval(loadPhotos, 20000);
     </script>
   </body>
 </html>
 
 <style>
-  .wedding-photo-page,
-  .wedding-photo-page * ,
-  .wedding-photo-page *::before,
-  .wedding-photo-page *::after {
+  .wp-page,
+  .wp-page *,
+  .wp-page *::before,
+  .wp-page *::after {
     box-sizing: border-box;
   }
 
-  .wedding-photo-page {
+  .wp-page {
     min-height: 100vh;
-    padding: 24px 14px 64px;
-    background: radial-gradient(circle at top, rgba(159, 111, 90, 0.12), transparent 30%), #faf7f2;
+    padding: 14px 10px 40px;
+    background: #faf7f2;
     color: #221b18;
     overflow-x: hidden;
+    font-family: system-ui, sans-serif;
   }
 
-  .wedding-photo-shell {
-    width: min(1120px, 100%);
-    margin: 0 auto;
-    display: grid;
-    gap: 24px;
-  }
-
-  .wedding-photo-hero,
-  .wedding-photo-gallery-section {
-    width: 100%;
-    min-width: 0;
-    background: rgba(255, 255, 255, 0.92);
-    border: 1px solid rgba(34, 27, 24, 0.1);
+  .wp-box {
+    width: min(100%, 980px);
+    margin: 0 auto 16px;
+    background: rgba(255,255,255,.94);
+    border: 1px solid rgba(34,27,24,.1);
     border-radius: 24px;
-    box-shadow: 0 20px 60px rgba(70, 44, 34, 0.12);
+    padding: 18px;
   }
 
-  .wedding-photo-hero {
-    padding: 24px;
-    text-align: center;
-  }
-
-  .wedding-photo-gallery-section {
-    padding: 22px;
-  }
-
-  .wedding-photo-eyebrow,
-  .wedding-photo-status-label {
-    margin: 0;
-    text-transform: uppercase;
-    letter-spacing: 0.14em;
+  .wp-kicker {
+    margin: 0 0 6px;
     font-size: 12px;
+    letter-spacing: .14em;
+    text-transform: uppercase;
     color: #6e625c;
   }
 
-  .wedding-photo-title {
-    margin: 10px auto 14px;
-    max-width: 12ch;
-    font-size: clamp(2.1rem, 5vw, 4rem);
-    line-height: 1.03;
-    font-family: "Montserrat", "Playfair Display", serif;
+  .wp-hero h1,
+  .wp-gallery-section h2 {
+    margin: 0 0 10px;
+    font-family: "Montserrat","Playfair Display",serif;
+    line-height: 1.05;
   }
 
-  .wedding-photo-subtitle {
-    margin: 6px 0 10px;
-    font-size: clamp(1.4rem, 3vw, 2rem);
-    line-height: 1.1;
-    font-family: "Montserrat", "Playfair Display", serif;
+  .wp-hero h1 {
+    font-size: clamp(2rem, 5vw, 3.6rem);
   }
 
-  .wedding-photo-intro,
-  .wedding-photo-message,
-  .wedding-photo-card-meta,
-  .wedding-photo-selected {
+  .wp-gallery-section h2 {
+    font-size: clamp(1.45rem, 3.2vw, 2rem);
+  }
+
+  .wp-intro,
+  .wp-selected,
+  .wp-message,
+  .wp-card-meta {
     margin: 0;
     color: #6e625c;
+    line-height: 1.6;
     font-size: 16px;
-    line-height: 1.65;
   }
 
-  .wedding-photo-intro {
-    max-width: 640px;
-    margin-inline: auto;
-  }
-
-  .wedding-photo-actions,
-  .wedding-photo-status-grid,
-  .wedding-photo-section-head {
+  .wp-actions,
+  .wp-stats,
+  .wp-gallery-head {
     display: flex;
     flex-wrap: wrap;
-    align-items: center;
     gap: 12px;
+    align-items: center;
   }
 
-  .wedding-photo-actions,
-  .wedding-photo-status-grid {
-    justify-content: center;
-    margin-top: 20px;
+  .wp-actions,
+  .wp-stats {
+    margin-top: 16px;
   }
 
-  .wedding-photo-btn {
+  .wp-gallery-head {
+    justify-content: space-between;
+    margin-bottom: 14px;
+  }
+
+  .wp-btn {
     display: inline-flex;
     align-items: center;
     justify-content: center;
     min-height: 48px;
-    min-width: 0;
-    padding: 14px 20px;
+    padding: 12px 18px;
     border-radius: 999px;
-    border: 1px solid transparent;
-    background: transparent;
+    border: 1px solid rgba(34,27,24,.1);
+    background: #fff;
     color: #221b18;
     font: inherit;
     font-weight: 600;
-    text-align: center;
     text-decoration: none;
     cursor: pointer;
   }
 
-  .wedding-photo-btn-primary {
+  .wp-btn-primary {
     background: #9f6f5a;
+    border-color: #9f6f5a;
     color: #fff;
   }
 
-  .wedding-photo-btn-secondary,
-  .wedding-photo-btn-ghost {
-    border-color: rgba(34, 27, 24, 0.1);
-    background: #fff;
-  }
-
-  .wedding-photo-btn-accent {
-    border-color: rgba(159, 111, 90, 0.24);
+  .wp-btn-soft {
     background: #efe3db;
+    border-color: rgba(159,111,90,.2);
   }
 
-  .wedding-photo-btn:disabled {
-    opacity: 0.5;
+  .wp-btn:disabled {
+    opacity: .5;
     cursor: not-allowed;
   }
 
-  .wedding-photo-selected {
-    margin-top: 14px;
+  .wp-selected {
+    margin-top: 12px;
     word-break: break-word;
   }
 
-  .wedding-photo-status-card {
-    width: 100%;
+  .wp-stat {
+    flex: 1 1 160px;
     min-width: 0;
-    max-width: 220px;
-    padding: 16px 18px;
-    border-radius: 18px;
-    border: 1px solid rgba(34, 27, 24, 0.1);
     background: #fff;
-    text-align: left;
+    border: 1px solid rgba(34,27,24,.1);
+    border-radius: 18px;
+    padding: 14px 16px;
   }
 
-  .wedding-photo-status-card strong {
+  .wp-stat span {
+    display: block;
+    font-size: 12px;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: #6e625c;
+  }
+
+  .wp-stat strong {
     display: block;
     margin-top: 6px;
     font-size: 1.15rem;
   }
 
-  .wedding-photo-section-head {
-    justify-content: space-between;
-    margin-bottom: 16px;
-  }
-
-  .wedding-photo-message[data-error="true"] {
+  .wp-message[data-error="true"] {
     color: #a04242;
   }
 
-  .wedding-photo-grid {
-    margin-top: 18px;
+  .wp-grid {
     display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 12px;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
     width: 100%;
-    min-width: 0;
+    margin-top: 14px;
   }
 
-  .wedding-photo-card {
-    width: 100%;
+  .wp-card {
     min-width: 0;
+    width: 100%;
     overflow: hidden;
     border-radius: 18px;
-    border: 1px solid rgba(34, 27, 24, 0.1);
     background: #fff;
+    border: 1px solid rgba(34,27,24,.1);
   }
 
-  .wedding-photo-card-link {
+  .wp-card-link {
     display: block;
     width: 100%;
-    min-width: 0;
-    color: inherit;
     text-decoration: none;
+    color: inherit;
   }
 
-  .wedding-photo-card-media {
+  .wp-card-media {
     width: 100%;
-    aspect-ratio: 4 / 5;
+    height: 220px;
     overflow: hidden;
-    background: #efe7df;
+    background: #ece5dd;
   }
 
-  .wedding-photo-card-media img {
+  .wp-card-media img {
     display: block;
     width: 100%;
-    height: 100%;
-    max-width: none;
+    height: 220px;
+    min-width: 100%;
+    max-width: 100%;
     object-fit: cover;
     object-position: center;
+    vertical-align: middle;
   }
 
-  .wedding-photo-card-meta {
-    padding: 12px 14px 14px;
+  .wp-card-meta {
+    padding: 10px 12px 12px;
     font-size: 14px;
   }
 
-  .wedding-photo-sr-only {
+  .wp-sr-only {
     position: absolute;
     width: 1px;
     height: 1px;
     padding: 0;
     margin: -1px;
     overflow: hidden;
-    clip: rect(0, 0, 0, 0);
+    clip: rect(0,0,0,0);
     white-space: nowrap;
     border: 0;
   }
 
-  @media (min-width: 700px) {
-    .wedding-photo-grid {
-      grid-template-columns: repeat(3, minmax(0, 1fr));
+  @media (min-width: 720px) {
+    .wp-grid {
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+    }
+
+    .wp-card-media,
+    .wp-card-media img {
+      height: 240px;
     }
   }
 
-  @media (min-width: 1024px) {
-    .wedding-photo-grid {
-      grid-template-columns: repeat(4, minmax(0, 1fr));
+  @media (min-width: 1040px) {
+    .wp-grid {
+      grid-template-columns: repeat(4, 1fr);
     }
   }
 
   @media (max-width: 760px) {
-    .wedding-photo-page {
-      padding: 14px 10px 48px;
-    }
-
-    .wedding-photo-hero,
-    .wedding-photo-gallery-section {
-      padding: 18px;
-    }
-
-    .wedding-photo-hero {
-      text-align: left;
-    }
-
-    .wedding-photo-actions > *,
-    .wedding-photo-section-head > *,
-    .wedding-photo-btn {
+    .wp-actions > *,
+    .wp-gallery-head > *,
+    .wp-btn {
       width: 100%;
-    }
-
-    .wedding-photo-status-grid {
-      justify-content: stretch;
-    }
-
-    .wedding-photo-status-card {
-      max-width: none;
     }
   }
 </style>
