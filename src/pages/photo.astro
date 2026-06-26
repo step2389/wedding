@@ -1,15 +1,12 @@
 ---
 ---
-<section class="photo-page font-montserrat" data-photo-app>
-  <div class="photo-shell">
-    <div class="photo-panel photo-upload-panel">
-      <div class="photo-intro">
-        <p class="photo-kicker">Album condiviso</p>
-        <h1 class="photo-title">Carica le tue foto del matrimonio</h1>
-        <p class="photo-text">
-          Scatta una foto oppure scegli immagini dal telefono, poi condividile nella galleria del matrimonio.
-        </p>
-      </div>
+
+<section class="photo-page" data-photo-app>
+  <div class="photo-wrap">
+    <section class="photo-box photo-box-upload">
+      <p class="photo-kicker">Album condiviso</p>
+      <h1 class="photo-title">Carica le tue foto del matrimonio</h1>
+      <p class="photo-text">Scatta una foto oppure scegli immagini dal telefono, poi condividile nella galleria del matrimonio.</p>
 
       <div class="photo-actions">
         <label for="camera-input" class="photo-btn photo-btn-primary">Scatta una foto</label>
@@ -32,9 +29,9 @@
           <strong id="photo-count">0</strong>
         </div>
       </div>
-    </div>
+    </section>
 
-    <div class="photo-panel photo-gallery-panel">
+    <section class="photo-box photo-box-gallery">
       <div class="photo-gallery-head">
         <p class="photo-kicker photo-kicker-gallery">Galleria Live</p>
         <button id="refresh-btn" class="photo-refresh-icon" type="button" aria-label="Aggiorna galleria" title="Aggiorna galleria">
@@ -47,7 +44,7 @@
 
       <p id="message" class="photo-message" role="status" aria-live="polite"></p>
       <div id="gallery-grid" class="photo-grid"></div>
-    </div>
+    </section>
   </div>
 
   <dialog id="lightbox" class="photo-lightbox" aria-label="Foto ingrandita">
@@ -273,122 +270,131 @@
 </script>
 
 <style>
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: linear-gradient(180deg, #e7f2f7 0%, #d7e8ef 55%, #edf5f7 100%);
+  }
+
+  body {
+    font-family: Montserrat, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    color: #221b18;
+  }
+
+  *, *::before, *::after {
+    box-sizing: border-box;
+  }
+
   .photo-page {
-    position: relative;
     min-height: 100vh;
-    padding: 1rem 0.9rem 2.5rem;
-    font-family: Montserrat, sans-serif;
-    color: var(--color-text-dark, #f5efe6);
-    background:
-      linear-gradient(180deg, rgba(186, 210, 221, 0.7) 0%, rgba(206, 226, 234, 0.5) 22%, rgba(233, 236, 231, 0.18) 100%),
-      radial-gradient(circle at top, rgba(226, 244, 255, 0.95) 0%, rgba(187, 214, 227, 0.45) 38%, rgba(142, 171, 186, 0.12) 74%, transparent 100%);
+    padding: 14px 10px 40px;
+    background: radial-gradient(circle at top, rgba(255, 255, 255, 0.55), transparent 34%);
   }
 
-  .photo-shell {
-    width: min(100%, 72rem);
+  .photo-wrap {
+    width: min(100%, 1120px);
     margin: 0 auto;
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
   }
 
-  .photo-panel {
-    border-radius: 1.8rem;
-    padding: 1rem;
-    background: rgba(141, 130, 124, 0.72);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    box-shadow: 0 14px 40px rgba(79, 95, 108, 0.12);
+  .photo-box {
+    border-radius: 24px;
+    padding: 16px;
+    margin-bottom: 16px;
     overflow: hidden;
   }
 
-  .photo-upload-panel {
-    background:
-      linear-gradient(180deg, rgba(219, 234, 240, 0.88) 0%, rgba(208, 227, 235, 0.78) 100%),
-      rgba(205, 224, 232, 0.82);
-    color: #231f1d;
-    border: 1px solid rgba(255, 255, 255, 0.3);
+  .photo-box-upload {
+    background: linear-gradient(180deg, rgba(220, 238, 246, 0.98) 0%, rgba(211, 231, 240, 0.96) 100%);
+    border: 1px solid rgba(177, 205, 218, 0.9);
+    box-shadow: 0 10px 28px rgba(136, 168, 183, 0.18);
   }
 
-  .photo-gallery-panel {
-    background: rgba(124, 114, 109, 0.72);
-  }
-
-  .photo-intro {
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
-    text-align: center;
+  .photo-box-gallery {
+    background: rgba(123, 112, 106, 0.88);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    box-shadow: 0 10px 28px rgba(85, 77, 73, 0.12);
   }
 
   .photo-kicker {
-    margin: 0;
-    font-size: 0.68rem;
-    line-height: 1;
-    letter-spacing: 0.42em;
+    margin: 0 0 6px;
+    font-size: 12px;
+    letter-spacing: 0.28em;
     text-transform: uppercase;
-    opacity: 0.8;
+    color: #6c6663;
   }
 
   .photo-kicker-gallery {
-    color: rgba(244, 239, 233, 0.92);
+    color: rgba(241, 235, 229, 0.88);
+    margin-bottom: 0;
   }
 
   .photo-title {
-    margin: 0;
+    margin: 0 0 10px;
+    line-height: 0.9;
+    font-size: clamp(2.25rem, 7vw, 4.8rem);
     text-transform: uppercase;
-    line-height: 0.88;
     letter-spacing: -0.05em;
-    font-size: clamp(2.5rem, 9vw, 5rem);
-    color: #201917;
+    color: #241d1b;
   }
 
   .photo-text,
-  .photo-selected,
+  .photo-hint,
   .photo-message,
+  .photo-selected,
   .photo-lightbox-caption {
     margin: 0;
     line-height: 1.6;
-    text-align: center;
+    font-size: 15px;
   }
 
   .photo-text,
-  .photo-selected,
-  .photo-stat span,
-  .photo-stat strong {
-    color: rgba(35, 31, 29, 0.92);
+  .photo-selected {
+    color: #544c48;
   }
 
-  .photo-actions {
+  .photo-actions,
+  .photo-stats,
+  .photo-gallery-head {
     display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
-    margin-top: 1.35rem;
+    flex-wrap: wrap;
+    gap: 12px;
+    align-items: center;
+  }
+
+  .photo-actions,
+  .photo-stats {
+    margin-top: 16px;
+  }
+
+  .photo-gallery-head {
+    justify-content: space-between;
+    margin-bottom: 8px;
   }
 
   .photo-btn {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    min-height: 50px;
-    width: 100%;
-    padding: 0.95rem 1.3rem;
+    min-height: 46px;
+    padding: 12px 18px;
     border-radius: 999px;
-    border: 1px solid rgba(255, 255, 255, 0.55);
-    background: rgba(255, 255, 255, 0.1);
-    color: rgba(47, 54, 57, 0.9);
-    text-decoration: none;
-    text-transform: uppercase;
-    letter-spacing: 0.24em;
-    font-size: 0.62rem;
+    border: 1px solid rgba(166, 189, 199, 0.95);
+    background: rgba(255, 255, 255, 0.34);
+    color: #45535b;
+    font: inherit;
+    font-size: 11px;
     font-weight: 700;
-    transition: transform 180ms ease, background 180ms ease, border-color 180ms ease, opacity 180ms ease;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    text-decoration: none;
     cursor: pointer;
+    transition: transform 180ms ease, background 180ms ease, border-color 180ms ease, opacity 180ms ease;
   }
 
   .photo-btn:hover,
   .photo-btn:focus-visible {
-    background: rgba(255, 255, 255, 0.22);
-    border-color: rgba(255, 255, 255, 0.78);
+    background: rgba(255, 255, 255, 0.48);
+    border-color: rgba(142, 172, 185, 1);
   }
 
   .photo-btn:active {
@@ -396,82 +402,65 @@
   }
 
   .photo-btn-primary {
-    background: rgba(255, 255, 255, 0.2);
+    background: rgba(255, 255, 255, 0.46);
   }
 
-  .photo-btn-soft:disabled {
-    opacity: 0.42;
+  .photo-btn-soft {
+    background: rgba(255, 255, 255, 0.22);
+  }
+
+  .photo-btn:disabled {
+    opacity: 0.5;
     cursor: not-allowed;
     transform: none;
   }
 
   .photo-selected {
-    margin-top: 0.95rem;
-    font-size: 0.94rem;
-  }
-
-  .photo-stats {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 0.65rem;
-    margin-top: 1rem;
+    margin-top: 12px;
+    word-break: break-word;
+    text-align: center;
   }
 
   .photo-stat {
-    border-radius: 1.2rem;
-    padding: 0.9rem 0.8rem;
-    background: rgba(255, 255, 255, 0.08);
-    border: 1px solid rgba(255, 255, 255, 0.28);
+    flex: 1 1 160px;
+    min-width: 0;
+    background: rgba(255, 255, 255, 0.18);
+    border: 1px solid rgba(166, 189, 199, 0.68);
+    border-radius: 18px;
+    padding: 14px 16px;
     text-align: center;
   }
 
   .photo-stat span {
     display: block;
-    font-size: 0.58rem;
-    letter-spacing: 0.25em;
+    font-size: 10px;
+    letter-spacing: 0.18em;
     text-transform: uppercase;
-    opacity: 0.8;
+    color: #617079;
   }
 
   .photo-stat strong {
     display: block;
-    margin-top: 0.35rem;
+    margin-top: 6px;
     font-size: 1.05rem;
-    font-weight: 500;
-  }
-
-  .photo-gallery-head {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 0.75rem;
-    margin-bottom: 0.75rem;
+    color: #2f2a28;
+    font-weight: 600;
   }
 
   .photo-refresh-icon {
-    flex: 0 0 auto;
-    width: 2.65rem;
-    height: 2.65rem;
+    width: 36px;
+    height: 36px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
     border-radius: 999px;
-    border: 1px solid rgba(228, 242, 247, 0.68);
-    background: linear-gradient(180deg, rgba(226, 245, 251, 0.95) 0%, rgba(183, 210, 220, 0.96) 100%);
-    color: rgba(58, 74, 79, 0.95);
-    box-shadow: 0 8px 18px rgba(34, 44, 49, 0.16);
+    border: 1px solid rgba(225, 238, 244, 0.7);
+    background: linear-gradient(180deg, rgba(228, 244, 249, 0.98) 0%, rgba(184, 211, 221, 0.98) 100%);
+    color: #47585f;
+    cursor: pointer;
+    flex: 0 0 auto;
+    box-shadow: 0 8px 18px rgba(56, 69, 76, 0.12);
     transition: transform 180ms ease, filter 180ms ease;
-  }
-
-  .photo-refresh-icon svg,
-  .photo-lightbox-close svg {
-    width: 1.15rem;
-    height: 1.15rem;
-    fill: none;
-    stroke: currentColor;
-    stroke-width: 1.8;
-    stroke-linecap: round;
-    stroke-linejoin: round;
   }
 
   .photo-refresh-icon:hover,
@@ -486,11 +475,22 @@
     transform: scale(0.97);
   }
 
+  .photo-refresh-icon svg,
+  .photo-lightbox-close svg {
+    width: 16px;
+    height: 16px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.9;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
   .photo-message {
     min-height: 1.2rem;
-    margin-bottom: 0.4rem;
-    color: rgba(244, 239, 233, 0.9);
-    font-size: 0.88rem;
+    margin-bottom: 0.45rem;
+    color: rgba(244, 237, 232, 0.88);
+    text-align: center;
   }
 
   .photo-message:empty,
@@ -505,16 +505,18 @@
   .photo-grid {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 0.5rem;
-    align-items: start;
+    gap: 10px;
+    width: 100%;
+    margin-top: 14px;
   }
 
   .photo-card {
     width: 100%;
     min-width: 0;
-    border-radius: 0;
     overflow: hidden;
-    background: rgba(255, 255, 255, 0.06);
+    border-radius: 16px;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.06);
   }
 
   .photo-card-button {
@@ -525,14 +527,15 @@
     border: 0;
     background: transparent;
     cursor: pointer;
+    text-align: left;
   }
 
   .photo-media {
     position: relative;
     width: 100%;
-    aspect-ratio: 3 / 4;
+    aspect-ratio: 1 / 1;
     overflow: hidden;
-    background: rgba(215, 215, 215, 0.22);
+    background: rgba(236, 229, 221, 0.22);
   }
 
   .photo-media img {
@@ -543,6 +546,7 @@
     height: 100%;
     object-fit: cover;
     object-position: center;
+    margin: 0;
   }
 
   .photo-lightbox {
@@ -554,7 +558,7 @@
   }
 
   .photo-lightbox::backdrop {
-    background: rgba(12, 10, 9, 0.78);
+    background: rgba(0, 0, 0, 0.72);
     backdrop-filter: blur(4px);
   }
 
@@ -564,18 +568,19 @@
 
   .photo-lightbox-close {
     position: absolute;
-    top: 0.8rem;
-    right: 0.8rem;
+    top: 12px;
+    right: 12px;
     z-index: 2;
-    width: 2.5rem;
-    height: 2.5rem;
+    width: 42px;
+    height: 42px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
+    border: 0;
     border-radius: 999px;
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    background: rgba(34, 30, 28, 0.58);
+    background: rgba(34, 27, 24, 0.82);
     color: #fff;
+    cursor: pointer;
   }
 
   .photo-lightbox-image {
@@ -583,15 +588,16 @@
     width: 100%;
     max-height: 78vh;
     object-fit: contain;
-    border-radius: 1.3rem;
-    background: rgba(11, 9, 8, 0.96);
+    border-radius: 18px;
+    background: #111;
   }
 
   .photo-lightbox-caption {
-    margin-top: 0.7rem;
-    color: rgba(244, 239, 233, 0.92);
-    font-size: 0.8rem;
-    letter-spacing: 0.12em;
+    margin-top: 10px;
+    text-align: center;
+    color: #f2eee9;
+    font-size: 13px;
+    letter-spacing: 0.08em;
     text-transform: uppercase;
   }
 
@@ -608,17 +614,34 @@
   }
 
   @media (min-width: 900px) {
-    .photo-page {
-      padding: 1.3rem 1.2rem 3rem;
+    .photo-grid {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
     }
+  }
 
-    .photo-panel {
-      padding: 1.25rem;
+  @media (max-width: 760px) {
+    .photo-actions > * {
+      width: 100%;
     }
 
     .photo-grid {
-      grid-template-columns: repeat(4, minmax(0, 1fr));
-      gap: 0.7rem;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .photo-box {
+      padding: 14px;
+    }
+
+    .photo-lightbox {
+      width: calc(100vw - 20px);
+    }
+  }
+
+  @media (max-width: 520px) {
+    .photo-grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
     }
   }
 </style>
