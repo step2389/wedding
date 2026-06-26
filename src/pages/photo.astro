@@ -10,49 +10,49 @@ const workerBase = "https://wedding-worker.stefano-penzo23.workers.dev";
   </head>
 
   <body>
-    <section class="photo-page">
-      <div class="shell">
-        <header class="hero">
-          <p class="eyebrow">Album condiviso</p>
-          <h1>Carica le tue foto del matrimonio</h1>
-          <p class="intro">
+    <section class="wedding-photo-page">
+      <div class="wedding-photo-shell">
+        <header class="wedding-photo-hero">
+          <p class="wedding-photo-eyebrow">Album condiviso</p>
+          <h1 class="wedding-photo-title">Carica le tue foto del matrimonio</h1>
+          <p class="wedding-photo-intro">
             Puoi scattare una foto al momento oppure scegliere immagini già presenti sul telefono. Poi premi il pulsante di upload per aggiungerle alla galleria condivisa.
           </p>
 
-          <div class="hero-actions">
-            <label for="camera-input" class="btn btn-primary">Scatta una foto</label>
-            <label for="gallery-input" class="btn btn-secondary">Scegli dalla galleria</label>
-            <button id="upload-btn" class="btn btn-accent" type="button" disabled>Carica adesso</button>
+          <div class="wedding-photo-actions">
+            <label for="camera-input" class="wedding-photo-btn wedding-photo-btn-primary">Scatta una foto</label>
+            <label for="gallery-input" class="wedding-photo-btn wedding-photo-btn-secondary">Scegli dalla galleria</label>
+            <button id="upload-btn" class="wedding-photo-btn wedding-photo-btn-accent" type="button" disabled>Carica adesso</button>
           </div>
 
-          <input id="camera-input" class="sr-only" type="file" accept="image/*" capture="environment" />
-          <input id="gallery-input" class="sr-only" type="file" accept="image/*" multiple />
+          <input id="camera-input" class="wedding-photo-sr-only" type="file" accept="image/*" capture="environment" />
+          <input id="gallery-input" class="wedding-photo-sr-only" type="file" accept="image/*" multiple />
 
-          <p id="selected-files" class="selected-files">Nessuna foto selezionata.</p>
+          <p id="selected-files" class="wedding-photo-selected">Nessuna foto selezionata.</p>
 
-          <div class="status-grid">
-            <div class="status-card">
-              <span class="status-label">Stato upload</span>
+          <div class="wedding-photo-status-grid">
+            <div class="wedding-photo-status-card">
+              <span class="wedding-photo-status-label">Stato upload</span>
               <strong id="upload-status">Pronto</strong>
             </div>
-            <div class="status-card">
-              <span class="status-label">Foto visibili</span>
+            <div class="wedding-photo-status-card">
+              <span class="wedding-photo-status-label">Foto visibili</span>
               <strong id="photo-count">0</strong>
             </div>
           </div>
         </header>
 
-        <section id="gallery" class="gallery-section">
-          <div class="section-head">
+        <section id="gallery" class="wedding-photo-gallery-section">
+          <div class="wedding-photo-section-head">
             <div>
-              <p class="panel-kicker">Galleria live</p>
-              <h2>Tutte le foto degli invitati</h2>
+              <p class="wedding-photo-eyebrow">Galleria live</p>
+              <h2 class="wedding-photo-subtitle">Tutte le foto degli invitati</h2>
             </div>
-            <button id="refresh-btn" class="btn btn-ghost" type="button">Aggiorna</button>
+            <button id="refresh-btn" class="wedding-photo-btn wedding-photo-btn-ghost" type="button">Aggiorna</button>
           </div>
 
-          <p id="message" class="message" role="status" aria-live="polite">Sto caricando la galleria...</p>
-          <div id="gallery-grid" class="gallery-grid"></div>
+          <p id="message" class="wedding-photo-message" role="status" aria-live="polite">Sto caricando la galleria...</p>
+          <div id="gallery-grid" class="wedding-photo-grid"></div>
         </section>
       </div>
     </section>
@@ -90,7 +90,7 @@ const workerBase = "https://wedding-worker.stefano-penzo23.workers.dev";
         uploadBtn.disabled = false;
       }
 
-      function setSelectedFiles(files, mode = "replace") {
+      function setSelectedFiles(files, mode = "append") {
         const next = Array.from(files || []);
         if (!next.length) return;
 
@@ -104,32 +104,30 @@ const workerBase = "https://wedding-worker.stefano-penzo23.workers.dev";
       }
 
       function createPhotoCard(photo) {
-        const article = document.createElement("article");
-        article.className = "photo-card";
+        const card = document.createElement("article");
+        card.className = "wedding-photo-card";
 
         const link = document.createElement("a");
         link.href = photo.url;
         link.target = "_blank";
         link.rel = "noopener noreferrer";
-        link.className = "photo-trigger";
+        link.className = "wedding-photo-card-link";
         link.setAttribute("aria-label", "Apri foto intera");
 
-        const frame = document.createElement("div");
-        frame.className = "photo-frame";
+        const media = document.createElement("div");
+        media.className = "wedding-photo-card-media";
 
         const img = document.createElement("img");
         img.src = photo.url;
         img.alt = "Foto caricata dagli invitati";
         img.loading = "lazy";
         img.decoding = "async";
-        img.width = 1200;
-        img.height = 1500;
 
-        frame.appendChild(img);
-        link.appendChild(frame);
+        media.appendChild(img);
+        link.appendChild(media);
 
         const meta = document.createElement("div");
-        meta.className = "photo-meta";
+        meta.className = "wedding-photo-card-meta";
 
         const date = photo.uploaded ? new Date(photo.uploaded) : null;
         meta.textContent =
@@ -137,8 +135,8 @@ const workerBase = "https://wedding-worker.stefano-penzo23.workers.dev";
             ? date.toLocaleString("it-IT", { dateStyle: "short", timeStyle: "short" })
             : "Appena caricata";
 
-        article.append(link, meta);
-        return article;
+        card.append(link, meta);
+        return card;
       }
 
       async function loadPhotos() {
@@ -226,240 +224,219 @@ const workerBase = "https://wedding-worker.stefano-penzo23.workers.dev";
 </html>
 
 <style>
-  :root {
-    --bg: #faf7f2;
-    --surface: rgba(255, 255, 255, 0.9);
-    --surface-strong: #ffffff;
-    --text: #221b18;
-    --muted: #6e625c;
-    --line: rgba(34, 27, 24, 0.1);
-    --accent: #9f6f5a;
-    --accent-dark: #7f5644;
-    --accent-soft: #efe3db;
-    --shadow: 0 20px 60px rgba(70, 44, 34, 0.12);
-    --radius: 24px;
-  }
-
-  *, *::before, *::after {
+  .wedding-photo-page,
+  .wedding-photo-page * ,
+  .wedding-photo-page *::before,
+  .wedding-photo-page *::after {
     box-sizing: border-box;
   }
 
-  html {
-    -webkit-text-size-adjust: 100%;
-  }
-
-  body {
-    margin: 0;
-    font-family: system-ui, sans-serif;
-    background: var(--bg);
-    color: var(--text);
+  .wedding-photo-page {
+    min-height: 100vh;
+    padding: 24px 14px 64px;
+    background: radial-gradient(circle at top, rgba(159, 111, 90, 0.12), transparent 30%), #faf7f2;
+    color: #221b18;
     overflow-x: hidden;
   }
 
-  img {
-    display: block;
-    max-width: 100%;
-    height: auto;
-  }
-
-  .photo-page {
-    background: radial-gradient(circle at top, rgba(159, 111, 90, 0.12), transparent 30%), var(--bg);
-    min-height: 100vh;
-    padding: 4rem 1.25rem 6rem;
-  }
-
-  .shell {
+  .wedding-photo-shell {
     width: min(1120px, 100%);
     margin: 0 auto;
     display: grid;
-    gap: 1.5rem;
+    gap: 24px;
   }
 
-  .hero,
-  .gallery-section {
-    background: var(--surface);
-    backdrop-filter: blur(12px);
-    border: 1px solid var(--line);
-    border-radius: var(--radius);
-    box-shadow: var(--shadow);
+  .wedding-photo-hero,
+  .wedding-photo-gallery-section {
+    width: 100%;
+    min-width: 0;
+    background: rgba(255, 255, 255, 0.92);
+    border: 1px solid rgba(34, 27, 24, 0.1);
+    border-radius: 24px;
+    box-shadow: 0 20px 60px rgba(70, 44, 34, 0.12);
   }
 
-  .hero {
-    padding: 2rem;
+  .wedding-photo-hero {
+    padding: 24px;
     text-align: center;
   }
 
-  .eyebrow,
-  .panel-kicker,
-  .status-label {
+  .wedding-photo-gallery-section {
+    padding: 22px;
+  }
+
+  .wedding-photo-eyebrow,
+  .wedding-photo-status-label {
+    margin: 0;
     text-transform: uppercase;
     letter-spacing: 0.14em;
-    font-size: 0.78rem;
-    color: var(--muted);
+    font-size: 12px;
+    color: #6e625c;
   }
 
-  h1 {
-    font-size: clamp(2.2rem, 5vw, 4.3rem);
-    line-height: 1.04;
-    margin: 0.75rem auto 1rem;
+  .wedding-photo-title {
+    margin: 10px auto 14px;
     max-width: 12ch;
+    font-size: clamp(2.1rem, 5vw, 4rem);
+    line-height: 1.03;
+    font-family: "Montserrat", "Playfair Display", serif;
   }
 
-  h2 {
-    font-size: clamp(1.45rem, 3vw, 2.1rem);
+  .wedding-photo-subtitle {
+    margin: 6px 0 10px;
+    font-size: clamp(1.4rem, 3vw, 2rem);
     line-height: 1.1;
-    margin: 0.35rem 0 0.75rem;
+    font-family: "Montserrat", "Playfair Display", serif;
   }
 
-  .intro,
-  .message,
-  .photo-meta,
-  .selected-files {
-    color: var(--muted);
-    font-size: 1rem;
+  .wedding-photo-intro,
+  .wedding-photo-message,
+  .wedding-photo-card-meta,
+  .wedding-photo-selected {
+    margin: 0;
+    color: #6e625c;
+    font-size: 16px;
     line-height: 1.65;
   }
 
-  .intro {
+  .wedding-photo-intro {
     max-width: 640px;
-    margin: 0 auto;
+    margin-inline: auto;
   }
 
-  .hero-actions,
-  .section-head,
-  .status-grid {
+  .wedding-photo-actions,
+  .wedding-photo-status-grid,
+  .wedding-photo-section-head {
     display: flex;
-    gap: 0.9rem;
     flex-wrap: wrap;
     align-items: center;
+    gap: 12px;
   }
 
-  .hero-actions,
-  .status-grid {
+  .wedding-photo-actions,
+  .wedding-photo-status-grid {
     justify-content: center;
-    margin-top: 1.5rem;
+    margin-top: 20px;
   }
 
-  .btn {
+  .wedding-photo-btn {
     display: inline-flex;
     align-items: center;
     justify-content: center;
     min-height: 48px;
     min-width: 0;
-    padding: 0.85rem 1.25rem;
+    padding: 14px 20px;
     border-radius: 999px;
-    text-decoration: none;
     border: 1px solid transparent;
-    font-weight: 600;
     background: transparent;
-    color: var(--text);
-    cursor: pointer;
-    white-space: normal;
+    color: #221b18;
+    font: inherit;
+    font-weight: 600;
     text-align: center;
+    text-decoration: none;
+    cursor: pointer;
   }
 
-  .btn-primary {
-    background: var(--accent);
-    color: white;
+  .wedding-photo-btn-primary {
+    background: #9f6f5a;
+    color: #fff;
   }
 
-  .btn-primary:hover {
-    background: var(--accent-dark);
+  .wedding-photo-btn-secondary,
+  .wedding-photo-btn-ghost {
+    border-color: rgba(34, 27, 24, 0.1);
+    background: #fff;
   }
 
-  .btn-accent {
-    background: var(--accent-soft);
+  .wedding-photo-btn-accent {
     border-color: rgba(159, 111, 90, 0.24);
+    background: #efe3db;
   }
 
-  .btn-secondary,
-  .btn-ghost {
-    border-color: var(--line);
-  }
-
-  .btn:disabled {
+  .wedding-photo-btn:disabled {
     opacity: 0.5;
     cursor: not-allowed;
   }
 
-  .selected-files {
-    margin-top: 1rem;
+  .wedding-photo-selected {
+    margin-top: 14px;
     word-break: break-word;
   }
 
-  .status-card {
-    min-width: 155px;
-    background: var(--surface-strong);
+  .wedding-photo-status-card {
+    width: 100%;
+    min-width: 0;
+    max-width: 220px;
+    padding: 16px 18px;
     border-radius: 18px;
-    border: 1px solid var(--line);
-    padding: 1rem 1.1rem;
+    border: 1px solid rgba(34, 27, 24, 0.1);
+    background: #fff;
     text-align: left;
   }
 
-  .status-card strong {
+  .wedding-photo-status-card strong {
     display: block;
-    font-size: 1.2rem;
-    margin-top: 0.35rem;
+    margin-top: 6px;
+    font-size: 1.15rem;
   }
 
-  .gallery-section {
-    padding: 1.4rem;
-  }
-
-  .section-head {
+  .wedding-photo-section-head {
     justify-content: space-between;
-    margin-bottom: 1rem;
+    margin-bottom: 16px;
   }
 
-  .message[data-error="true"] {
+  .wedding-photo-message[data-error="true"] {
     color: #a04242;
   }
 
-  .gallery-grid {
-    margin-top: 1.1rem;
+  .wedding-photo-grid {
+    margin-top: 18px;
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 0.75rem;
-    align-items: start;
+    gap: 12px;
+    width: 100%;
+    min-width: 0;
   }
 
-  .photo-card {
+  .wedding-photo-card {
     width: 100%;
     min-width: 0;
     overflow: hidden;
     border-radius: 18px;
-    background: var(--surface-strong);
-    border: 1px solid var(--line);
-    box-shadow: 0 8px 24px rgba(70, 44, 34, 0.06);
+    border: 1px solid rgba(34, 27, 24, 0.1);
+    background: #fff;
   }
 
-  .photo-trigger {
+  .wedding-photo-card-link {
     display: block;
     width: 100%;
-    text-decoration: none;
+    min-width: 0;
     color: inherit;
+    text-decoration: none;
   }
 
-  .photo-frame {
+  .wedding-photo-card-media {
     width: 100%;
     aspect-ratio: 4 / 5;
     overflow: hidden;
     background: #efe7df;
   }
 
-  .photo-frame img {
+  .wedding-photo-card-media img {
+    display: block;
     width: 100%;
     height: 100%;
+    max-width: none;
     object-fit: cover;
     object-position: center;
   }
 
-  .photo-meta {
-    padding: 0.72rem 0.82rem 0.9rem;
-    font-size: 0.9rem;
+  .wedding-photo-card-meta {
+    padding: 12px 14px 14px;
+    font-size: 14px;
   }
 
-  .sr-only {
+  .wedding-photo-sr-only {
     position: absolute;
     width: 1px;
     height: 1px;
@@ -471,41 +448,44 @@ const workerBase = "https://wedding-worker.stefano-penzo23.workers.dev";
     border: 0;
   }
 
-  @media (min-width: 640px) {
-    .gallery-grid {
+  @media (min-width: 700px) {
+    .wedding-photo-grid {
       grid-template-columns: repeat(3, minmax(0, 1fr));
     }
   }
 
-  @media (min-width: 980px) {
-    .gallery-grid {
+  @media (min-width: 1024px) {
+    .wedding-photo-grid {
       grid-template-columns: repeat(4, minmax(0, 1fr));
     }
   }
 
   @media (max-width: 760px) {
-    .photo-page {
-      padding: 1rem 0.85rem 4rem;
+    .wedding-photo-page {
+      padding: 14px 10px 48px;
     }
 
-    .hero {
-      padding: 1.35rem;
+    .wedding-photo-hero,
+    .wedding-photo-gallery-section {
+      padding: 18px;
+    }
+
+    .wedding-photo-hero {
       text-align: left;
     }
 
-    .hero-actions > *,
-    .section-head > *,
-    .btn {
+    .wedding-photo-actions > *,
+    .wedding-photo-section-head > *,
+    .wedding-photo-btn {
       width: 100%;
     }
 
-    .status-grid {
+    .wedding-photo-status-grid {
       justify-content: stretch;
     }
 
-    .status-card {
-      width: 100%;
-      min-width: 0;
+    .wedding-photo-status-card {
+      max-width: none;
     }
   }
 </style>
