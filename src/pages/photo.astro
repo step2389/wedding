@@ -16,16 +16,17 @@ const workerBase = "https://wedding-worker.stefano-penzo23.workers.dev";
           <p class="eyebrow">Album condiviso</p>
           <h1>Carica le tue foto del matrimonio</h1>
           <p class="intro">
-            Scegli le immagini dal telefono, poi premi il pulsante di upload per aggiungerle alla galleria condivisa.
+            Puoi scattare una foto al momento oppure scegliere immagini già presenti sul telefono. Poi premi il pulsante di upload per aggiungerle alla galleria condivisa.
           </p>
 
           <div class="hero-actions">
-            <label for="photo-input" class="btn btn-primary">Scegli le foto</label>
+            <label for="camera-input" class="btn btn-primary">Scatta una foto</label>
+            <label for="gallery-input" class="btn btn-secondary">Scegli dalla galleria</label>
             <button id="upload-btn" class="btn btn-accent" type="button" disabled>Carica adesso</button>
-            <a href="#gallery" class="btn btn-secondary">Guarda la galleria</a>
           </div>
 
-          <input id="photo-input" class="sr-only" type="file" accept="image/*" multiple />
+          <input id="camera-input" class="sr-only" type="file" accept="image/*" capture="environment" />
+          <input id="gallery-input" class="sr-only" type="file" accept="image/*" multiple />
 
           <p id="selected-files" class="selected-files">Nessuna foto selezionata.</p>
 
@@ -59,7 +60,8 @@ const workerBase = "https://wedding-worker.stefano-penzo23.workers.dev";
     <script type="module">
       const workerBase = "https://wedding-worker.stefano-penzo23.workers.dev";
 
-      const input = document.getElementById("photo-input");
+      const cameraInput = document.getElementById("camera-input");
+      const galleryInput = document.getElementById("gallery-input");
       const uploadBtn = document.getElementById("upload-btn");
       const selectedFilesText = document.getElementById("selected-files");
       const gallery = document.getElementById("gallery-grid");
@@ -88,6 +90,19 @@ const workerBase = "https://wedding-worker.stefano-penzo23.workers.dev";
         uploadBtn.disabled = false;
       }
 
+      function setSelectedFiles(files, mode = "replace") {
+        const next = Array.from(files || []);
+        if (!next.length) return;
+
+        if (mode === "append") {
+          selectedFiles = [...selectedFiles, ...next];
+        } else {
+          selectedFiles = next;
+        }
+
+        updateSelectedFilesUI();
+      }
+
       function createPhotoCard(photo) {
         const article = document.createElement("article");
         article.className = "photo-card";
@@ -99,11 +114,19 @@ const workerBase = "https://wedding-worker.stefano-penzo23.workers.dev";
         link.className = "photo-trigger";
         link.setAttribute("aria-label", "Apri foto intera");
 
+        const frame = document.createElement("div");
+        frame.className = "photo-frame";
+
         const img = document.createElement("img");
         img.src = photo.url;
         img.alt = "Foto caricata dagli invitati";
         img.loading = "lazy";
         img.decoding = "async";
+        img.width = 1200;
+        img.height = 1500;
+
+        frame.appendChild(img);
+        link.appendChild(frame);
 
         const meta = document.createElement("div");
         meta.className = "photo-meta";
@@ -114,7 +137,6 @@ const workerBase = "https://wedding-worker.stefano-penzo23.workers.dev";
             ? date.toLocaleString("it-IT", { dateStyle: "short", timeStyle: "short" })
             : "Appena caricata";
 
-        link.appendChild(img);
         article.append(link, meta);
         return article;
       }
@@ -122,7 +144,7 @@ const workerBase = "https://wedding-worker.stefano-penzo23.workers.dev";
       async function loadPhotos() {
         try {
           showMessage("Sto caricando la galleria...");
-          const res = await fetch(`${workerBase}/photos`);
+          const res = await fetch(`${workerBase}/photos`, { cache: "no-store" });
           if (!res.ok) throw new Error("Errore nel caricamento");
           const photos = await res.json();
 
@@ -134,7 +156,9 @@ const workerBase = "https://wedding-worker.stefano-penzo23.workers.dev";
             return;
           }
 
-          photos.forEach((photo) => gallery.appendChild(createPhotoCard(photo)));
+          const fragment = document.createDocumentFragment();
+          photos.forEach((photo) => fragment.appendChild(createPhotoCard(photo)));
+          gallery.appendChild(fragment);
           showMessage(`Galleria aggiornata: ${photos.length} foto disponibili.`);
         } catch {
           showMessage("Non riesco a caricare la galleria in questo momento.", true);
@@ -172,7 +196,8 @@ const workerBase = "https://wedding-worker.stefano-penzo23.workers.dev";
           );
 
           selectedFiles = [];
-          input.value = "";
+          cameraInput.value = "";
+          galleryInput.value = "";
           updateSelectedFilesUI();
           await loadPhotos();
         } catch {
@@ -182,9 +207,12 @@ const workerBase = "https://wedding-worker.stefano-penzo23.workers.dev";
         }
       }
 
-      input?.addEventListener("change", (event) => {
-        selectedFiles = Array.from(event.target.files || []);
-        updateSelectedFilesUI();
+      cameraInput?.addEventListener("change", (event) => {
+        setSelectedFiles(event.target.files, "append");
+      });
+
+      galleryInput?.addEventListener("change", (event) => {
+        setSelectedFiles(event.target.files, "append");
       });
 
       uploadBtn?.addEventListener("click", uploadFiles);
@@ -200,7 +228,7 @@ const workerBase = "https://wedding-worker.stefano-penzo23.workers.dev";
 <style>
   :root {
     --bg: #faf7f2;
-    --surface: rgba(255, 255, 255, 0.82);
+    --surface: rgba(255, 255, 255, 0.9);
     --surface-strong: #ffffff;
     --text: #221b18;
     --muted: #6e625c;
@@ -212,16 +240,30 @@ const workerBase = "https://wedding-worker.stefano-penzo23.workers.dev";
     --radius: 24px;
   }
 
-  * { box-sizing: border-box; }
+  *, *::before, *::after {
+    box-sizing: border-box;
+  }
+
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+
   body {
     margin: 0;
     font-family: system-ui, sans-serif;
     background: var(--bg);
     color: var(--text);
+    overflow-x: hidden;
+  }
+
+  img {
+    display: block;
+    max-width: 100%;
+    height: auto;
   }
 
   .photo-page {
-    background: radial-gradient(circle at top, rgba(159,111,90,.12), transparent 30%), var(--bg);
+    background: radial-gradient(circle at top, rgba(159, 111, 90, 0.12), transparent 30%), var(--bg);
     min-height: 100vh;
     padding: 4rem 1.25rem 6rem;
   }
@@ -251,22 +293,22 @@ const workerBase = "https://wedding-worker.stefano-penzo23.workers.dev";
   .panel-kicker,
   .status-label {
     text-transform: uppercase;
-    letter-spacing: .14em;
-    font-size: .78rem;
+    letter-spacing: 0.14em;
+    font-size: 0.78rem;
     color: var(--muted);
   }
 
   h1 {
-    font-size: clamp(2.3rem, 5vw, 4.4rem);
-    line-height: 1.02;
-    margin: .75rem auto 1rem;
+    font-size: clamp(2.2rem, 5vw, 4.3rem);
+    line-height: 1.04;
+    margin: 0.75rem auto 1rem;
     max-width: 12ch;
   }
 
   h2 {
-    font-size: clamp(1.5rem, 3vw, 2.2rem);
+    font-size: clamp(1.45rem, 3vw, 2.1rem);
     line-height: 1.1;
-    margin: .35rem 0 .75rem;
+    margin: 0.35rem 0 0.75rem;
   }
 
   .intro,
@@ -279,7 +321,7 @@ const workerBase = "https://wedding-worker.stefano-penzo23.workers.dev";
   }
 
   .intro {
-    max-width: 620px;
+    max-width: 640px;
     margin: 0 auto;
   }
 
@@ -287,7 +329,7 @@ const workerBase = "https://wedding-worker.stefano-penzo23.workers.dev";
   .section-head,
   .status-grid {
     display: flex;
-    gap: .9rem;
+    gap: 0.9rem;
     flex-wrap: wrap;
     align-items: center;
   }
@@ -303,7 +345,8 @@ const workerBase = "https://wedding-worker.stefano-penzo23.workers.dev";
     align-items: center;
     justify-content: center;
     min-height: 48px;
-    padding: .85rem 1.25rem;
+    min-width: 0;
+    padding: 0.85rem 1.25rem;
     border-radius: 999px;
     text-decoration: none;
     border: 1px solid transparent;
@@ -311,6 +354,8 @@ const workerBase = "https://wedding-worker.stefano-penzo23.workers.dev";
     background: transparent;
     color: var(--text);
     cursor: pointer;
+    white-space: normal;
+    text-align: center;
   }
 
   .btn-primary {
@@ -324,7 +369,7 @@ const workerBase = "https://wedding-worker.stefano-penzo23.workers.dev";
 
   .btn-accent {
     background: var(--accent-soft);
-    border-color: rgba(159,111,90,.24);
+    border-color: rgba(159, 111, 90, 0.24);
   }
 
   .btn-secondary,
@@ -333,12 +378,13 @@ const workerBase = "https://wedding-worker.stefano-penzo23.workers.dev";
   }
 
   .btn:disabled {
-    opacity: .5;
+    opacity: 0.5;
     cursor: not-allowed;
   }
 
   .selected-files {
     margin-top: 1rem;
+    word-break: break-word;
   }
 
   .status-card {
@@ -353,7 +399,7 @@ const workerBase = "https://wedding-worker.stefano-penzo23.workers.dev";
   .status-card strong {
     display: block;
     font-size: 1.2rem;
-    margin-top: .35rem;
+    margin-top: 0.35rem;
   }
 
   .gallery-section {
@@ -372,39 +418,45 @@ const workerBase = "https://wedding-worker.stefano-penzo23.workers.dev";
   .gallery-grid {
     margin-top: 1.1rem;
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-    gap: .75rem;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.75rem;
     align-items: start;
   }
 
   .photo-card {
+    width: 100%;
+    min-width: 0;
     overflow: hidden;
     border-radius: 18px;
     background: var(--surface-strong);
     border: 1px solid var(--line);
-    min-width: 0;
+    box-shadow: 0 8px 24px rgba(70, 44, 34, 0.06);
   }
 
   .photo-trigger {
     display: block;
     width: 100%;
     text-decoration: none;
-    line-height: 0;
+    color: inherit;
   }
 
-  .photo-card img {
+  .photo-frame {
     width: 100%;
-    height: auto;
     aspect-ratio: 4 / 5;
-    object-fit: cover;
-    object-position: center;
-    display: block;
+    overflow: hidden;
     background: #efe7df;
   }
 
+  .photo-frame img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+  }
+
   .photo-meta {
-    padding: .8rem .9rem 1rem;
-    font-size: .92rem;
+    padding: 0.72rem 0.82rem 0.9rem;
+    font-size: 0.9rem;
   }
 
   .sr-only {
@@ -414,18 +466,30 @@ const workerBase = "https://wedding-worker.stefano-penzo23.workers.dev";
     padding: 0;
     margin: -1px;
     overflow: hidden;
-    clip: rect(0,0,0,0);
+    clip: rect(0, 0, 0, 0);
     white-space: nowrap;
     border: 0;
   }
 
+  @media (min-width: 640px) {
+    .gallery-grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+
+  @media (min-width: 980px) {
+    .gallery-grid {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+  }
+
   @media (max-width: 760px) {
     .photo-page {
-      padding: 1rem .85rem 4rem;
+      padding: 1rem 0.85rem 4rem;
     }
 
     .hero {
-      padding: 1.4rem;
+      padding: 1.35rem;
       text-align: left;
     }
 
@@ -435,13 +499,13 @@ const workerBase = "https://wedding-worker.stefano-penzo23.workers.dev";
       width: 100%;
     }
 
-    .gallery-grid {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: .6rem;
+    .status-grid {
+      justify-content: stretch;
     }
 
-    .photo-card img {
-      aspect-ratio: 3 / 4;
+    .status-card {
+      width: 100%;
+      min-width: 0;
     }
   }
 </style>
