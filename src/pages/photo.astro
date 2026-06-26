@@ -41,6 +41,7 @@
 
           <p id="message" class="photo-message" role="status" aria-live="polite"></p>
           <div id="gallery-grid" class="photo-grid"></div>
+          <div id="gallery-pagination" class="photo-pagination" aria-label="Pagine galleria"></div>
         </section>
       </div>
     </main>
@@ -57,6 +58,7 @@
       const workerBase = "https://wedding-worker.stefano-penzo23.workers.dev";
       const MAX_FILES = 20;
       const MAX_FILE_SIZE = 10 * 1024 * 1024;
+      const PHOTOS_PER_PAGE = 20;
 
       const cameraInput = document.getElementById("camera-input");
       const galleryInput = document.getElementById("gallery-input");
@@ -64,6 +66,7 @@
       const refreshBtn = document.getElementById("refresh-btn");
       const selectedFilesText = document.getElementById("selected-files");
       const gallery = document.getElementById("gallery-grid");
+      const pagination = document.getElementById("gallery-pagination");
       const message = document.getElementById("message");
       const photoCount = document.getElementById("photo-count");
       const lightbox = document.getElementById("lightbox");
@@ -73,6 +76,8 @@
 
       let selectedFiles = [];
       let isUploading = false;
+      let allPhotos = [];
+      let currentPage = 1;
 
       function showMessage(text = "", isError = false) {
         message.textContent = text;
@@ -167,24 +172,79 @@
         return card;
       }
 
+      function renderPagination(totalPages) {
+        pagination.innerHTML = "";
+
+        if (totalPages <= 1) {
+          pagination.hidden = true;
+          return;
+        }
+
+        pagination.hidden = false;
+
+        for (let page = 1; page <= totalPages; page += 1) {
+          const button = document.createElement("button");
+          button.type = "button";
+          button.className = "photo-page-btn";
+          button.textContent = String(page);
+          button.setAttribute("aria-label", `Vai alla pagina ${page}`);
+
+          if (page === currentPage) {
+            button.dataset.active = "true";
+            button.setAttribute("aria-current", "page");
+          }
+
+          button.addEventListener("click", () => {
+            if (page === currentPage) return;
+            currentPage = page;
+            renderGallery();
+          });
+
+          pagination.appendChild(button);
+        }
+      }
+
+      function renderGallery() {
+        gallery.innerHTML = "";
+
+        if (!allPhotos.length) {
+          pagination.hidden = true;
+          return;
+        }
+
+        const totalPages = Math.max(1, Math.ceil(allPhotos.length / PHOTOS_PER_PAGE));
+        if (currentPage > totalPages) currentPage = totalPages;
+
+        const start = (currentPage - 1) * PHOTOS_PER_PAGE;
+        const visiblePhotos = allPhotos.slice(start, start + PHOTOS_PER_PAGE);
+        const frag = document.createDocumentFragment();
+
+        visiblePhotos.forEach((photo, index) => {
+          frag.appendChild(createPhotoCard(photo, start + index));
+        });
+
+        gallery.appendChild(frag);
+        renderPagination(totalPages);
+      }
+
       async function loadPhotos() {
         try {
           showMessage("");
           const res = await fetch(`${workerBase}/photos`, { cache: "no-store" });
           if (!res.ok) throw new Error("Errore nel caricamento galleria");
 
-          const photos = await res.json();
-          gallery.innerHTML = "";
-          photoCount.textContent = String(photos.length);
+          allPhotos = await res.json();
+          photoCount.textContent = String(allPhotos.length);
 
-          if (!photos.length) {
+          if (!allPhotos.length) {
+            gallery.innerHTML = "";
+            pagination.hidden = true;
             showMessage("");
             return;
           }
 
-          const frag = document.createDocumentFragment();
-          photos.forEach((photo, index) => frag.appendChild(createPhotoCard(photo, index)));
-          gallery.appendChild(frag);
+          currentPage = 1;
+          renderGallery();
           showMessage("");
         } catch {
           showMessage("Non riesco a caricare la galleria.", true);
@@ -399,7 +459,8 @@
   .photo-btn:focus-visible,
   .photo-card-button:focus-visible,
   .photo-lightbox-close:focus-visible,
-  .photo-refresh-icon:focus-visible {
+  .photo-refresh-icon:focus-visible,
+  .photo-page-btn:focus-visible {
     outline: 3px solid rgba(34, 27, 24, 0.18);
     outline-offset: 3px;
   }
@@ -520,6 +581,38 @@
     text-transform: uppercase;
   }
 
+  .photo-pagination {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 16px;
+  }
+
+  .photo-pagination[hidden] {
+    display: none;
+  }
+
+  .photo-page-btn {
+    min-width: 34px;
+    height: 34px;
+    padding: 0 10px;
+    border-radius: 999px;
+    border: 1px solid rgba(34, 27, 24, 0.08);
+    background: rgba(255, 255, 255, 0.92);
+    color: var(--color-text-dark, #221b18);
+    font: inherit;
+    font-size: 11px;
+    font-weight: 700;
+    line-height: 1;
+    cursor: pointer;
+  }
+
+  .photo-page-btn[data-active="true"] {
+    background: rgba(34, 27, 24, 0.9);
+    border-color: rgba(34, 27, 24, 0.9);
+    color: #ffffff;
+  }
+
   .photo-lightbox {
     width: min(92vw, 960px);
     max-width: 960px;
@@ -620,6 +713,17 @@
     .photo-meta {
       font-size: 9px;
       padding: 6px 8px 8px;
+    }
+
+    .photo-pagination {
+      gap: 6px;
+    }
+
+    .photo-page-btn {
+      min-width: 32px;
+      height: 32px;
+      padding: 0 8px;
+      font-size: 10px;
     }
   }
 </style>
