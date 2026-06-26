@@ -2,56 +2,288 @@
 const workerBase = "https://wedding-worker.stefano-penzo23.workers.dev";
 ---
 
+<!doctype html>
 <html lang="it">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <title>Foto matrimonio</title>
+    <style>
+      html, body {
+        margin: 0;
+        padding: 0;
+        background: #faf7f2;
+      }
+
+      body {
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        color: #221b18;
+      }
+
+      *, *::before, *::after {
+        box-sizing: border-box;
+      }
+
+      .photo-page {
+        min-height: 100vh;
+        padding: 14px 10px 40px;
+        background: #faf7f2;
+      }
+
+      .photo-wrap {
+        width: min(100%, 980px);
+        margin: 0 auto;
+      }
+
+      .photo-box {
+        background: rgba(255, 255, 255, 0.96);
+        border: 1px solid rgba(34, 27, 24, 0.1);
+        border-radius: 24px;
+        padding: 18px;
+        margin-bottom: 16px;
+        overflow: hidden;
+      }
+
+      .photo-kicker {
+        margin: 0 0 6px;
+        font-size: 12px;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: #6e625c;
+      }
+
+      .photo-title,
+      .photo-subtitle {
+        margin: 0 0 10px;
+        line-height: 1.05;
+        font-family: Georgia, "Times New Roman", serif;
+      }
+
+      .photo-title {
+        font-size: clamp(2rem, 5vw, 3.6rem);
+      }
+
+      .photo-subtitle {
+        font-size: clamp(1.45rem, 3.2vw, 2rem);
+      }
+
+      .photo-text,
+      .photo-message,
+      .photo-selected,
+      .photo-meta {
+        margin: 0;
+        color: #6e625c;
+        line-height: 1.6;
+        font-size: 16px;
+      }
+
+      .photo-actions,
+      .photo-stats,
+      .photo-head {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        align-items: center;
+      }
+
+      .photo-actions,
+      .photo-stats {
+        margin-top: 16px;
+      }
+
+      .photo-head {
+        justify-content: space-between;
+        margin-bottom: 14px;
+      }
+
+      .photo-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 48px;
+        padding: 12px 18px;
+        border-radius: 999px;
+        border: 1px solid rgba(34, 27, 24, 0.1);
+        background: #fff;
+        color: #221b18;
+        font: inherit;
+        font-weight: 600;
+        text-decoration: none;
+        cursor: pointer;
+      }
+
+      .photo-btn-primary {
+        background: #9f6f5a;
+        border-color: #9f6f5a;
+        color: #fff;
+      }
+
+      .photo-btn-soft {
+        background: #efe3db;
+        border-color: rgba(159, 111, 90, 0.2);
+      }
+
+      .photo-btn:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+
+      .photo-selected {
+        margin-top: 12px;
+        word-break: break-word;
+      }
+
+      .photo-stat {
+        flex: 1 1 160px;
+        min-width: 0;
+        background: #fff;
+        border: 1px solid rgba(34, 27, 24, 0.1);
+        border-radius: 18px;
+        padding: 14px 16px;
+      }
+
+      .photo-stat span {
+        display: block;
+        font-size: 12px;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: #6e625c;
+      }
+
+      .photo-stat strong {
+        display: block;
+        margin-top: 6px;
+        font-size: 1.15rem;
+      }
+
+      .photo-message[data-error="true"] {
+        color: #a04242;
+      }
+
+      .photo-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 12px;
+        width: 100%;
+        margin-top: 14px;
+      }
+
+      .photo-card {
+        width: 100%;
+        min-width: 0;
+        overflow: hidden;
+        border-radius: 18px;
+        background: #fff;
+        border: 1px solid rgba(34, 27, 24, 0.1);
+      }
+
+      .photo-link {
+        display: block;
+        width: 100%;
+        text-decoration: none;
+        color: inherit;
+      }
+
+      .photo-media {
+        width: 100%;
+        height: 240px;
+        overflow: hidden;
+        background: #ece5dd;
+      }
+
+      .photo-media img {
+        display: block;
+        width: 100%;
+        height: 240px;
+        object-fit: cover;
+        object-position: center;
+      }
+
+      .photo-meta {
+        padding: 10px 12px 12px;
+        font-size: 14px;
+      }
+
+      .sr-only {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip: rect(0,0,0,0);
+        white-space: nowrap;
+        border: 0;
+      }
+
+      @media (min-width: 700px) {
+        .photo-grid {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+      }
+
+      @media (min-width: 1024px) {
+        .photo-grid {
+          grid-template-columns: repeat(3, minmax(0, 1fr));
+        }
+      }
+
+      @media (max-width: 760px) {
+        .photo-actions > *,
+        .photo-head > *,
+        .photo-btn {
+          width: 100%;
+        }
+      }
+    </style>
   </head>
+
   <body>
-    <main class="wp-page">
-      <section class="wp-box wp-hero">
-        <p class="wp-kicker">Album condiviso</p>
-        <h1>Carica le tue foto del matrimonio</h1>
-        <p class="wp-intro">
-          Puoi scattare una foto al momento oppure scegliere immagini già presenti sul telefono.
-        </p>
+    <main class="photo-page">
+      <div class="photo-wrap">
+        <section class="photo-box">
+          <p class="photo-kicker">Album condiviso</p>
+          <h1 class="photo-title">Carica le tue foto del matrimonio</h1>
+          <p class="photo-text">
+            Puoi scattare una foto al momento oppure scegliere immagini già presenti sul telefono.
+          </p>
 
-        <div class="wp-actions">
-          <label for="camera-input" class="wp-btn wp-btn-primary">Scatta una foto</label>
-          <label for="gallery-input" class="wp-btn wp-btn-secondary">Scegli dalla galleria</label>
-          <button id="upload-btn" class="wp-btn wp-btn-soft" type="button" disabled>Carica adesso</button>
-        </div>
-
-        <input id="camera-input" class="wp-sr-only" type="file" accept="image/*" capture="environment" />
-        <input id="gallery-input" class="wp-sr-only" type="file" accept="image/*" multiple />
-
-        <p id="selected-files" class="wp-selected">Nessuna foto selezionata.</p>
-
-        <div class="wp-stats">
-          <div class="wp-stat">
-            <span>Stato upload</span>
-            <strong id="upload-status">Pronto</strong>
+          <div class="photo-actions">
+            <label for="camera-input" class="photo-btn photo-btn-primary">Scatta una foto</label>
+            <label for="gallery-input" class="photo-btn">Scegli dalla galleria</label>
+            <button id="upload-btn" class="photo-btn photo-btn-soft" type="button" disabled>Carica adesso</button>
           </div>
-          <div class="wp-stat">
-            <span>Foto visibili</span>
-            <strong id="photo-count">0</strong>
-          </div>
-        </div>
-      </section>
 
-      <section class="wp-box wp-gallery-section">
-        <div class="wp-gallery-head">
-          <div>
-            <p class="wp-kicker">Galleria live</p>
-            <h2>Tutte le foto degli invitati</h2>
-          </div>
-          <button id="refresh-btn" class="wp-btn wp-btn-secondary" type="button">Aggiorna</button>
-        </div>
+          <input id="camera-input" class="sr-only" type="file" accept="image/*" capture="environment" />
+          <input id="gallery-input" class="sr-only" type="file" accept="image/*" multiple />
 
-        <p id="message" class="wp-message" role="status" aria-live="polite">Sto caricando la galleria...</p>
-        <div id="gallery-grid" class="wp-grid"></div>
-      </section>
+          <p id="selected-files" class="photo-selected">Nessuna foto selezionata.</p>
+
+          <div class="photo-stats">
+            <div class="photo-stat">
+              <span>Stato upload</span>
+              <strong id="upload-status">Pronto</strong>
+            </div>
+            <div class="photo-stat">
+              <span>Foto visibili</span>
+              <strong id="photo-count">0</strong>
+            </div>
+          </div>
+        </section>
+
+        <section class="photo-box">
+          <div class="photo-head">
+            <div>
+              <p class="photo-kicker">Galleria live</p>
+              <h2 class="photo-subtitle">Tutte le foto degli invitati</h2>
+            </div>
+            <button id="refresh-btn" class="photo-btn" type="button">Aggiorna</button>
+          </div>
+
+          <p id="message" class="photo-message" role="status" aria-live="polite">Sto caricando la galleria...</p>
+          <div id="gallery-grid" class="photo-grid"></div>
+        </section>
+      </div>
     </main>
 
     <script type="module">
@@ -96,16 +328,16 @@ const workerBase = "https://wedding-worker.stefano-penzo23.workers.dev";
 
       function createPhotoCard(photo) {
         const card = document.createElement("article");
-        card.className = "wp-card";
+        card.className = "photo-card";
 
         const link = document.createElement("a");
         link.href = photo.url;
         link.target = "_blank";
         link.rel = "noopener noreferrer";
-        link.className = "wp-card-link";
+        link.className = "photo-link";
 
         const media = document.createElement("div");
-        media.className = "wp-card-media";
+        media.className = "photo-media";
 
         const img = document.createElement("img");
         img.src = photo.url;
@@ -117,7 +349,7 @@ const workerBase = "https://wedding-worker.stefano-penzo23.workers.dev";
         link.appendChild(media);
 
         const meta = document.createElement("div");
-        meta.className = "wp-card-meta";
+        meta.className = "photo-meta";
 
         const date = photo.uploaded ? new Date(photo.uploaded) : null;
         meta.textContent =
@@ -195,231 +427,3 @@ const workerBase = "https://wedding-worker.stefano-penzo23.workers.dev";
     </script>
   </body>
 </html>
-
-<style>
-  .wp-page,
-  .wp-page *,
-  .wp-page *::before,
-  .wp-page *::after {
-    box-sizing: border-box;
-  }
-
-  .wp-page {
-    min-height: 100vh;
-    padding: 14px 10px 40px;
-    background: #faf7f2;
-    color: #221b18;
-    overflow-x: hidden;
-    font-family: system-ui, sans-serif;
-  }
-
-  .wp-box {
-    width: min(100%, 980px);
-    margin: 0 auto 16px;
-    background: rgba(255,255,255,.94);
-    border: 1px solid rgba(34,27,24,.1);
-    border-radius: 24px;
-    padding: 18px;
-  }
-
-  .wp-kicker {
-    margin: 0 0 6px;
-    font-size: 12px;
-    letter-spacing: .14em;
-    text-transform: uppercase;
-    color: #6e625c;
-  }
-
-  .wp-hero h1,
-  .wp-gallery-section h2 {
-    margin: 0 0 10px;
-    font-family: "Montserrat","Playfair Display",serif;
-    line-height: 1.05;
-  }
-
-  .wp-hero h1 {
-    font-size: clamp(2rem, 5vw, 3.6rem);
-  }
-
-  .wp-gallery-section h2 {
-    font-size: clamp(1.45rem, 3.2vw, 2rem);
-  }
-
-  .wp-intro,
-  .wp-selected,
-  .wp-message,
-  .wp-card-meta {
-    margin: 0;
-    color: #6e625c;
-    line-height: 1.6;
-    font-size: 16px;
-  }
-
-  .wp-actions,
-  .wp-stats,
-  .wp-gallery-head {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 12px;
-    align-items: center;
-  }
-
-  .wp-actions,
-  .wp-stats {
-    margin-top: 16px;
-  }
-
-  .wp-gallery-head {
-    justify-content: space-between;
-    margin-bottom: 14px;
-  }
-
-  .wp-btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    min-height: 48px;
-    padding: 12px 18px;
-    border-radius: 999px;
-    border: 1px solid rgba(34,27,24,.1);
-    background: #fff;
-    color: #221b18;
-    font: inherit;
-    font-weight: 600;
-    text-decoration: none;
-    cursor: pointer;
-  }
-
-  .wp-btn-primary {
-    background: #9f6f5a;
-    border-color: #9f6f5a;
-    color: #fff;
-  }
-
-  .wp-btn-soft {
-    background: #efe3db;
-    border-color: rgba(159,111,90,.2);
-  }
-
-  .wp-btn:disabled {
-    opacity: .5;
-    cursor: not-allowed;
-  }
-
-  .wp-selected {
-    margin-top: 12px;
-    word-break: break-word;
-  }
-
-  .wp-stat {
-    flex: 1 1 160px;
-    min-width: 0;
-    background: #fff;
-    border: 1px solid rgba(34,27,24,.1);
-    border-radius: 18px;
-    padding: 14px 16px;
-  }
-
-  .wp-stat span {
-    display: block;
-    font-size: 12px;
-    letter-spacing: .12em;
-    text-transform: uppercase;
-    color: #6e625c;
-  }
-
-  .wp-stat strong {
-    display: block;
-    margin-top: 6px;
-    font-size: 1.15rem;
-  }
-
-  .wp-message[data-error="true"] {
-    color: #a04242;
-  }
-
-  .wp-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
-    width: 100%;
-    margin-top: 14px;
-  }
-
-  .wp-card {
-    min-width: 0;
-    width: 100%;
-    overflow: hidden;
-    border-radius: 18px;
-    background: #fff;
-    border: 1px solid rgba(34,27,24,.1);
-  }
-
-  .wp-card-link {
-    display: block;
-    width: 100%;
-    text-decoration: none;
-    color: inherit;
-  }
-
-  .wp-card-media {
-    width: 100%;
-    height: 220px;
-    overflow: hidden;
-    background: #ece5dd;
-  }
-
-  .wp-card-media img {
-    display: block;
-    width: 100%;
-    height: 220px;
-    min-width: 100%;
-    max-width: 100%;
-    object-fit: cover;
-    object-position: center;
-    vertical-align: middle;
-  }
-
-  .wp-card-meta {
-    padding: 10px 12px 12px;
-    font-size: 14px;
-  }
-
-  .wp-sr-only {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    padding: 0;
-    margin: -1px;
-    overflow: hidden;
-    clip: rect(0,0,0,0);
-    white-space: nowrap;
-    border: 0;
-  }
-
-  @media (min-width: 720px) {
-    .wp-grid {
-      grid-template-columns: repeat(3, 1fr);
-      gap: 12px;
-    }
-
-    .wp-card-media,
-    .wp-card-media img {
-      height: 240px;
-    }
-  }
-
-  @media (min-width: 1040px) {
-    .wp-grid {
-      grid-template-columns: repeat(4, 1fr);
-    }
-  }
-
-  @media (max-width: 760px) {
-    .wp-actions > *,
-    .wp-gallery-head > *,
-    .wp-btn {
-      width: 100%;
-    }
-  }
-</style>
