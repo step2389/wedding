@@ -1,72 +1,68 @@
 ---
-import Layout from "../layouts/Layout.astro";
 ---
-
-<Layout>
-  <section class="photo-page font-montserrat" data-photo-app>
-    <div class="photo-shell">
-      <div class="photo-panel">
-        <div class="photo-intro">
-          <p class="photo-kicker">Album condiviso</p>
-          <h1 class="photo-title">Carica le tue foto del matrimonio</h1>
-          <p class="photo-text">
-            Scatta una foto oppure scegli immagini dal telefono, poi condividile nella galleria del matrimonio.
-          </p>
-        </div>
-
-        <div class="photo-actions">
-          <label for="camera-input" class="photo-btn photo-btn-primary">Scatta una foto</label>
-          <label for="gallery-input" class="photo-btn">Scegli dalla galleria</label>
-          <button id="upload-btn" class="photo-btn photo-btn-soft" type="button" disabled>Carica adesso</button>
-        </div>
-
-        <input id="camera-input" class="sr-only" type="file" accept="image/*" capture="environment" />
-        <input id="gallery-input" class="sr-only" type="file" accept="image/*" multiple />
-
-        <p id="selected-files" class="photo-selected">Nessuna foto selezionata.</p>
-
-        <div class="photo-stats" aria-hidden="true">
-          <div class="photo-stat">
-            <span>Stato upload</span>
-            <strong id="upload-status">In attesa</strong>
-          </div>
-          <div class="photo-stat">
-            <span>Foto visibili</span>
-            <strong id="photo-count">0</strong>
-          </div>
-        </div>
+<section class="photo-page font-montserrat" data-photo-app>
+  <div class="photo-shell">
+    <div class="photo-panel photo-upload-panel">
+      <div class="photo-intro">
+        <p class="photo-kicker">Album condiviso</p>
+        <h1 class="photo-title">Carica le tue foto del matrimonio</h1>
+        <p class="photo-text">
+          Scatta una foto oppure scegli immagini dal telefono, poi condividile nella galleria del matrimonio.
+        </p>
       </div>
 
-      <div class="photo-panel photo-panel-gallery">
-        <div class="photo-gallery-head">
-          <p class="photo-kicker photo-kicker-gallery">Galleria Live</p>
-          <button id="refresh-btn" class="photo-refresh-icon" type="button" aria-label="Aggiorna galleria" title="Aggiorna galleria">
-            <svg viewBox="0 0 24 24" aria-hidden="true">
-              <path d="M21 12a9 9 0 1 1-2.64-6.36" />
-              <path d="M21 3v6h-6" />
-            </svg>
-          </button>
-        </div>
+      <div class="photo-actions">
+        <label for="camera-input" class="photo-btn photo-btn-primary">Scatta una foto</label>
+        <label for="gallery-input" class="photo-btn">Scegli dalla galleria</label>
+        <button id="upload-btn" class="photo-btn photo-btn-soft" type="button" disabled>Carica adesso</button>
+      </div>
 
-        <p id="message" class="photo-message" role="status" aria-live="polite"></p>
-        <div id="gallery-grid" class="photo-grid"></div>
+      <input id="camera-input" class="sr-only" type="file" accept="image/*" capture="environment" />
+      <input id="gallery-input" class="sr-only" type="file" accept="image/*" multiple />
+
+      <p id="selected-files" class="photo-selected">Nessuna foto selezionata.</p>
+
+      <div class="photo-stats">
+        <div class="photo-stat">
+          <span>Stato upload</span>
+          <strong id="upload-status">In attesa</strong>
+        </div>
+        <div class="photo-stat">
+          <span>Foto visibili</span>
+          <strong id="photo-count">0</strong>
+        </div>
       </div>
     </div>
 
-    <dialog id="lightbox" class="photo-lightbox" aria-label="Foto ingrandita">
-      <div class="photo-lightbox-inner">
-        <button id="lightbox-close" class="photo-lightbox-close" type="button" aria-label="Chiudi immagine">
+    <div class="photo-panel photo-gallery-panel">
+      <div class="photo-gallery-head">
+        <p class="photo-kicker photo-kicker-gallery">Galleria Live</p>
+        <button id="refresh-btn" class="photo-refresh-icon" type="button" aria-label="Aggiorna galleria" title="Aggiorna galleria">
           <svg viewBox="0 0 24 24" aria-hidden="true">
-            <path d="M18 6L6 18" />
-            <path d="M6 6l12 12" />
+            <path d="M21 12a9 9 0 1 1-2.64-6.36" />
+            <path d="M21 3v6h-6" />
           </svg>
         </button>
-        <img id="lightbox-image" class="photo-lightbox-image" alt="Foto ingrandita" />
-        <p id="lightbox-caption" class="photo-lightbox-caption"></p>
       </div>
-    </dialog>
-  </section>
-</Layout>
+
+      <p id="message" class="photo-message" role="status" aria-live="polite"></p>
+      <div id="gallery-grid" class="photo-grid"></div>
+    </div>
+  </div>
+
+  <dialog id="lightbox" class="photo-lightbox" aria-label="Foto ingrandita">
+    <div class="photo-lightbox-inner">
+      <button id="lightbox-close" class="photo-lightbox-close" type="button" aria-label="Chiudi immagine">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M18 6L6 18" />
+          <path d="M6 6l12 12" />
+        </svg>
+      </button>
+      <img id="lightbox-image" class="photo-lightbox-image" alt="Foto ingrandita" />
+      <p id="lightbox-caption" class="photo-lightbox-caption"></p>
+    </div>
+  </dialog>
+</section>
 
 <script type="module">
   const workerBase = "https://wedding-worker.stefano-penzo23.workers.dev";
@@ -184,9 +180,9 @@ import Layout from "../layouts/Layout.astro";
     return card;
   }
 
-  async function loadPhotos({ silent = false } = {}) {
+  async function loadPhotos() {
     try {
-      if (!silent) showMessage("");
+      showMessage("");
       const res = await fetch(`${workerBase}/photos`, { cache: "no-store" });
       if (!res.ok) throw new Error("Errore nel caricamento galleria");
 
@@ -242,7 +238,7 @@ import Layout from "../layouts/Layout.astro";
       updateSelectedFilesUI();
       if (uploadStatus) uploadStatus.textContent = "Upload completato";
       showMessage("");
-      await loadPhotos({ silent: true });
+      await loadPhotos();
     } catch {
       if (uploadStatus) uploadStatus.textContent = "Errore upload";
       showMessage("Upload non riuscito. Riprova.", true);
@@ -255,7 +251,7 @@ import Layout from "../layouts/Layout.astro";
   cameraInput?.addEventListener("change", (event) => addFiles(event.target.files));
   galleryInput?.addEventListener("change", (event) => addFiles(event.target.files));
   uploadBtn?.addEventListener("click", uploadFiles);
-  refreshBtn?.addEventListener("click", () => loadPhotos());
+  refreshBtn?.addEventListener("click", loadPhotos);
   lightboxClose?.addEventListener("click", closeLightbox);
 
   lightbox?.addEventListener("click", (event) => {
@@ -280,38 +276,41 @@ import Layout from "../layouts/Layout.astro";
   .photo-page {
     position: relative;
     min-height: 100vh;
-    padding: 2.5rem 1.5rem 4rem;
+    padding: 1rem 0.9rem 2.5rem;
+    font-family: Montserrat, sans-serif;
     color: var(--color-text-dark, #f5efe6);
-  }
-
-  .photo-page::before {
-    content: "";
-    position: absolute;
-    inset: 0;
     background:
-      linear-gradient(180deg, rgba(22, 14, 12, 0.38) 0%, rgba(22, 14, 12, 0.55) 100%),
-      radial-gradient(circle at top, rgba(255, 255, 255, 0.08), transparent 42%);
-    pointer-events: none;
+      linear-gradient(180deg, rgba(186, 210, 221, 0.7) 0%, rgba(206, 226, 234, 0.5) 22%, rgba(233, 236, 231, 0.18) 100%),
+      radial-gradient(circle at top, rgba(226, 244, 255, 0.95) 0%, rgba(187, 214, 227, 0.45) 38%, rgba(142, 171, 186, 0.12) 74%, transparent 100%);
   }
 
   .photo-shell {
-    position: relative;
-    z-index: 1;
     width: min(100%, 72rem);
     margin: 0 auto;
     display: flex;
     flex-direction: column;
-    gap: 1.5rem;
+    gap: 1rem;
   }
 
   .photo-panel {
-    border: 1px solid rgba(255, 255, 255, 0.18);
-    background: rgba(20, 14, 12, 0.28);
-    backdrop-filter: blur(14px);
-    -webkit-backdrop-filter: blur(14px);
-    border-radius: 2rem;
-    box-shadow: 0 18px 60px rgba(0, 0, 0, 0.16);
-    padding: 1.35rem;
+    border-radius: 1.8rem;
+    padding: 1rem;
+    background: rgba(141, 130, 124, 0.72);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 14px 40px rgba(79, 95, 108, 0.12);
+    overflow: hidden;
+  }
+
+  .photo-upload-panel {
+    background:
+      linear-gradient(180deg, rgba(219, 234, 240, 0.88) 0%, rgba(208, 227, 235, 0.78) 100%),
+      rgba(205, 224, 232, 0.82);
+    color: #231f1d;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+  }
+
+  .photo-gallery-panel {
+    background: rgba(124, 114, 109, 0.72);
   }
 
   .photo-intro {
@@ -323,26 +322,24 @@ import Layout from "../layouts/Layout.astro";
 
   .photo-kicker {
     margin: 0;
-    font-size: 0.72rem;
+    font-size: 0.68rem;
     line-height: 1;
-    letter-spacing: 0.35em;
+    letter-spacing: 0.42em;
     text-transform: uppercase;
-    opacity: 0.78;
-    color: var(--color-text-dark, #f5efe6);
+    opacity: 0.8;
   }
 
   .photo-kicker-gallery {
-    margin-right: auto;
+    color: rgba(244, 239, 233, 0.92);
   }
 
   .photo-title {
     margin: 0;
     text-transform: uppercase;
     line-height: 0.88;
-    letter-spacing: -0.04em;
-    font-size: clamp(2.4rem, 7vw, 4.9rem);
-    color: var(--color-text-dark, #f5efe6);
-    text-shadow: 0 12px 30px rgba(0, 0, 0, 0.18);
+    letter-spacing: -0.05em;
+    font-size: clamp(2.5rem, 9vw, 5rem);
+    color: #201917;
   }
 
   .photo-text,
@@ -350,34 +347,39 @@ import Layout from "../layouts/Layout.astro";
   .photo-message,
   .photo-lightbox-caption {
     margin: 0;
+    line-height: 1.6;
     text-align: center;
-    line-height: 1.7;
-    opacity: 0.92;
-    color: var(--color-text-dark, #f5efe6);
+  }
+
+  .photo-text,
+  .photo-selected,
+  .photo-stat span,
+  .photo-stat strong {
+    color: rgba(35, 31, 29, 0.92);
   }
 
   .photo-actions {
     display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
+    flex-direction: column;
     gap: 0.75rem;
-    margin-top: 1.4rem;
+    margin-top: 1.35rem;
   }
 
   .photo-btn {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    min-height: 48px;
-    padding: 0.9rem 1.45rem;
+    min-height: 50px;
+    width: 100%;
+    padding: 0.95rem 1.3rem;
     border-radius: 999px;
-    border: 1px solid var(--color-muted, rgba(255, 255, 255, 0.35));
-    background: rgba(255, 255, 255, 0.05);
-    color: var(--color-secondary, var(--color-text-dark, #f5efe6));
+    border: 1px solid rgba(255, 255, 255, 0.55);
+    background: rgba(255, 255, 255, 0.1);
+    color: rgba(47, 54, 57, 0.9);
     text-decoration: none;
     text-transform: uppercase;
-    letter-spacing: 0.18em;
-    font-size: 0.68rem;
+    letter-spacing: 0.24em;
+    font-size: 0.62rem;
     font-weight: 700;
     transition: transform 180ms ease, background 180ms ease, border-color 180ms ease, opacity 180ms ease;
     cursor: pointer;
@@ -385,62 +387,57 @@ import Layout from "../layouts/Layout.astro";
 
   .photo-btn:hover,
   .photo-btn:focus-visible {
-    background: rgba(255, 255, 255, 0.1);
-    border-color: rgba(255, 255, 255, 0.6);
+    background: rgba(255, 255, 255, 0.22);
+    border-color: rgba(255, 255, 255, 0.78);
   }
 
   .photo-btn:active {
-    transform: scale(0.97);
+    transform: scale(0.98);
   }
 
   .photo-btn-primary {
-    background: rgba(255, 255, 255, 0.12);
+    background: rgba(255, 255, 255, 0.2);
   }
 
   .photo-btn-soft:disabled {
-    opacity: 0.48;
+    opacity: 0.42;
     cursor: not-allowed;
     transform: none;
   }
 
   .photo-selected {
-    margin-top: 1rem;
-    font-size: 0.92rem;
+    margin-top: 0.95rem;
+    font-size: 0.94rem;
   }
 
   .photo-stats {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 0.85rem;
-    margin-top: 1.1rem;
+    gap: 0.65rem;
+    margin-top: 1rem;
   }
 
   .photo-stat {
-    padding: 0.95rem 1rem;
-    border-radius: 1.3rem;
-    border: 1px solid rgba(255, 255, 255, 0.12);
-    background: rgba(255, 255, 255, 0.06);
+    border-radius: 1.2rem;
+    padding: 0.9rem 0.8rem;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.28);
     text-align: center;
   }
 
   .photo-stat span {
     display: block;
-    font-size: 0.62rem;
-    letter-spacing: 0.26em;
+    font-size: 0.58rem;
+    letter-spacing: 0.25em;
     text-transform: uppercase;
-    opacity: 0.7;
+    opacity: 0.8;
   }
 
   .photo-stat strong {
     display: block;
     margin-top: 0.35rem;
-    font-size: 1rem;
-    font-weight: 600;
-    color: var(--color-text-dark, #f5efe6);
-  }
-
-  .photo-panel-gallery {
-    padding-top: 1.1rem;
+    font-size: 1.05rem;
+    font-weight: 500;
   }
 
   .photo-gallery-head {
@@ -448,27 +445,28 @@ import Layout from "../layouts/Layout.astro";
     align-items: center;
     justify-content: space-between;
     gap: 0.75rem;
-    margin-bottom: 0.8rem;
+    margin-bottom: 0.75rem;
   }
 
   .photo-refresh-icon {
-    width: 2.2rem;
-    height: 2.2rem;
+    flex: 0 0 auto;
+    width: 2.65rem;
+    height: 2.65rem;
     display: inline-flex;
     align-items: center;
     justify-content: center;
     border-radius: 999px;
-    border: 1px solid rgba(255, 255, 255, 0.18);
-    background: rgba(255, 255, 255, 0.06);
-    color: var(--color-text-dark, #f5efe6);
-    opacity: 0.9;
-    transition: transform 180ms ease, background 180ms ease, border-color 180ms ease, opacity 180ms ease;
+    border: 1px solid rgba(228, 242, 247, 0.68);
+    background: linear-gradient(180deg, rgba(226, 245, 251, 0.95) 0%, rgba(183, 210, 220, 0.96) 100%);
+    color: rgba(58, 74, 79, 0.95);
+    box-shadow: 0 8px 18px rgba(34, 44, 49, 0.16);
+    transition: transform 180ms ease, filter 180ms ease;
   }
 
   .photo-refresh-icon svg,
   .photo-lightbox-close svg {
-    width: 1rem;
-    height: 1rem;
+    width: 1.15rem;
+    height: 1.15rem;
     fill: none;
     stroke: currentColor;
     stroke-width: 1.8;
@@ -480,20 +478,19 @@ import Layout from "../layouts/Layout.astro";
   .photo-refresh-icon:focus-visible,
   .photo-lightbox-close:hover,
   .photo-lightbox-close:focus-visible {
-    background: rgba(255, 255, 255, 0.12);
-    border-color: rgba(255, 255, 255, 0.4);
+    filter: brightness(1.05);
   }
 
   .photo-refresh-icon:active,
   .photo-lightbox-close:active {
-    transform: scale(0.96);
+    transform: scale(0.97);
   }
 
   .photo-message {
-    min-height: 1.4rem;
-    margin-bottom: 0.6rem;
-    font-size: 0.9rem;
-    opacity: 0.86;
+    min-height: 1.2rem;
+    margin-bottom: 0.4rem;
+    color: rgba(244, 239, 233, 0.9);
+    font-size: 0.88rem;
   }
 
   .photo-message:empty,
@@ -502,42 +499,46 @@ import Layout from "../layouts/Layout.astro";
   }
 
   .photo-message[data-error="true"] {
-    color: #ffd4d4;
+    color: #ffe1df;
   }
 
   .photo-grid {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 0.55rem;
+    gap: 0.5rem;
+    align-items: start;
   }
 
   .photo-card {
-    border-radius: 1.1rem;
+    width: 100%;
+    min-width: 0;
+    border-radius: 0;
     overflow: hidden;
-    border: 1px solid rgba(255, 255, 255, 0.12);
-    background: rgba(255, 255, 255, 0.05);
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+    background: rgba(255, 255, 255, 0.06);
   }
 
   .photo-card-button {
     display: block;
     width: 100%;
     padding: 0;
+    margin: 0;
     border: 0;
     background: transparent;
+    cursor: pointer;
   }
 
   .photo-media {
     position: relative;
     width: 100%;
-    aspect-ratio: 1 / 1;
+    aspect-ratio: 3 / 4;
     overflow: hidden;
-    background: rgba(255, 255, 255, 0.08);
+    background: rgba(215, 215, 215, 0.22);
   }
 
   .photo-media img {
     position: absolute;
     inset: 0;
+    display: block;
     width: 100%;
     height: 100%;
     object-fit: cover;
@@ -553,9 +554,8 @@ import Layout from "../layouts/Layout.astro";
   }
 
   .photo-lightbox::backdrop {
-    background: rgba(8, 6, 5, 0.82);
-    backdrop-filter: blur(5px);
-    -webkit-backdrop-filter: blur(5px);
+    background: rgba(12, 10, 9, 0.78);
+    backdrop-filter: blur(4px);
   }
 
   .photo-lightbox-inner {
@@ -564,8 +564,8 @@ import Layout from "../layouts/Layout.astro";
 
   .photo-lightbox-close {
     position: absolute;
-    top: 0.9rem;
-    right: 0.9rem;
+    top: 0.8rem;
+    right: 0.8rem;
     z-index: 2;
     width: 2.5rem;
     height: 2.5rem;
@@ -574,7 +574,7 @@ import Layout from "../layouts/Layout.astro";
     justify-content: center;
     border-radius: 999px;
     border: 1px solid rgba(255, 255, 255, 0.2);
-    background: rgba(20, 14, 12, 0.42);
+    background: rgba(34, 30, 28, 0.58);
     color: #fff;
   }
 
@@ -583,14 +583,15 @@ import Layout from "../layouts/Layout.astro";
     width: 100%;
     max-height: 78vh;
     object-fit: contain;
-    border-radius: 1.4rem;
-    background: rgba(10, 8, 7, 0.95);
+    border-radius: 1.3rem;
+    background: rgba(11, 9, 8, 0.96);
   }
 
   .photo-lightbox-caption {
-    margin-top: 0.75rem;
-    font-size: 0.88rem;
-    letter-spacing: 0.08em;
+    margin-top: 0.7rem;
+    color: rgba(244, 239, 233, 0.92);
+    font-size: 0.8rem;
+    letter-spacing: 0.12em;
     text-transform: uppercase;
   }
 
@@ -607,41 +608,17 @@ import Layout from "../layouts/Layout.astro";
   }
 
   @media (min-width: 900px) {
+    .photo-page {
+      padding: 1.3rem 1.2rem 3rem;
+    }
+
+    .photo-panel {
+      padding: 1.25rem;
+    }
+
     .photo-grid {
       grid-template-columns: repeat(4, minmax(0, 1fr));
-      gap: 0.8rem;
-    }
-
-    .photo-panel {
-      padding: 1.6rem;
-    }
-  }
-
-  @media (max-width: 640px) {
-    .photo-page {
-      padding: 1.4rem 0.9rem 3rem;
-    }
-
-    .photo-panel {
-      padding: 1rem;
-      border-radius: 1.5rem;
-    }
-
-    .photo-actions {
-      flex-direction: column;
-      align-items: stretch;
-    }
-
-    .photo-btn {
-      width: 100%;
-    }
-
-    .photo-stats {
-      gap: 0.65rem;
-    }
-
-    .photo-title {
-      font-size: clamp(2.1rem, 10vw, 3.4rem);
+      gap: 0.7rem;
     }
   }
 </style>
