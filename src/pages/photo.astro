@@ -8,7 +8,7 @@
   <body>
     <main class="photo-page">
       <div class="photo-wrap">
-        <section class="photo-box">
+        <section class="photo-box photo-box-upload">
           <p class="photo-kicker">Album condiviso</p>
           <h1 class="photo-title">Carica le tue foto del matrimonio</h1>
           <p class="photo-text">Scatta una foto oppure scegli immagini dal telefono, poi condividile nella galleria del matrimonio.</p>
@@ -36,7 +36,7 @@
           </div>
         </section>
 
-        <section class="photo-box">
+        <section class="photo-box photo-box-gallery">
           <div class="photo-head photo-head-gallery">
             <p class="photo-kicker photo-kicker-inline">Galleria live</p>
             <button id="refresh-btn" class="photo-refresh-icon" type="button" aria-label="Aggiorna galleria" title="Aggiorna galleria">
@@ -274,12 +274,12 @@
   html, body {
     margin: 0;
     padding: 0;
-    background: #faf7f2;
+    background: var(--color-primary, #d7e3e8);
   }
 
   body {
-    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-    color: #221b18;
+    font-family: Montserrat, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    color: var(--color-text-dark, #221b18);
   }
 
   *, *::before, *::after {
@@ -289,7 +289,8 @@
   .photo-page {
     min-height: 100vh;
     padding: 14px 10px 40px;
-    background: #faf7f2;
+    background:
+      linear-gradient(180deg, rgba(215, 227, 232, 0.92) 0%, rgba(239, 243, 245, 0.98) 100%);
   }
 
   .photo-wrap {
@@ -298,32 +299,49 @@
   }
 
   .photo-box {
-    background: rgba(255, 255, 255, 0.96);
-    border: 1px solid rgba(34, 27, 24, 0.1);
     border-radius: 24px;
     padding: 16px;
     margin-bottom: 16px;
     overflow: hidden;
+    backdrop-filter: blur(4px);
+  }
+
+  .photo-box-upload {
+    background: rgba(255, 255, 255, 0.18);
+    border: 1px solid rgba(255, 255, 255, 0.32);
+  }
+
+  .photo-box-gallery {
+    background: rgba(118, 106, 101, 0.76);
+    border: 1px solid rgba(255, 255, 255, 0.12);
   }
 
   .photo-kicker {
     margin: 0 0 6px;
-    font-size: 12px;
-    letter-spacing: 0.14em;
+    font-size: 11px;
+    letter-spacing: 0.35em;
     text-transform: uppercase;
-    color: #6e625c;
+    color: var(--color-text-dark, #221b18);
+    opacity: 0.78;
   }
 
   .photo-kicker-inline {
     margin: 0;
   }
 
+  .photo-box-gallery .photo-kicker {
+    color: #f4eeea;
+    opacity: 0.88;
+  }
+
   .photo-title {
     margin: 0 0 10px;
-    line-height: 1.05;
-    font-family: Georgia, "Times New Roman", serif;
-    color: #221b18;
-    font-size: clamp(2rem, 5vw, 3.4rem);
+    line-height: 0.88;
+    font-family: Montserrat, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    font-size: clamp(2.35rem, 7vw, 4.9rem);
+    letter-spacing: -0.05em;
+    text-transform: uppercase;
+    color: var(--color-text-dark, #221b18);
   }
 
   .photo-text,
@@ -332,9 +350,14 @@
   .photo-meta,
   .photo-lightbox-caption {
     margin: 0;
-    color: #6e625c;
     line-height: 1.6;
     font-size: 15px;
+  }
+
+  .photo-text,
+  .photo-selected {
+    color: var(--color-text-dark, #221b18);
+    opacity: 0.88;
   }
 
   .photo-actions,
@@ -363,24 +386,26 @@
     min-height: 46px;
     padding: 12px 18px;
     border-radius: 999px;
-    border: 1px solid rgba(34, 27, 24, 0.1);
-    background: #fff;
-    color: #221b18;
+    border: 1px solid var(--color-muted, rgba(255, 255, 255, 0.45));
+    background: rgba(255, 255, 255, 0.08);
+    color: var(--color-secondary, #ffffff);
     font: inherit;
-    font-weight: 600;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
     text-decoration: none;
     cursor: pointer;
   }
 
   .photo-btn-primary {
-    background: #9f6f5a;
-    border-color: #9f6f5a;
-    color: #fff;
+    background: rgba(255, 255, 255, 0.14);
+    color: var(--color-text-dark, #221b18);
   }
 
   .photo-btn-soft {
-    background: #efe3db;
-    border-color: rgba(159, 111, 90, 0.2);
+    background: rgba(255, 255, 255, 0.08);
+    color: var(--color-secondary, #ffffff);
   }
 
   .photo-btn:disabled {
@@ -392,32 +417,8 @@
   .photo-card-button:focus-visible,
   .photo-lightbox-close:focus-visible,
   .photo-refresh-icon:focus-visible {
-    outline: 3px solid rgba(159, 111, 90, 0.45);
+    outline: 3px solid rgba(255, 255, 255, 0.24);
     outline-offset: 3px;
-  }
-
-  .photo-refresh-icon {
-    width: 36px;
-    height: 36px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 999px;
-    border: 1px solid rgba(34, 27, 24, 0.1);
-    background: #fff;
-    color: #221b18;
-    cursor: pointer;
-    flex: 0 0 auto;
-  }
-
-  .photo-refresh-icon svg {
-    width: 16px;
-    height: 16px;
-    fill: none;
-    stroke: currentColor;
-    stroke-width: 1.9;
-    stroke-linecap: round;
-    stroke-linejoin: round;
   }
 
   .photo-selected {
@@ -428,28 +429,57 @@
   .photo-stat {
     flex: 1 1 160px;
     min-width: 0;
-    background: #fff;
-    border: 1px solid rgba(34, 27, 24, 0.1);
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.18);
     border-radius: 18px;
     padding: 14px 16px;
   }
 
   .photo-stat span {
     display: block;
-    font-size: 12px;
-    letter-spacing: 0.12em;
+    font-size: 10px;
+    letter-spacing: 0.22em;
     text-transform: uppercase;
-    color: #6e625c;
+    color: var(--color-text-dark, #221b18);
+    opacity: 0.72;
   }
 
   .photo-stat strong {
     display: block;
     margin-top: 6px;
     font-size: 1.05rem;
+    color: var(--color-text-dark, #221b18);
+    font-weight: 600;
+  }
+
+  .photo-refresh-icon {
+    width: 34px;
+    height: 34px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 999px;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    background: rgba(255, 255, 255, 0.1);
+    color: #f4eeea;
+    cursor: pointer;
+    flex: 0 0 auto;
+  }
+
+  .photo-refresh-icon svg {
+    width: 15px;
+    height: 15px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.9;
+    stroke-linecap: round;
+    stroke-linejoin: round;
   }
 
   .photo-message {
     margin-bottom: 8px;
+    color: #f4eeea;
+    opacity: 0.9;
   }
 
   .photo-message:empty,
@@ -458,7 +488,8 @@
   }
 
   .photo-message[data-error="true"] {
-    color: #a04242;
+    color: #ffd6d1;
+    opacity: 1;
   }
 
   .photo-grid {
@@ -474,8 +505,8 @@
     min-width: 0;
     overflow: hidden;
     border-radius: 16px;
-    background: #fff;
-    border: 1px solid rgba(34, 27, 24, 0.1);
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.08);
   }
 
   .photo-card-button {
@@ -494,7 +525,7 @@
     width: 100%;
     aspect-ratio: 1 / 1;
     overflow: hidden;
-    background: #ece5dd;
+    background: rgba(255, 255, 255, 0.08);
   }
 
   .photo-media img {
@@ -510,7 +541,11 @@
 
   .photo-meta {
     padding: 8px 10px 10px;
-    font-size: 12px;
+    font-size: 10px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: #f4eeea;
+    opacity: 0.74;
   }
 
   .photo-lightbox {
@@ -537,11 +572,15 @@
     z-index: 2;
     min-height: 42px;
     padding: 10px 14px;
-    border: 0;
+    border: 1px solid rgba(255, 255, 255, 0.16);
     border-radius: 999px;
-    background: rgba(34, 27, 24, 0.82);
+    background: rgba(34, 27, 24, 0.62);
     color: #fff;
     font: inherit;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
     cursor: pointer;
   }
 
@@ -558,6 +597,9 @@
     margin-top: 10px;
     text-align: center;
     color: #f2eee9;
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
   }
 
   .sr-only {
@@ -604,7 +646,7 @@
     }
 
     .photo-meta {
-      font-size: 11px;
+      font-size: 9px;
       padding: 6px 8px 8px;
     }
   }
