@@ -172,36 +172,53 @@
       }
 
       function renderPagination(totalPages) {
-        pagination.innerHTML = "";
+  pagination.innerHTML = "";
 
-        if (totalPages <= 1) {
-          pagination.hidden = true;
-          return;
-        }
+  if (totalPages <= 1) {
+    pagination.hidden = true;
+    return;
+  }
 
-        pagination.hidden = false;
+  pagination.hidden = false;
 
-        for (let page = 1; page <= totalPages; page += 1) {
-          const button = document.createElement("button");
-          button.type = "button";
-          button.className = "photo-page-btn";
-          button.textContent = String(page);
-          button.setAttribute("aria-label", `Vai alla pagina ${page}`);
+  const pages = new Set([1, totalPages, currentPage - 1, currentPage, currentPage + 1]);
 
-          if (page === currentPage) {
-            button.dataset.active = "true";
-            button.setAttribute("aria-current", "page");
-          }
+  const orderedPages = [...pages]
+    .filter((page) => page >= 1 && page <= totalPages)
+    .sort((a, b) => a - b);
 
-          button.addEventListener("click", () => {
-            if (page === currentPage) return;
-            currentPage = page;
-            renderGallery();
-          });
+  let lastPage = 0;
 
-          pagination.appendChild(button);
-        }
-      }
+  orderedPages.forEach((page) => {
+    if (page - lastPage > 1) {
+      const dots = document.createElement("span");
+      dots.className = "photo-page-dots";
+      dots.textContent = "...";
+      dots.setAttribute("aria-hidden", "true");
+      pagination.appendChild(dots);
+    }
+
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "photo-page-btn";
+    button.textContent = String(page);
+    button.setAttribute("aria-label", `Vai alla pagina ${page}`);
+
+    if (page === currentPage) {
+      button.dataset.active = "true";
+      button.setAttribute("aria-current", "page");
+    }
+
+    button.addEventListener("click", () => {
+      if (page === currentPage) return;
+      currentPage = page;
+      renderGallery();
+    });
+
+    pagination.appendChild(button);
+    lastPage = page;
+  });
+}
 
       function renderGallery() {
         gallery.innerHTML = "";
@@ -611,6 +628,18 @@
     border-color: rgba(34, 27, 24, 0.9);
     color: #ffffff;
   }
+
+  .photo-page-dots {
+  min-width: 20px;
+  height: 34px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-text-dark, #221b18);
+  opacity: 0.55;
+  font-size: 14px;
+  font-weight: 700;
+}
 
   .photo-lightbox {
     width: min(92vw, 960px);
