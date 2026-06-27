@@ -11,7 +11,6 @@
         <section class="gallery-panel" aria-label="Galleria live">
           <div class="gallery-header">
             <p class="gallery-title">Galleria live</p>
-
             <div class="gallery-tools">
               <span id="photo-count" class="gallery-count" aria-label="Numero totale foto">0</span>
               <button id="refresh-btn" class="gallery-refresh" type="button" aria-label="Aggiorna galleria" title="Aggiorna galleria">
@@ -34,20 +33,20 @@
           <input id="camera-input" class="sr-only" type="file" accept="image/*" capture="environment" />
           <input id="gallery-input" class="sr-only" type="file" accept="image/*" multiple />
 
-          <label for="camera-input" class="dock-action dock-action-secondary dock-action-camera">
+          <label for="camera-input" class="dock-action dock-action-secondary">
             <span class="dock-icon" aria-hidden="true">
               <svg viewBox="0 0 24 24">
                 <path d="M4 7h3l1.5-2h7L17 7h3v11H4z" />
                 <circle cx="12" cy="13" r="4" />
               </svg>
             </span>
-            <span class="dock-texts">
+            <span class="dock-copy">
               <span class="dock-label">Foto</span>
               <span class="dock-sub">Scatta</span>
             </span>
           </label>
 
-          <label for="gallery-input" class="dock-action dock-action-secondary dock-action-gallery">
+          <label for="gallery-input" class="dock-action dock-action-secondary">
             <span class="dock-icon" aria-hidden="true">
               <svg viewBox="0 0 24 24">
                 <rect x="4" y="5" width="16" height="14" rx="3" />
@@ -55,7 +54,7 @@
                 <circle cx="9" cy="9" r="1.2" />
               </svg>
             </span>
-            <span class="dock-texts">
+            <span class="dock-copy">
               <span class="dock-label">Galleria</span>
               <span class="dock-sub">Scegli</span>
             </span>
@@ -69,11 +68,11 @@
                 <path d="M5 18.5h14" />
               </svg>
             </span>
-            <span class="dock-texts dock-texts-primary">
-              <span id="upload-btn-label" class="dock-label dock-label-strong">Invia foto</span>
-              <span id="upload-btn-sub" class="dock-sub dock-sub-primary">Seleziona prima</span>
+            <span class="dock-copy dock-copy-primary">
+              <span id="upload-label" class="dock-label dock-label-strong">Invia foto</span>
+              <span id="upload-sub" class="dock-sub dock-sub-primary">Seleziona prima</span>
             </span>
-            <span id="upload-count-badge" class="upload-count-badge" hidden>0</span>
+            <span id="upload-count" class="dock-badge" hidden>0</span>
           </button>
         </section>
       </div>
@@ -93,26 +92,26 @@
       const MAX_FILE_SIZE = 10 * 1024 * 1024;
       const PHOTOS_PER_PAGE = 18;
 
-      const cameraInput = document.getElementById("camera-input");
+      const cameraInput  = document.getElementById("camera-input");
       const galleryInput = document.getElementById("gallery-input");
-      const uploadBtn = document.getElementById("upload-btn");
-      const uploadBtnLabel = document.getElementById("upload-btn-label");
-      const uploadBtnSub = document.getElementById("upload-btn-sub");
-      const uploadCountBadge = document.getElementById("upload-count-badge");
-      const refreshBtn = document.getElementById("refresh-btn");
-      const gallery = document.getElementById("gallery-grid");
-      const pagination = document.getElementById("gallery-pagination");
-      const message = document.getElementById("message");
-      const photoCount = document.getElementById("photo-count");
-      const lightbox = document.getElementById("lightbox");
-      const lightboxImage = document.getElementById("lightbox-image");
+      const uploadBtn    = document.getElementById("upload-btn");
+      const uploadLabel  = document.getElementById("upload-label");
+      const uploadSub    = document.getElementById("upload-sub");
+      const uploadCount  = document.getElementById("upload-count");
+      const refreshBtn   = document.getElementById("refresh-btn");
+      const gallery      = document.getElementById("gallery-grid");
+      const pagination   = document.getElementById("gallery-pagination");
+      const message      = document.getElementById("message");
+      const photoCount   = document.getElementById("photo-count");
+      const lightbox     = document.getElementById("lightbox");
+      const lightboxImage   = document.getElementById("lightbox-image");
       const lightboxCaption = document.getElementById("lightbox-caption");
-      const lightboxClose = document.getElementById("lightbox-close");
+      const lightboxClose   = document.getElementById("lightbox-close");
 
       let selectedFiles = [];
-      let isUploading = false;
-      let allPhotos = [];
-      let currentPage = 1;
+      let isUploading   = false;
+      let allPhotos     = [];
+      let currentPage   = 1;
 
       function showMessage(text = "", isError = false) {
         message.textContent = text;
@@ -122,58 +121,53 @@
 
       function setUploadingState(nextUploading) {
         isUploading = nextUploading;
-        cameraInput.disabled = nextUploading;
+        cameraInput.disabled  = nextUploading;
         galleryInput.disabled = nextUploading;
-        refreshBtn.disabled = nextUploading;
-        uploadBtn.disabled = nextUploading || !selectedFiles.length;
-
-        if (nextUploading) {
-          uploadBtnLabel.textContent = "Invio foto";
-          uploadBtnSub.textContent = "Caricamento...";
-        } else {
-          updateUploadButton();
-        }
+        refreshBtn.disabled   = nextUploading;
+        uploadBtn.disabled    = nextUploading || !selectedFiles.length;
       }
 
-      function updateUploadButton() {
+      /* ── badge + sottotesto nel bottone di invio ── */
+      function updateSelectedFilesUI() {
         const count = selectedFiles.length;
 
         if (!count) {
-          uploadBtnLabel.textContent = "Invia foto";
-          uploadBtnSub.textContent = "Seleziona prima";
-          uploadCountBadge.hidden = true;
-          uploadBtn.disabled = true;
+          uploadLabel.textContent   = "Invia foto";
+          uploadSub.textContent     = "Seleziona prima";
+          uploadCount.hidden        = true;
+          uploadBtn.disabled        = true;
+          uploadBtn.dataset.hasFiles = "false";
           return;
         }
 
-        uploadBtnLabel.textContent = "Invia foto";
-        uploadBtnSub.textContent = count === 1 ? "1 foto pronta" : `${count} foto pronte`;
-        uploadCountBadge.textContent = String(count);
-        uploadCountBadge.hidden = false;
-        uploadBtn.disabled = isUploading;
+        uploadSub.textContent       = count === 1 ? "1 selezionata" : `${count} selezionate`;
+        uploadCount.textContent     = String(count);
+        uploadCount.hidden          = false;
+        uploadBtn.dataset.hasFiles  = "true";
+        uploadBtn.disabled          = isUploading;
       }
 
       function normalizeFiles(fileList) {
-        return Array.from(fileList || []).filter((file) => file.type.startsWith("image/") && file.size <= MAX_FILE_SIZE);
+        return Array.from(fileList || []).filter(
+          f => f.type.startsWith("image/") && f.size <= MAX_FILE_SIZE
+        );
       }
 
       function addFiles(fileList) {
-        const validFiles = normalizeFiles(fileList);
-
-        if (!validFiles.length) {
+        const valid = normalizeFiles(fileList);
+        if (!valid.length) {
           showMessage("Seleziona immagini valide fino a 10 MB.", true);
           return;
         }
-
-        selectedFiles = [...selectedFiles, ...validFiles].slice(0, MAX_FILES);
-        updateUploadButton();
+        selectedFiles = [...selectedFiles, ...valid].slice(0, MAX_FILES);
+        updateSelectedFilesUI();
         showMessage("");
       }
 
       function formatUploadedLabel(uploaded) {
-        const date = uploaded ? new Date(uploaded) : null;
-        return date && !Number.isNaN(date.getTime())
-          ? date.toLocaleString("it-IT", { dateStyle: "short", timeStyle: "short" })
+        const d = uploaded ? new Date(uploaded) : null;
+        return d && !isNaN(d)
+          ? d.toLocaleString("it-IT", { dateStyle: "short", timeStyle: "short" })
           : "Appena caricata";
       }
 
@@ -188,105 +182,79 @@
       }
 
       function createPhotoCard(photo, index) {
-        const card = document.createElement("article");
+        const card   = document.createElement("article");
         card.className = "gallery-item";
 
         const button = document.createElement("button");
-        button.type = "button";
+        button.type  = "button";
         button.className = "gallery-item-button";
 
-        const uploadedLabel = formatUploadedLabel(photo.uploaded);
-        button.setAttribute("aria-label", `Apri foto ${index + 1}, caricata ${uploadedLabel}`);
-        button.addEventListener("click", () => openLightbox(photo.url, uploadedLabel));
+        const label  = formatUploadedLabel(photo.uploaded);
+        button.setAttribute("aria-label", `Apri foto ${index + 1}, caricata ${label}`);
+        button.addEventListener("click", () => openLightbox(photo.url, label));
 
-        const imageWrap = document.createElement("div");
-        imageWrap.className = "gallery-image-wrap";
+        const wrap   = document.createElement("div");
+        wrap.className = "gallery-image-wrap";
 
-        const img = document.createElement("img");
-        img.src = photo.url;
-        img.alt = `Foto caricata ${uploadedLabel}`;
-        img.loading = "lazy";
+        const img    = document.createElement("img");
+        img.src      = photo.url;
+        img.alt      = `Foto caricata ${label}`;
+        img.loading  = "lazy";
         img.decoding = "async";
 
-        const meta = document.createElement("div");
-        meta.className = "gallery-item-meta";
-        meta.textContent = uploadedLabel;
-
-        imageWrap.appendChild(img);
-        button.appendChild(imageWrap);
+        wrap.appendChild(img);
+        button.appendChild(wrap);
         card.appendChild(button);
-        card.appendChild(meta);
         return card;
       }
 
       function renderPagination(totalPages) {
         pagination.innerHTML = "";
-
-        if (totalPages <= 1) {
-          pagination.hidden = true;
-          return;
-        }
-
+        if (totalPages <= 1) { pagination.hidden = true; return; }
         pagination.hidden = false;
 
         const pages = new Set([1, totalPages, currentPage - 1, currentPage, currentPage + 1]);
+        const ordered = [...pages].filter(p => p >= 1 && p <= totalPages).sort((a, b) => a - b);
+        let last = 0;
 
-        const orderedPages = [...pages]
-          .filter((page) => page >= 1 && page <= totalPages)
-          .sort((a, b) => a - b);
-
-        let lastPage = 0;
-
-        orderedPages.forEach((page) => {
-          if (page - lastPage > 1) {
+        ordered.forEach(page => {
+          if (page - last > 1) {
             const dots = document.createElement("span");
             dots.className = "gallery-page-dots";
             dots.textContent = "...";
             dots.setAttribute("aria-hidden", "true");
             pagination.appendChild(dots);
           }
-
-          const button = document.createElement("button");
-          button.type = "button";
-          button.className = "gallery-page-btn";
-          button.textContent = String(page);
-          button.setAttribute("aria-label", `Vai alla pagina ${page}`);
-
+          const btn = document.createElement("button");
+          btn.type = "button";
+          btn.className = "gallery-page-btn";
+          btn.textContent = String(page);
+          btn.setAttribute("aria-label", `Pagina ${page}`);
           if (page === currentPage) {
-            button.dataset.active = "true";
-            button.setAttribute("aria-current", "page");
+            btn.dataset.active = "true";
+            btn.setAttribute("aria-current", "page");
           }
-
-          button.addEventListener("click", () => {
+          btn.addEventListener("click", () => {
             if (page === currentPage) return;
             currentPage = page;
             renderGallery();
           });
-
-          pagination.appendChild(button);
-          lastPage = page;
+          pagination.appendChild(btn);
+          last = page;
         });
       }
 
       function renderGallery() {
         gallery.innerHTML = "";
-
-        if (!allPhotos.length) {
-          pagination.hidden = true;
-          return;
-        }
+        if (!allPhotos.length) { pagination.hidden = true; return; }
 
         const totalPages = Math.max(1, Math.ceil(allPhotos.length / PHOTOS_PER_PAGE));
         if (currentPage > totalPages) currentPage = totalPages;
 
-        const start = (currentPage - 1) * PHOTOS_PER_PAGE;
-        const visiblePhotos = allPhotos.slice(start, start + PHOTOS_PER_PAGE);
-        const frag = document.createDocumentFragment();
-
-        visiblePhotos.forEach((photo, index) => {
-          frag.appendChild(createPhotoCard(photo, start + index));
-        });
-
+        const start   = (currentPage - 1) * PHOTOS_PER_PAGE;
+        const visible = allPhotos.slice(start, start + PHOTOS_PER_PAGE);
+        const frag    = document.createDocumentFragment();
+        visible.forEach((photo, i) => frag.appendChild(createPhotoCard(photo, start + i)));
         gallery.appendChild(frag);
         renderPagination(totalPages);
       }
@@ -295,18 +263,15 @@
         try {
           showMessage("");
           const res = await fetch(`${workerBase}/photos`, { cache: "no-store" });
-          if (!res.ok) throw new Error("Errore nel caricamento galleria");
-
+          if (!res.ok) throw new Error();
           allPhotos = await res.json();
           photoCount.textContent = String(allPhotos.length);
-
           if (!allPhotos.length) {
             gallery.innerHTML = "";
             pagination.hidden = true;
             showMessage("La galleria è ancora vuota.", false);
             return;
           }
-
           renderGallery();
           showMessage("");
         } catch {
@@ -318,87 +283,63 @@
         if (!selectedFiles.length || isUploading) return;
 
         setUploadingState(true);
+        uploadSub.textContent  = "Invio in corso...";
+        uploadCount.hidden     = true;
         showMessage("Sto inviando le foto...");
 
         try {
           const fd = new FormData();
-          selectedFiles.forEach((file) => fd.append("photos", file));
+          selectedFiles.forEach(f => fd.append("photos", f));
 
-          const res = await fetch(`${workerBase}/upload`, {
-            method: "POST",
-            body: fd
-          });
-
+          const res = await fetch(`${workerBase}/upload`, { method: "POST", body: fd });
           let data;
-          try {
-            data = await res.json();
-          } catch {
-            throw new Error("Risposta server non valida");
-          }
+          try { data = await res.json(); } catch { throw new Error("Risposta non valida"); }
+          if (!res.ok || data?.error) throw new Error(data?.error || "Upload fallito");
 
-          if (!res.ok || data?.error) {
-            throw new Error(data?.error || "Upload fallito");
-          }
-
-          selectedFiles = [];
-          cameraInput.value = "";
+          /* ── reset completo dopo successo ── */
+          selectedFiles     = [];
+          cameraInput.value  = "";
           galleryInput.value = "";
-          updateUploadButton();
+          updateSelectedFilesUI();   /* badge → hidden, disabled → true */
+
           await loadPhotos();
           showMessage("Foto inviate correttamente.", false);
         } catch {
           showMessage("Invio non riuscito. Riprova.", true);
+          updateSelectedFilesUI();   /* ripristina badge se ci sono ancora file */
         } finally {
           setUploadingState(false);
-          updateUploadButton();
         }
       }
 
-      cameraInput?.addEventListener("change", (event) => addFiles(event.target.files));
-      galleryInput?.addEventListener("change", (event) => addFiles(event.target.files));
-      uploadBtn?.addEventListener("click", uploadFiles);
+      cameraInput?.addEventListener("change",  e => addFiles(e.target.files));
+      galleryInput?.addEventListener("change", e => addFiles(e.target.files));
+      uploadBtn?.addEventListener("click",  uploadFiles);
       refreshBtn?.addEventListener("click", loadPhotos);
       lightboxClose?.addEventListener("click", closeLightbox);
+      lightbox?.addEventListener("click", e => { if (e.target === lightbox) closeLightbox(); });
+      lightbox?.addEventListener("cancel", () => { lightboxImage.src = ""; lightboxCaption.textContent = ""; });
+      lightbox?.addEventListener("close",  () => { lightboxImage.src = ""; lightboxCaption.textContent = ""; });
 
-      lightbox?.addEventListener("click", (event) => {
-        if (event.target === lightbox) closeLightbox();
-      });
-
-      lightbox?.addEventListener("cancel", () => {
-        lightboxImage.src = "";
-        lightboxCaption.textContent = "";
-      });
-
-      lightbox?.addEventListener("close", () => {
-        lightboxImage.src = "";
-        lightboxCaption.textContent = "";
-      });
-
-      updateUploadButton();
+      updateSelectedFilesUI();
       loadPhotos();
     </script>
   </body>
 </html>
 
 <style is:global>
-  html, body {
-    margin: 0;
-    padding: 0;
-    background: #edf2f5;
-  }
+  html, body { margin: 0; padding: 0; background: #edf2f5; }
 
   body {
     font-family: Montserrat, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
     color: #221b18;
   }
 
-  *, *::before, *::after {
-    box-sizing: border-box;
-  }
+  *, *::before, *::after { box-sizing: border-box; }
 
   .photo-page {
     min-height: 100vh;
-    padding: 10px 10px 128px;
+    padding: 10px 10px 126px;
     background: linear-gradient(180deg, #e4edf1 0%, #eef3f6 50%, #f5f7f8 100%);
   }
 
@@ -407,13 +348,15 @@
     margin: 0 auto;
   }
 
+  /* ─── GALLERY PANEL ─────────────────────────────── */
   .gallery-panel {
     border-radius: 28px;
-    background: rgba(255, 255, 255, 0.72);
-    border: 1px solid rgba(255, 255, 255, 0.92);
+    background: rgba(255, 255, 255, 0.74);
+    border: 1px solid rgba(255, 255, 255, 0.96);
     box-shadow: 0 20px 44px rgba(103, 126, 138, 0.12);
     backdrop-filter: blur(14px);
-    padding: 14px;
+    overflow: hidden;
+    padding: 12px 12px 12px;
   }
 
   .gallery-header {
@@ -426,18 +369,14 @@
 
   .gallery-title {
     margin: 0;
-    font-size: 13px;
+    font-size: 12px;
     font-weight: 700;
     letter-spacing: 0.28em;
     text-transform: uppercase;
     color: rgba(34, 27, 24, 0.82);
   }
 
-  .gallery-tools {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-  }
+  .gallery-tools { display: inline-flex; align-items: center; gap: 8px; }
 
   .gallery-count,
   .gallery-refresh,
@@ -449,61 +388,51 @@
     justify-content: center;
     padding: 0 12px;
     border-radius: 999px;
-    border: 1px solid rgba(34, 27, 24, 0.07);
-    background: rgba(255, 255, 255, 0.95);
+    border: 1px solid rgba(34, 27, 24, 0.06);
+    background: rgba(255, 255, 255, 0.96);
     color: #221b18;
     font-size: 11px;
     font-weight: 700;
     line-height: 1;
+    box-shadow: 0 4px 12px rgba(103, 126, 138, 0.08);
   }
 
   .gallery-refresh,
   .gallery-page-btn,
   .gallery-item-button,
   .photo-lightbox-close,
-  .dock-action {
-    cursor: pointer;
-  }
+  .dock-action { cursor: pointer; }
 
   .gallery-refresh svg,
   .dock-icon svg {
-    width: 18px;
-    height: 18px;
-    fill: none;
-    stroke: currentColor;
-    stroke-width: 1.9;
-    stroke-linecap: round;
-    stroke-linejoin: round;
+    width: 18px; height: 18px;
+    fill: none; stroke: currentColor;
+    stroke-width: 1.9; stroke-linecap: round; stroke-linejoin: round;
   }
 
   .gallery-message {
-    margin: 0 0 10px;
+    margin: 0 2px 10px;
     font-size: 13px;
     line-height: 1.45;
     color: rgba(34, 27, 24, 0.66);
   }
-
   .gallery-message:empty,
-  .gallery-message[hidden] {
-    display: none;
-  }
+  .gallery-message[hidden] { display: none; }
+  .gallery-message[data-error="true"] { color: #a04242; }
 
-  .gallery-message[data-error="true"] {
-    color: #a04242;
-  }
-
+  /* ─── INSTAGRAM-STYLE GRID ──────────────────────── */
   .gallery-grid {
     display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 10px;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 3px;
+    /* flush inside the panel — no outer padding needed */
+    margin: 0 -12px;
   }
 
   .gallery-item {
     overflow: hidden;
     min-width: 0;
-    border-radius: 19px;
-    background: rgba(255, 255, 255, 0.94);
-    box-shadow: 0 8px 18px rgba(115, 137, 149, 0.08);
+    background: #dfe8ec;
   }
 
   .gallery-item-button {
@@ -511,7 +440,7 @@
     padding: 0;
     border: 0;
     background: transparent;
-    text-align: left;
+    display: block;
   }
 
   .gallery-image-wrap {
@@ -529,32 +458,22 @@
     height: 100%;
     object-fit: cover;
     object-position: center;
-    transition: transform 180ms ease;
+    transition: transform 200ms ease;
+    display: block;
   }
 
   .gallery-item-button:hover .gallery-image-wrap img,
   .gallery-item-button:focus-visible .gallery-image-wrap img {
-    transform: scale(1.03);
-  }
-
-  .gallery-item-meta {
-    padding: 8px 8px 2px;
-    font-size: 9px;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-    color: rgba(34, 27, 24, 0.52);
+    transform: scale(1.04);
   }
 
   .gallery-pagination {
     display: flex;
     flex-wrap: wrap;
     gap: 8px;
-    margin-top: 14px;
+    margin: 14px 12px 0;
   }
-
-  .gallery-pagination[hidden] {
-    display: none;
-  }
+  .gallery-pagination[hidden] { display: none; }
 
   .gallery-page-btn[data-active="true"] {
     background: rgba(34, 27, 24, 0.92);
@@ -563,16 +482,12 @@
   }
 
   .gallery-page-dots {
-    min-width: 20px;
-    height: 36px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 14px;
-    font-weight: 700;
-    color: rgba(34, 27, 24, 0.46);
+    min-width: 20px; height: 36px;
+    display: inline-flex; align-items: center; justify-content: center;
+    font-size: 14px; font-weight: 700; color: rgba(34, 27, 24, 0.46);
   }
 
+  /* ─── FLOATING DOCK ──────────────────────────────── */
   .upload-dock-wrap {
     position: fixed;
     left: 50%;
@@ -584,22 +499,21 @@
 
   .upload-dock {
     display: grid;
-    grid-template-columns: 1fr 1fr 1.24fr;
-    gap: 9px;
-    padding: 9px;
+    grid-template-columns: 1fr 1fr 1.15fr;
+    gap: 10px;
+    padding: 10px;
     border-radius: 28px;
-    background: rgba(255, 255, 255, 0.8);
+    background: rgba(255, 255, 255, 0.78);
     border: 1px solid rgba(255, 255, 255, 0.96);
     box-shadow: 0 18px 38px rgba(74, 94, 105, 0.18);
     backdrop-filter: blur(22px);
   }
 
   .dock-action {
-    position: relative;
     appearance: none;
     border: 0;
-    min-height: 70px;
-    padding: 12px 14px;
+    min-height: 74px;
+    padding: 10px 14px;
     border-radius: 22px;
     display: flex;
     align-items: center;
@@ -607,261 +521,141 @@
     gap: 12px;
     text-decoration: none;
     color: #221b18;
-    transition: transform 160ms ease, box-shadow 160ms ease, background 160ms ease;
+    position: relative;
+    transition: transform 160ms ease, box-shadow 160ms ease;
   }
 
-  .dock-action:hover {
-    transform: translateY(-1px);
-  }
+  .dock-action:hover:not(:disabled) { transform: translateY(-1px); }
 
   .dock-action-secondary {
-    background: linear-gradient(180deg, rgba(255, 255, 255, 0.98) 0%, rgba(245, 248, 250, 0.98) 100%);
-    box-shadow:
-      inset 0 0 0 1px rgba(34, 27, 24, 0.05),
-      0 8px 18px rgba(129, 148, 159, 0.08);
-  }
-
-  .dock-action-camera .dock-icon {
-    background: linear-gradient(180deg, rgba(34, 27, 24, 0.1) 0%, rgba(34, 27, 24, 0.06) 100%);
-  }
-
-  .dock-action-gallery .dock-icon {
-    background: linear-gradient(180deg, rgba(134, 174, 191, 0.2) 0%, rgba(134, 174, 191, 0.1) 100%);
+    background: linear-gradient(180deg, rgba(255,255,255,0.98) 0%, rgba(244,248,250,0.96) 100%);
+    box-shadow: inset 0 0 0 1px rgba(34,27,24,.05), 0 10px 20px rgba(103,126,138,.08);
   }
 
   .dock-action-primary {
-    background: linear-gradient(180deg, #2f2724 0%, #221b18 100%);
+    background: linear-gradient(180deg, #2c2421 0%, #1e1714 100%);
     color: #ffffff;
-    box-shadow: 0 12px 22px rgba(34, 27, 24, 0.2);
+    box-shadow: 0 14px 24px rgba(34,27,24,.22);
   }
 
-  .dock-action:disabled {
-    opacity: 0.72;
-    cursor: not-allowed;
-  }
+  .dock-action:disabled { opacity: 0.58; cursor: not-allowed; transform: none; }
 
-  .dock-action:disabled:hover {
-    transform: none;
+  /* sottile pulse sul primario quando ha file */
+  .dock-action-primary[data-has-files="true"] {
+    box-shadow: 0 14px 28px rgba(34,27,24,.28), 0 0 0 3px rgba(134,174,191,.22);
   }
 
   .dock-icon {
-    width: 40px;
-    height: 40px;
-    border-radius: 14px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    background: rgba(34, 27, 24, 0.06);
+    width: 42px; height: 42px;
+    border-radius: 15px;
+    display: inline-flex; align-items: center; justify-content: center;
+    background: rgba(34,27,24,.06);
     flex: 0 0 auto;
   }
+  .dock-action-primary .dock-icon { background: rgba(255,255,255,.12); }
 
-  .dock-action-primary .dock-icon {
-    background: rgba(255, 255, 255, 0.12);
+  .dock-copy {
+    display: flex; flex-direction: column; align-items: flex-start; min-width: 0;
   }
-
-  .dock-texts {
-    min-width: 0;
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 2px;
-  }
-
-  .dock-texts-primary {
-    padding-right: 32px;
-  }
+  .dock-copy-primary { padding-right: 30px; }
 
   .dock-label {
-    font-size: 12px;
-    font-weight: 700;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-    line-height: 1.15;
+    font-size: 12px; font-weight: 700;
+    letter-spacing: .08em; text-transform: uppercase; line-height: 1.15;
   }
-
-  .dock-label-strong {
-    letter-spacing: 0.04em;
-  }
+  .dock-label-strong { letter-spacing: .05em; }
 
   .dock-sub {
-    font-size: 10px;
-    font-weight: 600;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    color: rgba(34, 27, 24, 0.46);
-    line-height: 1.1;
+    margin-top: 4px;
+    font-size: 10px; font-weight: 600;
+    letter-spacing: .08em; text-transform: uppercase;
+    color: rgba(34,27,24,.48); line-height: 1.1;
   }
+  .dock-sub-primary { color: rgba(255,255,255,.68); }
 
-  .dock-sub-primary {
-    color: rgba(255, 255, 255, 0.7);
-  }
-
-  .upload-count-badge {
+  /* badge numero foto */
+  .dock-badge {
     position: absolute;
-    top: 10px;
-    right: 10px;
-    min-width: 24px;
-    height: 24px;
+    top: 10px; right: 10px;
+    min-width: 24px; height: 24px;
     padding: 0 7px;
     border-radius: 999px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
+    display: inline-flex; align-items: center; justify-content: center;
     background: #ffffff;
-    color: #221b18;
-    font-size: 11px;
-    font-weight: 800;
-    letter-spacing: 0;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12);
+    color: #1e1714;
+    font-size: 11px; font-weight: 800; line-height: 1;
+    box-shadow: 0 4px 12px rgba(0,0,0,.16);
+    transition: transform 180ms cubic-bezier(.34,1.56,.64,1), opacity 160ms ease;
   }
+  .dock-badge[hidden] { display: none; }
 
+  /* ─── LIGHTBOX ───────────────────────────────────── */
   .photo-lightbox {
-    width: min(92vw, 960px);
-    max-width: 960px;
-    padding: 0;
-    border: 0;
-    background: transparent;
+    width: min(92vw, 960px); max-width: 960px;
+    padding: 0; border: 0; background: transparent;
   }
-
-  .photo-lightbox::backdrop {
-    background: rgba(0, 0, 0, 0.72);
-    backdrop-filter: blur(4px);
-  }
-
-  .photo-lightbox-inner {
-    position: relative;
-  }
+  .photo-lightbox::backdrop { background: rgba(0,0,0,.72); backdrop-filter: blur(4px); }
+  .photo-lightbox-inner { position: relative; }
 
   .photo-lightbox-close {
-    position: absolute;
-    top: 12px;
-    right: 12px;
-    z-index: 2;
-    min-height: 42px;
-    padding: 10px 14px;
-    border: 1px solid rgba(255, 255, 255, 0.16);
+    position: absolute; top: 12px; right: 12px; z-index: 2;
+    min-height: 42px; padding: 10px 14px;
+    border: 1px solid rgba(255,255,255,.16);
     border-radius: 999px;
-    background: rgba(34, 27, 24, 0.62);
-    color: #fff;
-    font: inherit;
-    font-size: 10px;
-    font-weight: 700;
-    letter-spacing: 0.16em;
-    text-transform: uppercase;
+    background: rgba(34,27,24,.62); color: #fff;
+    font: inherit; font-size: 10px; font-weight: 700;
+    letter-spacing: .16em; text-transform: uppercase;
   }
 
   .photo-lightbox-image {
-    display: block;
-    width: 100%;
-    max-height: 78vh;
-    object-fit: contain;
-    border-radius: 18px;
-    background: #111;
+    display: block; width: 100%; max-height: 78vh;
+    object-fit: contain; border-radius: 18px; background: #111;
   }
 
   .photo-lightbox-caption {
-    margin-top: 10px;
-    text-align: center;
-    color: #f2eee9;
-    font-size: 11px;
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
+    margin-top: 10px; text-align: center;
+    color: #f2eee9; font-size: 11px; letter-spacing: .2em; text-transform: uppercase;
   }
 
+  /* ─── FOCUS ─────────────────────────────────────── */
   .gallery-refresh:focus-visible,
   .gallery-page-btn:focus-visible,
   .dock-action:focus-visible,
   .gallery-item-button:focus-visible,
   .photo-lightbox-close:focus-visible {
-    outline: 3px solid rgba(134, 174, 191, 0.4);
-    outline-offset: 3px;
+    outline: 3px solid rgba(134,174,191,.4); outline-offset: 3px;
   }
 
   .sr-only {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    padding: 0;
-    margin: -1px;
-    overflow: hidden;
-    clip: rect(0, 0, 0, 0);
-    white-space: nowrap;
-    border: 0;
+    position: absolute; width: 1px; height: 1px; padding: 0;
+    margin: -1px; overflow: hidden; clip: rect(0,0,0,0);
+    white-space: nowrap; border: 0;
   }
 
+  /* ─── RESPONSIVE ─────────────────────────────────── */
   @media (min-width: 900px) {
-    .gallery-grid {
-      grid-template-columns: repeat(4, minmax(0, 1fr));
-      gap: 12px;
-    }
+    .gallery-grid { grid-template-columns: repeat(4, 1fr); }
   }
 
   @media (max-width: 760px) {
-    .photo-page {
-      padding: 10px 8px 124px;
-    }
-
-    .upload-dock-wrap {
-      width: calc(100% - 16px);
-      bottom: calc(env(safe-area-inset-bottom, 0px) + 8px);
-    }
+    .photo-page { padding: 10px 8px 122px; }
+    .upload-dock-wrap { width: calc(100% - 16px); bottom: calc(env(safe-area-inset-bottom,0px) + 8px); }
+    .upload-dock { gap: 8px; padding: 8px; }
+    .dock-action { min-height: 68px; padding: 10px; border-radius: 20px; gap: 10px; }
+    .dock-icon { width: 38px; height: 38px; border-radius: 13px; }
   }
 
   @media (max-width: 560px) {
-    .gallery-grid {
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 8px;
-    }
-
-    .gallery-item-meta {
-      font-size: 8px;
-      padding: 7px 6px 2px;
-    }
+    .gallery-grid { grid-template-columns: repeat(3, 1fr); gap: 2px; }
 
     .gallery-count,
     .gallery-refresh,
-    .gallery-page-btn {
-      min-width: 34px;
-      height: 34px;
-      padding: 0 10px;
-      font-size: 10px;
-    }
+    .gallery-page-btn { min-width: 34px; height: 34px; padding: 0 10px; font-size: 10px; }
+    .gallery-page-dots { height: 34px; }
 
-    .gallery-page-dots {
-      height: 34px;
-    }
-
-    .upload-dock {
-      grid-template-columns: 1fr 1fr 1.1fr;
-      gap: 8px;
-      padding: 8px;
-      border-radius: 24px;
-    }
-
-    .dock-action {
-      min-height: 62px;
-      padding: 10px 10px;
-      border-radius: 18px;
-      justify-content: center;
-    }
-
-    .dock-texts {
-      display: none;
-    }
-
-    .dock-icon {
-      width: 36px;
-      height: 36px;
-      border-radius: 12px;
-    }
-
-    .upload-count-badge {
-      top: 6px;
-      right: 6px;
-      min-width: 20px;
-      height: 20px;
-      font-size: 10px;
-      padding: 0 6px;
-    }
+    .dock-copy { display: none; }
+    .dock-action { min-height: 60px; justify-content: center; padding: 10px 8px; }
+    .dock-icon { width: 36px; height: 36px; border-radius: 12px; }
+    .dock-badge { top: 6px; right: 6px; min-width: 22px; height: 22px; font-size: 10px; }
   }
 </style>
