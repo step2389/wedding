@@ -7,37 +7,37 @@
   </head>
   <body>
     <main class="photo-page font-montserrat">
-      <div class="app-shell">
-        <section class="gallery-panel" aria-label="I vostri scatti">
-          <div class="gallery-header-shell">
-            <div class="gallery-header">
-              <p class="gallery-title">I vostri scatti</p>
+      <section class="gallery-shell" aria-label="I vostri scatti">
+        <header class="gallery-topbar">
+          <div class="gallery-topbar-inner">
+            <p class="gallery-title">I vostri scatti</p>
 
-              <div class="gallery-tools">
-                <span id="new-badge" class="gallery-new-badge" hidden>Nuovi scatti</span>
-                <span id="photo-count" class="gallery-count" aria-label="Numero totale foto">0</span>
-                <button id="refresh-btn" class="gallery-refresh" type="button" aria-label="Aggiorna galleria" title="Aggiorna galleria">
-                  <svg viewBox="0 0 24 24" aria-hidden="true">
-                    <path d="M21 12a9 9 0 1 1-2.64-6.36" />
-                    <path d="M21 3v6h-6" />
-                  </svg>
-                </button>
-              </div>
+            <div class="gallery-tools">
+              <span id="new-badge" class="gallery-new-badge" hidden>Nuovi scatti</span>
+              <span id="photo-count" class="gallery-count" aria-label="Numero totale foto">0</span>
+              <button id="refresh-btn" class="gallery-refresh" type="button" aria-label="Aggiorna galleria" title="Aggiorna galleria">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M21 12a9 9 0 1 1-2.64-6.36" />
+                  <path d="M21 3v6h-6" />
+                </svg>
+              </button>
             </div>
           </div>
+        </header>
 
-          <p id="message" class="gallery-message" role="status" aria-live="polite"></p>
+        <p id="message" class="gallery-message" role="status" aria-live="polite"></p>
+
+        <div class="gallery-grid-wrap">
           <div id="gallery-grid" class="gallery-grid"></div>
+        </div>
 
-          <div class="gallery-footer">
-            <button id="load-more-btn" class="load-more-btn" type="button" hidden>Carica altre foto</button>
-            <div id="feed-sentinel" class="feed-sentinel" aria-hidden="true"></div>
-          </div>
-        </section>
-      </div>
+        <div class="gallery-actions">
+          <button id="load-more-btn" class="load-more-btn" type="button" hidden>Carica altre foto</button>
+        </div>
+      </section>
 
       <div class="upload-dock-wrap">
-        <section class="upload-dock" aria-label="Azioni caricamento foto">
+        <section class="upload-dock" aria-label="Carica nuove foto">
           <input id="camera-input" class="sr-only" type="file" accept="image/*" capture="environment" />
           <input id="gallery-input" class="sr-only" type="file" accept="image/*" multiple />
 
@@ -99,7 +99,7 @@
       const MAX_FILES = 20;
       const MAX_FILE_SIZE = 10 * 1024 * 1024;
       const BATCH_SIZE = 24;
-      const MAX_RENDERED_ITEMS = 180;
+      const MAX_RENDERED_ITEMS = 120;
       const AUTO_REFRESH_MS = 10 * 60 * 1000;
 
       const cameraInput = document.getElementById("camera-input");
@@ -112,7 +112,6 @@
       const loadMoreBtn = document.getElementById("load-more-btn");
       const newBadge = document.getElementById("new-badge");
       const gallery = document.getElementById("gallery-grid");
-      const sentinel = document.getElementById("feed-sentinel");
       const message = document.getElementById("message");
       const photoCount = document.getElementById("photo-count");
       const lightbox = document.getElementById("lightbox");
@@ -122,13 +121,12 @@
 
       let selectedFiles = [];
       let isUploading = false;
-      let isLoadingMore = false;
       let isRefreshing = false;
+      let isLoadingMore = false;
       let allPhotos = [];
       let renderedCount = 0;
-      let newestTimestamp = null;
+      let newestTimestamp = 0;
       let autoRefreshTimer = null;
-      let observer = null;
 
       function showMessage(text = "", isError = false) {
         message.textContent = text;
@@ -236,8 +234,7 @@
       }
 
       function updateLoadMoreVisibility() {
-        const hasMore = renderedCount < allPhotos.length;
-        loadMoreBtn.hidden = !hasMore;
+        loadMoreBtn.hidden = renderedCount >= allPhotos.length;
       }
 
       function trimRenderedItems() {
@@ -246,8 +243,7 @@
 
         const toRemove = items.length - MAX_RENDERED_ITEMS;
         for (let i = 0; i < toRemove; i += 1) {
-          const item = items[i];
-          if (item) item.remove();
+          items[i]?.remove();
         }
       }
 
@@ -259,6 +255,8 @@
         }
 
         isLoadingMore = true;
+        loadMoreBtn.disabled = true;
+
         const nextChunk = allPhotos.slice(renderedCount, renderedCount + BATCH_SIZE);
         const fragment = document.createDocumentFragment();
 
@@ -266,11 +264,14 @@
           fragment.appendChild(createPhotoCard(photo, renderedCount + index));
         });
 
-        gallery.appendChild(fragment);
-        renderedCount += nextChunk.length;
-        trimRenderedItems();
-        updateLoadMoreVisibility();
-        isLoadingMore = false;
+        requestAnimationFrame(() => {
+          gallery.appendChild(fragment);
+          renderedCount += nextChunk.length;
+          trimRenderedItems();
+          updateLoadMoreVisibility();
+          isLoadingMore = false;
+          loadMoreBtn.disabled = false;
+        });
       }
 
       function prependNewPhotos(photos) {
@@ -281,8 +282,10 @@
           fragment.appendChild(createPhotoCard(photo, index));
         });
 
-        gallery.prepend(fragment);
-        trimRenderedItems();
+        requestAnimationFrame(() => {
+          gallery.prepend(fragment);
+          trimRenderedItems();
+        });
       }
 
       function resetFeed() {
@@ -302,7 +305,7 @@
         try {
           showMessage("");
           allPhotos = await fetchAllPhotos();
-          newestTimestamp = allPhotos.length ? getPhotoTimestamp(allPhotos[0]) : null;
+          newestTimestamp = allPhotos.length ? getPhotoTimestamp(allPhotos[0]) : 0;
           updatePhotoCount();
 
           if (!allPhotos.length) {
@@ -313,10 +316,8 @@
           }
 
           resetFeed();
-          showMessage("");
         } catch {
           showMessage("Non riesco a caricare la galleria.", true);
-          loadMoreBtn.hidden = false;
         }
       }
 
@@ -328,12 +329,10 @@
         try {
           const freshPhotos = await fetchAllPhotos();
           if (!Array.isArray(freshPhotos) || !freshPhotos.length) {
-            isRefreshing = false;
-            refreshBtn.disabled = false;
             return;
           }
 
-          const latestKnown = newestTimestamp ?? 0;
+          const latestKnown = newestTimestamp || 0;
           const newItems = freshPhotos.filter((photo) => getPhotoTimestamp(photo) > latestKnown);
 
           allPhotos = freshPhotos;
@@ -353,7 +352,7 @@
 
             window.setTimeout(() => {
               newBadge.hidden = true;
-            }, 5000);
+            }, 4500);
           } else if (!silent) {
             showMessage("Nessuna nuova foto al momento.", false);
           }
@@ -361,7 +360,6 @@
           if (!silent) {
             showMessage("Non riesco ad aggiornare la galleria.", true);
           }
-          loadMoreBtn.hidden = false;
         } finally {
           isRefreshing = false;
           refreshBtn.disabled = isUploading;
@@ -373,22 +371,6 @@
         autoRefreshTimer = window.setInterval(() => {
           refreshOnlyNewPhotos({ silent: true });
         }, AUTO_REFRESH_MS);
-      }
-
-      function setupInfiniteScroll() {
-        if (observer) observer.disconnect();
-
-        observer = new IntersectionObserver((entries) => {
-          const entry = entries[0];
-          if (!entry?.isIntersecting) return;
-          appendNextBatch();
-        }, {
-          root: null,
-          rootMargin: "800px 0px 800px 0px",
-          threshold: 0
-        });
-
-        observer.observe(sentinel);
       }
 
       async function uploadFiles() {
@@ -456,7 +438,6 @@
 
       updateSelectedFilesUI();
       await loadInitialPhotos();
-      setupInfiniteScroll();
       startAutoRefresh();
     </script>
   </body>
@@ -464,17 +445,16 @@
 
 <style is:global>
   :root {
-    --sand-1: #f5f0e8;
-    --sand-2: #ece2d3;
-    --sand-3: #dbcdb7;
-    --blue-1: #edf5f7;
-    --blue-2: #dbeaf0;
-    --blue-3: #b9d2dc;
-    --blue-4: #86aebf;
-    --blue-5: #6b97ab;
-    --ink: #221b18;
-    --ink-soft: rgba(34, 27, 24, 0.68);
-    --white: rgba(255, 255, 255, 0.96);
+    --sand-1: #f6f1e8;
+    --sand-2: #eadfce;
+    --sand-3: #dac8ae;
+    --blue-1: #eef6f8;
+    --blue-2: #deedf2;
+    --blue-3: #bed8e2;
+    --blue-4: #8fb4c3;
+    --blue-5: #6e97aa;
+    --ink: #241d1a;
+    --ink-soft: rgba(36, 29, 26, 0.68);
   }
 
   html, body {
@@ -494,60 +474,50 @@
 
   .photo-page {
     min-height: 100vh;
-    padding: 10px 10px 128px;
+    padding: 0 0 124px;
     background:
-      radial-gradient(circle at top left, rgba(185, 210, 220, 0.5), transparent 36%),
-      linear-gradient(180deg, var(--blue-2) 0%, #eef4f5 44%, var(--sand-1) 100%);
+      radial-gradient(circle at top left, rgba(190, 216, 226, 0.42), transparent 30%),
+      linear-gradient(180deg, var(--blue-2) 0%, #f2f6f6 38%, var(--sand-1) 100%);
   }
 
-  .app-shell {
+  .gallery-shell {
     width: min(100%, 980px);
     margin: 0 auto;
+    padding: 0 10px;
   }
 
-  .gallery-panel {
-    border-radius: 30px;
-    background: rgba(255, 255, 255, 0.72);
-    border: 1px solid rgba(255, 255, 255, 0.94);
-    box-shadow: 0 18px 40px rgba(107, 151, 171, 0.12);
-    backdrop-filter: blur(16px);
-    overflow: visible;
-    padding: 0 12px 14px;
-  }
-
-  .gallery-header-shell {
+  .gallery-topbar {
     position: sticky;
     top: 0;
-    z-index: 12;
-    margin: 0 -12px;
-    padding: 12px 12px 10px;
-    backdrop-filter: blur(18px);
-    background: linear-gradient(180deg, rgba(245, 240, 232, 0.92) 0%, rgba(237, 245, 247, 0.88) 100%);
-    border-bottom: 1px solid rgba(134, 174, 191, 0.16);
+    z-index: 30;
+    padding-top: max(8px, env(safe-area-inset-top, 0px));
+    background: linear-gradient(180deg, rgba(238, 246, 248, 0.96) 0%, rgba(238, 246, 248, 0.82) 70%, rgba(238, 246, 248, 0) 100%);
+    backdrop-filter: blur(10px);
   }
 
-  .gallery-header {
+  .gallery-topbar-inner {
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 12px;
+    padding: 12px 4px 10px;
   }
 
   .gallery-title {
     margin: 0;
     font-size: 12px;
     font-weight: 700;
-    letter-spacing: 0.28em;
+    letter-spacing: 0.26em;
     text-transform: uppercase;
-    color: rgba(34, 27, 24, 0.82);
+    color: rgba(36, 29, 26, 0.82);
   }
 
   .gallery-tools {
     display: inline-flex;
     align-items: center;
+    justify-content: flex-end;
     gap: 8px;
     flex-wrap: wrap;
-    justify-content: flex-end;
   }
 
   .gallery-new-badge,
@@ -567,18 +537,17 @@
 
   .gallery-new-badge {
     padding: 0 12px;
-    background: rgba(134, 174, 191, 0.18);
-    color: #3a6578;
-    border: 1px solid rgba(134, 174, 191, 0.24);
+    background: rgba(143, 180, 195, 0.18);
+    color: #42697b;
+    border: 1px solid rgba(143, 180, 195, 0.2);
   }
 
   .gallery-count,
   .gallery-refresh,
   .load-more-btn {
-    border: 1px solid rgba(107, 151, 171, 0.12);
-    background: rgba(255, 255, 255, 0.92);
+    background: rgba(255, 255, 255, 0.9);
+    border: 1px solid rgba(110, 151, 170, 0.14);
     color: var(--ink);
-    box-shadow: 0 4px 12px rgba(107, 151, 171, 0.08);
   }
 
   .gallery-count,
@@ -587,27 +556,8 @@
     padding: 0 12px;
   }
 
-  .gallery-refresh,
-  .gallery-item-button,
-  .photo-lightbox-close,
-  .dock-action,
-  .load-more-btn {
-    cursor: pointer;
-  }
-
-  .gallery-refresh svg,
-  .dock-icon svg {
-    width: 18px;
-    height: 18px;
-    fill: none;
-    stroke: currentColor;
-    stroke-width: 1.9;
-    stroke-linecap: round;
-    stroke-linejoin: round;
-  }
-
   .gallery-message {
-    margin: 12px 2px 10px;
+    margin: 8px 2px 12px;
     font-size: 13px;
     line-height: 1.45;
     color: var(--ink-soft);
@@ -622,27 +572,32 @@
     color: #a04242;
   }
 
-  .gallery-grid {
+  .gallery-grid-wrap {
+    border-radius: 22px;
     overflow: hidden;
+    background: rgba(255, 255, 255, 0.38);
+    border: 1px solid rgba(255, 255, 255, 0.55);
+  }
+
+  .gallery-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 3px;
-    margin: 0 -12px;
-    background: rgba(185, 210, 220, 0.16);
+    gap: 2px;
+    background: rgba(190, 216, 226, 0.26);
   }
 
   .gallery-item {
     overflow: hidden;
-    min-width: 0;
-    background: #dfe8ec;
+    background: #dfe9ed;
   }
 
   .gallery-item-button {
+    display: block;
     width: 100%;
     padding: 0;
     border: 0;
     background: transparent;
-    display: block;
+    cursor: pointer;
   }
 
   .gallery-image-wrap {
@@ -661,32 +616,37 @@
     object-fit: cover;
     object-position: center;
     display: block;
-    transition: transform 200ms ease;
   }
 
-  .gallery-item-button:hover .gallery-image-wrap img,
-  .gallery-item-button:focus-visible .gallery-image-wrap img {
-    transform: scale(1.04);
-  }
-
-  .gallery-footer {
-    padding: 14px 0 0;
+  .gallery-actions {
     display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 10px;
+    justify-content: center;
+    padding: 16px 0 0;
   }
 
   .load-more-btn {
     padding: 0 18px;
     background: linear-gradient(180deg, var(--sand-1) 0%, var(--sand-2) 100%);
-    border-color: rgba(134, 174, 191, 0.18);
-    color: #5d5349;
+    color: #5d5348;
+    cursor: pointer;
   }
 
-  .feed-sentinel {
-    width: 100%;
-    height: 2px;
+  .gallery-refresh,
+  .load-more-btn,
+  .photo-lightbox-close,
+  .dock-action {
+    cursor: pointer;
+  }
+
+  .gallery-refresh svg,
+  .dock-icon svg {
+    width: 18px;
+    height: 18px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.9;
+    stroke-linecap: round;
+    stroke-linejoin: round;
   }
 
   .upload-dock-wrap {
@@ -703,64 +663,51 @@
     grid-template-columns: 1fr 1fr 1.15fr;
     gap: 10px;
     padding: 10px;
-    border-radius: 28px;
+    border-radius: 24px;
     background: rgba(255, 255, 255, 0.78);
     border: 1px solid rgba(255, 255, 255, 0.96);
-    box-shadow: 0 18px 38px rgba(107, 151, 171, 0.2);
-    backdrop-filter: blur(22px);
+    box-shadow: 0 10px 24px rgba(110, 151, 170, 0.14);
+    backdrop-filter: blur(14px);
   }
 
   .dock-action {
     appearance: none;
     border: 0;
-    min-height: 74px;
+    min-height: 72px;
     padding: 10px 14px;
-    border-radius: 22px;
+    border-radius: 20px;
     display: flex;
     align-items: center;
     justify-content: flex-start;
     gap: 12px;
-    text-decoration: none;
-    color: var(--ink);
     position: relative;
-    transition: transform 160ms ease, box-shadow 160ms ease;
-  }
-
-  .dock-action:hover:not(:disabled) {
-    transform: translateY(-1px);
+    color: var(--ink);
+    text-decoration: none;
   }
 
   .dock-action-secondary {
-    background: linear-gradient(180deg, var(--blue-1) 0%, rgba(244, 239, 232, 0.96) 100%);
-    box-shadow:
-      inset 0 0 0 1px rgba(107, 151, 171, 0.08),
-      0 10px 20px rgba(107, 151, 171, 0.08);
+    background: linear-gradient(180deg, var(--blue-1) 0%, rgba(246, 241, 232, 0.96) 100%);
+    box-shadow: inset 0 0 0 1px rgba(110, 151, 170, 0.08);
   }
 
   .dock-action-primary {
-    background: linear-gradient(180deg, #84afc0 0%, #6b97ab 100%);
+    background: linear-gradient(180deg, #88b3c4 0%, #6e97aa 100%);
     color: #ffffff;
-    box-shadow: 0 14px 24px rgba(107, 151, 171, 0.28);
   }
 
   .dock-action:disabled {
-    opacity: 0.58;
+    opacity: 0.6;
     cursor: not-allowed;
-    transform: none;
-  }
-
-  .dock-action-primary[data-has-files="true"] {
-    box-shadow: 0 14px 28px rgba(107, 151, 171, 0.32), 0 0 0 3px rgba(185, 210, 220, 0.34);
   }
 
   .dock-icon {
-    width: 42px;
-    height: 42px;
-    border-radius: 15px;
+    width: 40px;
+    height: 40px;
+    border-radius: 14px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    background: rgba(107, 151, 171, 0.1);
+    background: rgba(110, 151, 170, 0.1);
     flex: 0 0 auto;
   }
 
@@ -797,7 +744,7 @@
     font-weight: 600;
     letter-spacing: 0.08em;
     text-transform: uppercase;
-    color: rgba(34, 27, 24, 0.48);
+    color: rgba(36, 29, 26, 0.48);
     line-height: 1.1;
   }
 
@@ -807,8 +754,8 @@
 
   .dock-badge {
     position: absolute;
-    top: 10px;
-    right: 10px;
+    top: 8px;
+    right: 8px;
     min-width: 24px;
     height: 24px;
     padding: 0 7px;
@@ -817,11 +764,10 @@
     align-items: center;
     justify-content: center;
     background: var(--sand-1);
-    color: #5c5248;
+    color: #5b5147;
     font-size: 11px;
     font-weight: 800;
     line-height: 1;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.14);
   }
 
   .dock-badge[hidden] {
@@ -854,7 +800,7 @@
     padding: 10px 14px;
     border: 1px solid rgba(255, 255, 255, 0.16);
     border-radius: 999px;
-    background: rgba(34, 27, 24, 0.62);
+    background: rgba(36, 29, 26, 0.64);
     color: #fff;
     font: inherit;
     font-size: 10px;
@@ -886,7 +832,7 @@
   .dock-action:focus-visible,
   .gallery-item-button:focus-visible,
   .photo-lightbox-close:focus-visible {
-    outline: 3px solid rgba(134, 174, 191, 0.38);
+    outline: 3px solid rgba(143, 180, 195, 0.34);
     outline-offset: 3px;
   }
 
@@ -909,8 +855,8 @@
   }
 
   @media (max-width: 760px) {
-    .photo-page {
-      padding: 10px 8px 124px;
+    .gallery-shell {
+      padding: 0 8px;
     }
 
     .upload-dock-wrap {
@@ -926,21 +872,14 @@
     .dock-action {
       min-height: 68px;
       padding: 10px;
-      border-radius: 20px;
+      border-radius: 18px;
       gap: 10px;
-    }
-
-    .dock-icon {
-      width: 38px;
-      height: 38px;
-      border-radius: 13px;
     }
   }
 
   @media (max-width: 560px) {
     .gallery-grid {
       grid-template-columns: repeat(3, 1fr);
-      gap: 2px;
     }
 
     .gallery-count,
