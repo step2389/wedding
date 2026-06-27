@@ -8,23 +8,31 @@
   <body>
     <main class="photo-page font-montserrat">
       <div class="app-shell">
-        <section class="gallery-panel" aria-label="Galleria live">
-          <div class="gallery-header">
-            <p class="gallery-title">Galleria live</p>
-            <div class="gallery-tools">
-              <span id="photo-count" class="gallery-count" aria-label="Numero totale foto">0</span>
-              <button id="refresh-btn" class="gallery-refresh" type="button" aria-label="Aggiorna galleria" title="Aggiorna galleria">
-                <svg viewBox="0 0 24 24" aria-hidden="true">
-                  <path d="M21 12a9 9 0 1 1-2.64-6.36" />
-                  <path d="M21 3v6h-6" />
-                </svg>
-              </button>
+        <section class="gallery-panel" aria-label="I vostri scatti">
+          <div class="gallery-header-shell">
+            <div class="gallery-header">
+              <p class="gallery-title">I vostri scatti</p>
+
+              <div class="gallery-tools">
+                <span id="new-badge" class="gallery-new-badge" hidden>Nuovi scatti</span>
+                <span id="photo-count" class="gallery-count" aria-label="Numero totale foto">0</span>
+                <button id="refresh-btn" class="gallery-refresh" type="button" aria-label="Aggiorna galleria" title="Aggiorna galleria">
+                  <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M21 12a9 9 0 1 1-2.64-6.36" />
+                    <path d="M21 3v6h-6" />
+                  </svg>
+                </button>
+              </div>
             </div>
           </div>
 
           <p id="message" class="gallery-message" role="status" aria-live="polite"></p>
           <div id="gallery-grid" class="gallery-grid"></div>
-          <div id="gallery-pagination" class="gallery-pagination" aria-label="Pagine galleria"></div>
+
+          <div class="gallery-footer">
+            <button id="load-more-btn" class="load-more-btn" type="button" hidden>Carica altre foto</button>
+            <div id="feed-sentinel" class="feed-sentinel" aria-hidden="true"></div>
+          </div>
         </section>
       </div>
 
@@ -90,28 +98,37 @@
       const workerBase = "https://wedding-worker.stefano-penzo23.workers.dev";
       const MAX_FILES = 20;
       const MAX_FILE_SIZE = 10 * 1024 * 1024;
-      const PHOTOS_PER_PAGE = 18;
+      const BATCH_SIZE = 24;
+      const MAX_RENDERED_ITEMS = 180;
+      const AUTO_REFRESH_MS = 10 * 60 * 1000;
 
-      const cameraInput  = document.getElementById("camera-input");
+      const cameraInput = document.getElementById("camera-input");
       const galleryInput = document.getElementById("gallery-input");
-      const uploadBtn    = document.getElementById("upload-btn");
-      const uploadLabel  = document.getElementById("upload-label");
-      const uploadSub    = document.getElementById("upload-sub");
-      const uploadCount  = document.getElementById("upload-count");
-      const refreshBtn   = document.getElementById("refresh-btn");
-      const gallery      = document.getElementById("gallery-grid");
-      const pagination   = document.getElementById("gallery-pagination");
-      const message      = document.getElementById("message");
-      const photoCount   = document.getElementById("photo-count");
-      const lightbox     = document.getElementById("lightbox");
-      const lightboxImage   = document.getElementById("lightbox-image");
+      const uploadBtn = document.getElementById("upload-btn");
+      const uploadLabel = document.getElementById("upload-label");
+      const uploadSub = document.getElementById("upload-sub");
+      const uploadCount = document.getElementById("upload-count");
+      const refreshBtn = document.getElementById("refresh-btn");
+      const loadMoreBtn = document.getElementById("load-more-btn");
+      const newBadge = document.getElementById("new-badge");
+      const gallery = document.getElementById("gallery-grid");
+      const sentinel = document.getElementById("feed-sentinel");
+      const message = document.getElementById("message");
+      const photoCount = document.getElementById("photo-count");
+      const lightbox = document.getElementById("lightbox");
+      const lightboxImage = document.getElementById("lightbox-image");
       const lightboxCaption = document.getElementById("lightbox-caption");
-      const lightboxClose   = document.getElementById("lightbox-close");
+      const lightboxClose = document.getElementById("lightbox-close");
 
       let selectedFiles = [];
-      let isUploading   = false;
-      let allPhotos     = [];
-      let currentPage   = 1;
+      let isUploading = false;
+      let isLoadingMore = false;
+      let isRefreshing = false;
+      let allPhotos = [];
+      let renderedCount = 0;
+      let newestTimestamp = null;
+      let autoRefreshTimer = null;
+      let observer = null;
 
       function showMessage(text = "", isError = false) {
         message.textContent = text;
@@ -121,53 +138,58 @@
 
       function setUploadingState(nextUploading) {
         isUploading = nextUploading;
-        cameraInput.disabled  = nextUploading;
+        cameraInput.disabled = nextUploading;
         galleryInput.disabled = nextUploading;
-        refreshBtn.disabled   = nextUploading;
-        uploadBtn.disabled    = nextUploading || !selectedFiles.length;
+        refreshBtn.disabled = nextUploading || isRefreshing;
+        uploadBtn.disabled = nextUploading || !selectedFiles.length;
       }
 
-      /* ── badge + sottotesto nel bottone di invio ── */
       function updateSelectedFilesUI() {
         const count = selectedFiles.length;
 
         if (!count) {
-          uploadLabel.textContent   = "Invia foto";
-          uploadSub.textContent     = "Seleziona prima";
-          uploadCount.hidden        = true;
-          uploadBtn.disabled        = true;
+          uploadLabel.textContent = "Invia foto";
+          uploadSub.textContent = "Seleziona prima";
+          uploadCount.hidden = true;
+          uploadBtn.disabled = true;
           uploadBtn.dataset.hasFiles = "false";
           return;
         }
 
-        uploadSub.textContent       = count === 1 ? "1 selezionata" : `${count} selezionate`;
-        uploadCount.textContent     = String(count);
-        uploadCount.hidden          = false;
-        uploadBtn.dataset.hasFiles  = "true";
-        uploadBtn.disabled          = isUploading;
+        uploadSub.textContent = count === 1 ? "1 selezionata" : `${count} selezionate`;
+        uploadCount.textContent = String(count);
+        uploadCount.hidden = false;
+        uploadBtn.dataset.hasFiles = "true";
+        uploadBtn.disabled = isUploading;
       }
 
       function normalizeFiles(fileList) {
-        return Array.from(fileList || []).filter(
-          f => f.type.startsWith("image/") && f.size <= MAX_FILE_SIZE
-        );
+        return Array.from(fileList || []).filter((file) => file.type.startsWith("image/") && file.size <= MAX_FILE_SIZE);
       }
 
       function addFiles(fileList) {
-        const valid = normalizeFiles(fileList);
-        if (!valid.length) {
+        const validFiles = normalizeFiles(fileList);
+
+        if (!validFiles.length) {
           showMessage("Seleziona immagini valide fino a 10 MB.", true);
           return;
         }
-        selectedFiles = [...selectedFiles, ...valid].slice(0, MAX_FILES);
+
+        selectedFiles = [...selectedFiles, ...validFiles].slice(0, MAX_FILES);
         updateSelectedFilesUI();
         showMessage("");
       }
 
+      function getPhotoTimestamp(photo) {
+        if (!photo?.uploaded) return 0;
+        const value = new Date(photo.uploaded).getTime();
+        return Number.isNaN(value) ? 0 : value;
+      }
+
       function formatUploadedLabel(uploaded) {
-        const d = uploaded ? new Date(uploaded) : null;
-        return d && !isNaN(d)
-          ? d.toLocaleString("it-IT", { dateStyle: "short", timeStyle: "short" })
+        const date = uploaded ? new Date(uploaded) : null;
+        return date && !Number.isNaN(date.getTime())
+          ? date.toLocaleString("it-IT", { dateStyle: "short", timeStyle: "short" })
           : "Appena caricata";
       }
 
@@ -182,181 +204,326 @@
       }
 
       function createPhotoCard(photo, index) {
-        const card   = document.createElement("article");
+        const card = document.createElement("article");
         card.className = "gallery-item";
+        card.dataset.timestamp = String(getPhotoTimestamp(photo));
 
         const button = document.createElement("button");
-        button.type  = "button";
+        button.type = "button";
         button.className = "gallery-item-button";
 
-        const label  = formatUploadedLabel(photo.uploaded);
-        button.setAttribute("aria-label", `Apri foto ${index + 1}, caricata ${label}`);
-        button.addEventListener("click", () => openLightbox(photo.url, label));
+        const uploadedLabel = formatUploadedLabel(photo.uploaded);
+        button.setAttribute("aria-label", `Apri foto ${index + 1}, caricata ${uploadedLabel}`);
+        button.addEventListener("click", () => openLightbox(photo.url, uploadedLabel));
 
-        const wrap   = document.createElement("div");
-        wrap.className = "gallery-image-wrap";
+        const imageWrap = document.createElement("div");
+        imageWrap.className = "gallery-image-wrap";
 
-        const img    = document.createElement("img");
-        img.src      = photo.url;
-        img.alt      = `Foto caricata ${label}`;
-        img.loading  = "lazy";
+        const img = document.createElement("img");
+        img.src = photo.url;
+        img.alt = `Foto caricata ${uploadedLabel}`;
+        img.loading = "lazy";
         img.decoding = "async";
 
-        wrap.appendChild(img);
-        button.appendChild(wrap);
+        imageWrap.appendChild(img);
+        button.appendChild(imageWrap);
         card.appendChild(button);
         return card;
       }
 
-      function renderPagination(totalPages) {
-        pagination.innerHTML = "";
-        if (totalPages <= 1) { pagination.hidden = true; return; }
-        pagination.hidden = false;
+      function updatePhotoCount() {
+        photoCount.textContent = String(allPhotos.length);
+      }
 
-        const pages = new Set([1, totalPages, currentPage - 1, currentPage, currentPage + 1]);
-        const ordered = [...pages].filter(p => p >= 1 && p <= totalPages).sort((a, b) => a - b);
-        let last = 0;
+      function updateLoadMoreVisibility() {
+        const hasMore = renderedCount < allPhotos.length;
+        loadMoreBtn.hidden = !hasMore;
+      }
 
-        ordered.forEach(page => {
-          if (page - last > 1) {
-            const dots = document.createElement("span");
-            dots.className = "gallery-page-dots";
-            dots.textContent = "...";
-            dots.setAttribute("aria-hidden", "true");
-            pagination.appendChild(dots);
-          }
-          const btn = document.createElement("button");
-          btn.type = "button";
-          btn.className = "gallery-page-btn";
-          btn.textContent = String(page);
-          btn.setAttribute("aria-label", `Pagina ${page}`);
-          if (page === currentPage) {
-            btn.dataset.active = "true";
-            btn.setAttribute("aria-current", "page");
-          }
-          btn.addEventListener("click", () => {
-            if (page === currentPage) return;
-            currentPage = page;
-            renderGallery();
-          });
-          pagination.appendChild(btn);
-          last = page;
+      function trimRenderedItems() {
+        const items = gallery.querySelectorAll(".gallery-item");
+        if (items.length <= MAX_RENDERED_ITEMS) return;
+
+        const toRemove = items.length - MAX_RENDERED_ITEMS;
+        for (let i = 0; i < toRemove; i += 1) {
+          const item = items[i];
+          if (item) item.remove();
+        }
+      }
+
+      function appendNextBatch() {
+        if (isLoadingMore) return;
+        if (renderedCount >= allPhotos.length) {
+          updateLoadMoreVisibility();
+          return;
+        }
+
+        isLoadingMore = true;
+        const nextChunk = allPhotos.slice(renderedCount, renderedCount + BATCH_SIZE);
+        const fragment = document.createDocumentFragment();
+
+        nextChunk.forEach((photo, index) => {
+          fragment.appendChild(createPhotoCard(photo, renderedCount + index));
         });
+
+        gallery.appendChild(fragment);
+        renderedCount += nextChunk.length;
+        trimRenderedItems();
+        updateLoadMoreVisibility();
+        isLoadingMore = false;
       }
 
-      function renderGallery() {
+      function prependNewPhotos(photos) {
+        if (!photos.length) return;
+
+        const fragment = document.createDocumentFragment();
+        photos.forEach((photo, index) => {
+          fragment.appendChild(createPhotoCard(photo, index));
+        });
+
+        gallery.prepend(fragment);
+        trimRenderedItems();
+      }
+
+      function resetFeed() {
         gallery.innerHTML = "";
-        if (!allPhotos.length) { pagination.hidden = true; return; }
-
-        const totalPages = Math.max(1, Math.ceil(allPhotos.length / PHOTOS_PER_PAGE));
-        if (currentPage > totalPages) currentPage = totalPages;
-
-        const start   = (currentPage - 1) * PHOTOS_PER_PAGE;
-        const visible = allPhotos.slice(start, start + PHOTOS_PER_PAGE);
-        const frag    = document.createDocumentFragment();
-        visible.forEach((photo, i) => frag.appendChild(createPhotoCard(photo, start + i)));
-        gallery.appendChild(frag);
-        renderPagination(totalPages);
+        renderedCount = 0;
+        appendNextBatch();
       }
 
-      async function loadPhotos() {
+      async function fetchAllPhotos() {
+        const response = await fetch(`${workerBase}/photos`, { cache: "no-store" });
+        if (!response.ok) throw new Error("Errore nel caricamento galleria");
+        const data = await response.json();
+        return Array.isArray(data) ? data : [];
+      }
+
+      async function loadInitialPhotos() {
         try {
           showMessage("");
-          const res = await fetch(`${workerBase}/photos`, { cache: "no-store" });
-          if (!res.ok) throw new Error();
-          allPhotos = await res.json();
-          photoCount.textContent = String(allPhotos.length);
+          allPhotos = await fetchAllPhotos();
+          newestTimestamp = allPhotos.length ? getPhotoTimestamp(allPhotos[0]) : null;
+          updatePhotoCount();
+
           if (!allPhotos.length) {
             gallery.innerHTML = "";
-            pagination.hidden = true;
+            loadMoreBtn.hidden = true;
             showMessage("La galleria è ancora vuota.", false);
             return;
           }
-          renderGallery();
+
+          resetFeed();
           showMessage("");
         } catch {
           showMessage("Non riesco a caricare la galleria.", true);
+          loadMoreBtn.hidden = false;
         }
+      }
+
+      async function refreshOnlyNewPhotos({ silent = false } = {}) {
+        if (isRefreshing) return;
+        isRefreshing = true;
+        refreshBtn.disabled = true;
+
+        try {
+          const freshPhotos = await fetchAllPhotos();
+          if (!Array.isArray(freshPhotos) || !freshPhotos.length) {
+            isRefreshing = false;
+            refreshBtn.disabled = false;
+            return;
+          }
+
+          const latestKnown = newestTimestamp ?? 0;
+          const newItems = freshPhotos.filter((photo) => getPhotoTimestamp(photo) > latestKnown);
+
+          allPhotos = freshPhotos;
+          newestTimestamp = getPhotoTimestamp(freshPhotos[0]);
+          updatePhotoCount();
+          updateLoadMoreVisibility();
+
+          if (newItems.length) {
+            prependNewPhotos(newItems);
+            renderedCount = Math.min(allPhotos.length, renderedCount + newItems.length);
+            newBadge.hidden = false;
+            newBadge.textContent = newItems.length === 1 ? "1 nuovo scatto" : `${newItems.length} nuovi scatti`;
+
+            if (!silent) {
+              showMessage(newItems.length === 1 ? "È arrivato un nuovo scatto." : `Sono arrivati ${newItems.length} nuovi scatti.`, false);
+            }
+
+            window.setTimeout(() => {
+              newBadge.hidden = true;
+            }, 5000);
+          } else if (!silent) {
+            showMessage("Nessuna nuova foto al momento.", false);
+          }
+        } catch {
+          if (!silent) {
+            showMessage("Non riesco ad aggiornare la galleria.", true);
+          }
+          loadMoreBtn.hidden = false;
+        } finally {
+          isRefreshing = false;
+          refreshBtn.disabled = isUploading;
+        }
+      }
+
+      function startAutoRefresh() {
+        if (autoRefreshTimer) window.clearInterval(autoRefreshTimer);
+        autoRefreshTimer = window.setInterval(() => {
+          refreshOnlyNewPhotos({ silent: true });
+        }, AUTO_REFRESH_MS);
+      }
+
+      function setupInfiniteScroll() {
+        if (observer) observer.disconnect();
+
+        observer = new IntersectionObserver((entries) => {
+          const entry = entries[0];
+          if (!entry?.isIntersecting) return;
+          appendNextBatch();
+        }, {
+          root: null,
+          rootMargin: "800px 0px 800px 0px",
+          threshold: 0
+        });
+
+        observer.observe(sentinel);
       }
 
       async function uploadFiles() {
         if (!selectedFiles.length || isUploading) return;
 
         setUploadingState(true);
-        uploadSub.textContent  = "Invio in corso...";
-        uploadCount.hidden     = true;
+        uploadSub.textContent = "Invio in corso...";
+        uploadCount.hidden = true;
         showMessage("Sto inviando le foto...");
 
         try {
           const fd = new FormData();
-          selectedFiles.forEach(f => fd.append("photos", f));
+          selectedFiles.forEach((file) => fd.append("photos", file));
 
-          const res = await fetch(`${workerBase}/upload`, { method: "POST", body: fd });
+          const res = await fetch(`${workerBase}/upload`, {
+            method: "POST",
+            body: fd
+          });
+
           let data;
-          try { data = await res.json(); } catch { throw new Error("Risposta non valida"); }
-          if (!res.ok || data?.error) throw new Error(data?.error || "Upload fallito");
+          try {
+            data = await res.json();
+          } catch {
+            throw new Error("Risposta server non valida");
+          }
 
-          /* ── reset completo dopo successo ── */
-          selectedFiles     = [];
-          cameraInput.value  = "";
+          if (!res.ok || data?.error) {
+            throw new Error(data?.error || "Upload fallito");
+          }
+
+          selectedFiles = [];
+          cameraInput.value = "";
           galleryInput.value = "";
-          updateSelectedFilesUI();   /* badge → hidden, disabled → true */
-
-          await loadPhotos();
+          updateSelectedFilesUI();
+          await refreshOnlyNewPhotos({ silent: false });
           showMessage("Foto inviate correttamente.", false);
         } catch {
           showMessage("Invio non riuscito. Riprova.", true);
-          updateSelectedFilesUI();   /* ripristina badge se ci sono ancora file */
+          updateSelectedFilesUI();
         } finally {
           setUploadingState(false);
         }
       }
 
-      cameraInput?.addEventListener("change",  e => addFiles(e.target.files));
-      galleryInput?.addEventListener("change", e => addFiles(e.target.files));
-      uploadBtn?.addEventListener("click",  uploadFiles);
-      refreshBtn?.addEventListener("click", loadPhotos);
+      cameraInput?.addEventListener("change", (event) => addFiles(event.target.files));
+      galleryInput?.addEventListener("change", (event) => addFiles(event.target.files));
+      uploadBtn?.addEventListener("click", uploadFiles);
+      refreshBtn?.addEventListener("click", () => refreshOnlyNewPhotos({ silent: false }));
+      loadMoreBtn?.addEventListener("click", appendNextBatch);
       lightboxClose?.addEventListener("click", closeLightbox);
-      lightbox?.addEventListener("click", e => { if (e.target === lightbox) closeLightbox(); });
-      lightbox?.addEventListener("cancel", () => { lightboxImage.src = ""; lightboxCaption.textContent = ""; });
-      lightbox?.addEventListener("close",  () => { lightboxImage.src = ""; lightboxCaption.textContent = ""; });
+
+      lightbox?.addEventListener("click", (event) => {
+        if (event.target === lightbox) closeLightbox();
+      });
+
+      lightbox?.addEventListener("cancel", () => {
+        lightboxImage.src = "";
+        lightboxCaption.textContent = "";
+      });
+
+      lightbox?.addEventListener("close", () => {
+        lightboxImage.src = "";
+        lightboxCaption.textContent = "";
+      });
 
       updateSelectedFilesUI();
-      loadPhotos();
+      await loadInitialPhotos();
+      setupInfiniteScroll();
+      startAutoRefresh();
     </script>
   </body>
 </html>
 
 <style is:global>
-  html, body { margin: 0; padding: 0; background: #edf2f5; }
+  :root {
+    --sand-1: #f5f0e8;
+    --sand-2: #ece2d3;
+    --sand-3: #dbcdb7;
+    --blue-1: #edf5f7;
+    --blue-2: #dbeaf0;
+    --blue-3: #b9d2dc;
+    --blue-4: #86aebf;
+    --blue-5: #6b97ab;
+    --ink: #221b18;
+    --ink-soft: rgba(34, 27, 24, 0.68);
+    --white: rgba(255, 255, 255, 0.96);
+  }
+
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: var(--blue-1);
+  }
 
   body {
     font-family: Montserrat, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-    color: #221b18;
+    color: var(--ink);
   }
 
-  *, *::before, *::after { box-sizing: border-box; }
+  *, *::before, *::after {
+    box-sizing: border-box;
+  }
 
   .photo-page {
     min-height: 100vh;
-    padding: 10px 10px 126px;
-    background: linear-gradient(180deg, #e4edf1 0%, #eef3f6 50%, #f5f7f8 100%);
+    padding: 10px 10px 128px;
+    background:
+      radial-gradient(circle at top left, rgba(185, 210, 220, 0.5), transparent 36%),
+      linear-gradient(180deg, var(--blue-2) 0%, #eef4f5 44%, var(--sand-1) 100%);
   }
 
   .app-shell {
-    width: min(100%, 960px);
+    width: min(100%, 980px);
     margin: 0 auto;
   }
 
-  /* ─── GALLERY PANEL ─────────────────────────────── */
   .gallery-panel {
-    border-radius: 28px;
-    background: rgba(255, 255, 255, 0.74);
-    border: 1px solid rgba(255, 255, 255, 0.96);
-    box-shadow: 0 20px 44px rgba(103, 126, 138, 0.12);
-    backdrop-filter: blur(14px);
+    border-radius: 30px;
+    background: rgba(255, 255, 255, 0.72);
+    border: 1px solid rgba(255, 255, 255, 0.94);
+    box-shadow: 0 18px 40px rgba(107, 151, 171, 0.12);
+    backdrop-filter: blur(16px);
     overflow: hidden;
-    padding: 12px 12px 12px;
+    padding: 0 12px 14px;
+  }
+
+  .gallery-header-shell {
+    position: sticky;
+    top: 0;
+    z-index: 12;
+    margin: 0 -12px;
+    padding: 12px 12px 10px;
+    backdrop-filter: blur(18px);
+    background: linear-gradient(180deg, rgba(245, 240, 232, 0.92) 0%, rgba(237, 245, 247, 0.88) 100%);
+    border-bottom: 1px solid rgba(134, 174, 191, 0.16);
   }
 
   .gallery-header {
@@ -364,7 +531,6 @@
     align-items: center;
     justify-content: space-between;
     gap: 12px;
-    margin-bottom: 10px;
   }
 
   .gallery-title {
@@ -376,57 +542,92 @@
     color: rgba(34, 27, 24, 0.82);
   }
 
-  .gallery-tools { display: inline-flex; align-items: center; gap: 8px; }
+  .gallery-tools {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+  }
 
+  .gallery-new-badge,
   .gallery-count,
   .gallery-refresh,
-  .gallery-page-btn {
-    min-width: 36px;
-    height: 36px;
+  .load-more-btn {
+    min-height: 36px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    padding: 0 12px;
     border-radius: 999px;
-    border: 1px solid rgba(34, 27, 24, 0.06);
-    background: rgba(255, 255, 255, 0.96);
-    color: #221b18;
     font-size: 11px;
     font-weight: 700;
-    line-height: 1;
-    box-shadow: 0 4px 12px rgba(103, 126, 138, 0.08);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  .gallery-new-badge {
+    padding: 0 12px;
+    background: rgba(134, 174, 191, 0.18);
+    color: #3a6578;
+    border: 1px solid rgba(134, 174, 191, 0.24);
+  }
+
+  .gallery-count,
+  .gallery-refresh,
+  .load-more-btn {
+    border: 1px solid rgba(107, 151, 171, 0.12);
+    background: rgba(255, 255, 255, 0.92);
+    color: var(--ink);
+    box-shadow: 0 4px 12px rgba(107, 151, 171, 0.08);
+  }
+
+  .gallery-count,
+  .gallery-refresh {
+    min-width: 36px;
+    padding: 0 12px;
   }
 
   .gallery-refresh,
-  .gallery-page-btn,
   .gallery-item-button,
   .photo-lightbox-close,
-  .dock-action { cursor: pointer; }
+  .dock-action,
+  .load-more-btn {
+    cursor: pointer;
+  }
 
   .gallery-refresh svg,
   .dock-icon svg {
-    width: 18px; height: 18px;
-    fill: none; stroke: currentColor;
-    stroke-width: 1.9; stroke-linecap: round; stroke-linejoin: round;
+    width: 18px;
+    height: 18px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.9;
+    stroke-linecap: round;
+    stroke-linejoin: round;
   }
 
   .gallery-message {
-    margin: 0 2px 10px;
+    margin: 12px 2px 10px;
     font-size: 13px;
     line-height: 1.45;
-    color: rgba(34, 27, 24, 0.66);
+    color: var(--ink-soft);
   }
-  .gallery-message:empty,
-  .gallery-message[hidden] { display: none; }
-  .gallery-message[data-error="true"] { color: #a04242; }
 
-  /* ─── INSTAGRAM-STYLE GRID ──────────────────────── */
+  .gallery-message:empty,
+  .gallery-message[hidden] {
+    display: none;
+  }
+
+  .gallery-message[data-error="true"] {
+    color: #a04242;
+  }
+
   .gallery-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 3px;
-    /* flush inside the panel — no outer padding needed */
     margin: 0 -12px;
+    background: rgba(185, 210, 220, 0.16);
   }
 
   .gallery-item {
@@ -448,7 +649,7 @@
     width: 100%;
     aspect-ratio: 1 / 1;
     overflow: hidden;
-    background: #dfe8ec;
+    background: linear-gradient(180deg, var(--blue-2) 0%, var(--sand-2) 100%);
   }
 
   .gallery-image-wrap img {
@@ -458,8 +659,8 @@
     height: 100%;
     object-fit: cover;
     object-position: center;
-    transition: transform 200ms ease;
     display: block;
+    transition: transform 200ms ease;
   }
 
   .gallery-item-button:hover .gallery-image-wrap img,
@@ -467,27 +668,26 @@
     transform: scale(1.04);
   }
 
-  .gallery-pagination {
+  .gallery-footer {
+    padding: 14px 0 0;
     display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-    margin: 14px 12px 0;
-  }
-  .gallery-pagination[hidden] { display: none; }
-
-  .gallery-page-btn[data-active="true"] {
-    background: rgba(34, 27, 24, 0.92);
-    border-color: rgba(34, 27, 24, 0.92);
-    color: #ffffff;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
   }
 
-  .gallery-page-dots {
-    min-width: 20px; height: 36px;
-    display: inline-flex; align-items: center; justify-content: center;
-    font-size: 14px; font-weight: 700; color: rgba(34, 27, 24, 0.46);
+  .load-more-btn {
+    padding: 0 18px;
+    background: linear-gradient(180deg, var(--sand-1) 0%, var(--sand-2) 100%);
+    border-color: rgba(134, 174, 191, 0.18);
+    color: #5d5349;
   }
 
-  /* ─── FLOATING DOCK ──────────────────────────────── */
+  .feed-sentinel {
+    width: 100%;
+    height: 2px;
+  }
+
   .upload-dock-wrap {
     position: fixed;
     left: 50%;
@@ -505,7 +705,7 @@
     border-radius: 28px;
     background: rgba(255, 255, 255, 0.78);
     border: 1px solid rgba(255, 255, 255, 0.96);
-    box-shadow: 0 18px 38px rgba(74, 94, 105, 0.18);
+    box-shadow: 0 18px 38px rgba(107, 151, 171, 0.2);
     backdrop-filter: blur(22px);
   }
 
@@ -520,142 +720,258 @@
     justify-content: flex-start;
     gap: 12px;
     text-decoration: none;
-    color: #221b18;
+    color: var(--ink);
     position: relative;
     transition: transform 160ms ease, box-shadow 160ms ease;
   }
 
-  .dock-action:hover:not(:disabled) { transform: translateY(-1px); }
+  .dock-action:hover:not(:disabled) {
+    transform: translateY(-1px);
+  }
 
   .dock-action-secondary {
-    background: linear-gradient(180deg, rgba(255,255,255,0.98) 0%, rgba(244,248,250,0.96) 100%);
-    box-shadow: inset 0 0 0 1px rgba(34,27,24,.05), 0 10px 20px rgba(103,126,138,.08);
+    background: linear-gradient(180deg, var(--blue-1) 0%, rgba(244, 239, 232, 0.96) 100%);
+    box-shadow:
+      inset 0 0 0 1px rgba(107, 151, 171, 0.08),
+      0 10px 20px rgba(107, 151, 171, 0.08);
   }
 
   .dock-action-primary {
-    background: linear-gradient(180deg, #2c2421 0%, #1e1714 100%);
+    background: linear-gradient(180deg, #84afc0 0%, #6b97ab 100%);
     color: #ffffff;
-    box-shadow: 0 14px 24px rgba(34,27,24,.22);
+    box-shadow: 0 14px 24px rgba(107, 151, 171, 0.28);
   }
 
-  .dock-action:disabled { opacity: 0.58; cursor: not-allowed; transform: none; }
+  .dock-action:disabled {
+    opacity: 0.58;
+    cursor: not-allowed;
+    transform: none;
+  }
 
-  /* sottile pulse sul primario quando ha file */
   .dock-action-primary[data-has-files="true"] {
-    box-shadow: 0 14px 28px rgba(34,27,24,.28), 0 0 0 3px rgba(134,174,191,.22);
+    box-shadow: 0 14px 28px rgba(107, 151, 171, 0.32), 0 0 0 3px rgba(185, 210, 220, 0.34);
   }
 
   .dock-icon {
-    width: 42px; height: 42px;
+    width: 42px;
+    height: 42px;
     border-radius: 15px;
-    display: inline-flex; align-items: center; justify-content: center;
-    background: rgba(34,27,24,.06);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(107, 151, 171, 0.1);
     flex: 0 0 auto;
   }
-  .dock-action-primary .dock-icon { background: rgba(255,255,255,.12); }
+
+  .dock-action-primary .dock-icon {
+    background: rgba(255, 255, 255, 0.16);
+  }
 
   .dock-copy {
-    display: flex; flex-direction: column; align-items: flex-start; min-width: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    min-width: 0;
   }
-  .dock-copy-primary { padding-right: 30px; }
+
+  .dock-copy-primary {
+    padding-right: 30px;
+  }
 
   .dock-label {
-    font-size: 12px; font-weight: 700;
-    letter-spacing: .08em; text-transform: uppercase; line-height: 1.15;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    line-height: 1.15;
   }
-  .dock-label-strong { letter-spacing: .05em; }
+
+  .dock-label-strong {
+    letter-spacing: 0.05em;
+  }
 
   .dock-sub {
     margin-top: 4px;
-    font-size: 10px; font-weight: 600;
-    letter-spacing: .08em; text-transform: uppercase;
-    color: rgba(34,27,24,.48); line-height: 1.1;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: rgba(34, 27, 24, 0.48);
+    line-height: 1.1;
   }
-  .dock-sub-primary { color: rgba(255,255,255,.68); }
 
-  /* badge numero foto */
+  .dock-sub-primary {
+    color: rgba(255, 255, 255, 0.72);
+  }
+
   .dock-badge {
     position: absolute;
-    top: 10px; right: 10px;
-    min-width: 24px; height: 24px;
+    top: 10px;
+    right: 10px;
+    min-width: 24px;
+    height: 24px;
     padding: 0 7px;
     border-radius: 999px;
-    display: inline-flex; align-items: center; justify-content: center;
-    background: #ffffff;
-    color: #1e1714;
-    font-size: 11px; font-weight: 800; line-height: 1;
-    box-shadow: 0 4px 12px rgba(0,0,0,.16);
-    transition: transform 180ms cubic-bezier(.34,1.56,.64,1), opacity 160ms ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--sand-1);
+    color: #5c5248;
+    font-size: 11px;
+    font-weight: 800;
+    line-height: 1;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.14);
   }
-  .dock-badge[hidden] { display: none; }
 
-  /* ─── LIGHTBOX ───────────────────────────────────── */
-  .photo-lightbox {
-    width: min(92vw, 960px); max-width: 960px;
-    padding: 0; border: 0; background: transparent;
+  .dock-badge[hidden] {
+    display: none;
   }
-  .photo-lightbox::backdrop { background: rgba(0,0,0,.72); backdrop-filter: blur(4px); }
-  .photo-lightbox-inner { position: relative; }
+
+  .photo-lightbox {
+    width: min(92vw, 960px);
+    max-width: 960px;
+    padding: 0;
+    border: 0;
+    background: transparent;
+  }
+
+  .photo-lightbox::backdrop {
+    background: rgba(0, 0, 0, 0.72);
+    backdrop-filter: blur(4px);
+  }
+
+  .photo-lightbox-inner {
+    position: relative;
+  }
 
   .photo-lightbox-close {
-    position: absolute; top: 12px; right: 12px; z-index: 2;
-    min-height: 42px; padding: 10px 14px;
-    border: 1px solid rgba(255,255,255,.16);
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    z-index: 2;
+    min-height: 42px;
+    padding: 10px 14px;
+    border: 1px solid rgba(255, 255, 255, 0.16);
     border-radius: 999px;
-    background: rgba(34,27,24,.62); color: #fff;
-    font: inherit; font-size: 10px; font-weight: 700;
-    letter-spacing: .16em; text-transform: uppercase;
+    background: rgba(34, 27, 24, 0.62);
+    color: #fff;
+    font: inherit;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
   }
 
   .photo-lightbox-image {
-    display: block; width: 100%; max-height: 78vh;
-    object-fit: contain; border-radius: 18px; background: #111;
+    display: block;
+    width: 100%;
+    max-height: 78vh;
+    object-fit: contain;
+    border-radius: 18px;
+    background: #111;
   }
 
   .photo-lightbox-caption {
-    margin-top: 10px; text-align: center;
-    color: #f2eee9; font-size: 11px; letter-spacing: .2em; text-transform: uppercase;
+    margin-top: 10px;
+    text-align: center;
+    color: #f2eee9;
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
   }
 
-  /* ─── FOCUS ─────────────────────────────────────── */
   .gallery-refresh:focus-visible,
-  .gallery-page-btn:focus-visible,
+  .load-more-btn:focus-visible,
   .dock-action:focus-visible,
   .gallery-item-button:focus-visible,
   .photo-lightbox-close:focus-visible {
-    outline: 3px solid rgba(134,174,191,.4); outline-offset: 3px;
+    outline: 3px solid rgba(134, 174, 191, 0.38);
+    outline-offset: 3px;
   }
 
   .sr-only {
-    position: absolute; width: 1px; height: 1px; padding: 0;
-    margin: -1px; overflow: hidden; clip: rect(0,0,0,0);
-    white-space: nowrap; border: 0;
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
   }
 
-  /* ─── RESPONSIVE ─────────────────────────────────── */
   @media (min-width: 900px) {
-    .gallery-grid { grid-template-columns: repeat(4, 1fr); }
+    .gallery-grid {
+      grid-template-columns: repeat(4, 1fr);
+    }
   }
 
   @media (max-width: 760px) {
-    .photo-page { padding: 10px 8px 122px; }
-    .upload-dock-wrap { width: calc(100% - 16px); bottom: calc(env(safe-area-inset-bottom,0px) + 8px); }
-    .upload-dock { gap: 8px; padding: 8px; }
-    .dock-action { min-height: 68px; padding: 10px; border-radius: 20px; gap: 10px; }
-    .dock-icon { width: 38px; height: 38px; border-radius: 13px; }
+    .photo-page {
+      padding: 10px 8px 124px;
+    }
+
+    .upload-dock-wrap {
+      width: calc(100% - 16px);
+      bottom: calc(env(safe-area-inset-bottom, 0px) + 8px);
+    }
+
+    .upload-dock {
+      gap: 8px;
+      padding: 8px;
+    }
+
+    .dock-action {
+      min-height: 68px;
+      padding: 10px;
+      border-radius: 20px;
+      gap: 10px;
+    }
+
+    .dock-icon {
+      width: 38px;
+      height: 38px;
+      border-radius: 13px;
+    }
   }
 
   @media (max-width: 560px) {
-    .gallery-grid { grid-template-columns: repeat(3, 1fr); gap: 2px; }
+    .gallery-grid {
+      grid-template-columns: repeat(3, 1fr);
+      gap: 2px;
+    }
 
     .gallery-count,
     .gallery-refresh,
-    .gallery-page-btn { min-width: 34px; height: 34px; padding: 0 10px; font-size: 10px; }
-    .gallery-page-dots { height: 34px; }
+    .gallery-new-badge,
+    .load-more-btn {
+      min-height: 34px;
+      font-size: 10px;
+    }
 
-    .dock-copy { display: none; }
-    .dock-action { min-height: 60px; justify-content: center; padding: 10px 8px; }
-    .dock-icon { width: 36px; height: 36px; border-radius: 12px; }
-    .dock-badge { top: 6px; right: 6px; min-width: 22px; height: 22px; font-size: 10px; }
+    .dock-copy {
+      display: none;
+    }
+
+    .dock-action {
+      min-height: 60px;
+      justify-content: center;
+      padding: 10px 8px;
+    }
+
+    .dock-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 12px;
+    }
+
+    .dock-badge {
+      top: 6px;
+      right: 6px;
+      min-width: 22px;
+      height: 22px;
+      font-size: 10px;
+    }
   }
 </style>
