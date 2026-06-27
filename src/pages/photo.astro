@@ -8,103 +8,69 @@
   <body>
     <main class="photo-page font-montserrat">
       <div class="app-shell">
-        <section class="app-hero">
-          <div class="app-hero-top">
-            <div>
-              <p class="app-kicker">Album live</p>
-              <h1 class="app-title">Galleria matrimonio</h1>
-              <p class="app-subtitle">Tutte le foto in tempo reale, in uno stile più app e più semplice da usare.</p>
-            </div>
-            <div class="app-live-pill">
-              <span class="app-live-dot"></span>
-              <span>Live</span>
+        <section class="gallery-panel" aria-label="Galleria live">
+          <div class="gallery-header">
+            <p class="gallery-title">Galleria live</p>
+
+            <div class="gallery-tools">
+              <span id="photo-count" class="gallery-count" aria-label="Numero totale foto">0</span>
+              <button id="refresh-btn" class="gallery-refresh" type="button" aria-label="Aggiorna galleria" title="Aggiorna galleria">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M21 12a9 9 0 1 1-2.64-6.36" />
+                  <path d="M21 3v6h-6" />
+                </svg>
+              </button>
             </div>
           </div>
 
-          <div class="gallery-card">
-            <div class="gallery-card-head">
-              <div>
-                <p class="gallery-label">Galleria live</p>
-                <p class="gallery-caption">Sfoglia le foto degli invitati pagina per pagina.</p>
-              </div>
-
-              <div class="gallery-tools">
-                <span id="photo-count" class="gallery-count" aria-label="Numero totale foto">0</span>
-                <button id="refresh-btn" class="gallery-refresh" type="button" aria-label="Aggiorna galleria" title="Aggiorna galleria">
-                  <svg viewBox="0 0 24 24" aria-hidden="true">
-                    <path d="M21 12a9 9 0 1 1-2.64-6.36" />
-                    <path d="M21 3v6h-6" />
-                  </svg>
-                </button>
-              </div>
-            </div>
-
-            <p id="message" class="gallery-message" role="status" aria-live="polite"></p>
-            <div id="gallery-grid" class="gallery-grid"></div>
-            <div id="gallery-pagination" class="gallery-pagination" aria-label="Pagine galleria"></div>
-          </div>
+          <p id="message" class="gallery-message" role="status" aria-live="polite"></p>
+          <div id="gallery-grid" class="gallery-grid"></div>
+          <div id="gallery-pagination" class="gallery-pagination" aria-label="Pagine galleria"></div>
         </section>
+      </div>
 
-        <section class="upload-panel">
-          <div class="upload-panel-head">
-            <div>
-              <p class="app-kicker">Caricamento</p>
-              <h2 class="upload-title">Aggiungi le tue foto</h2>
-            </div>
-            <p class="upload-copy">Tre azioni chiare: scatta, scegli, invia.</p>
-          </div>
-
-          <div class="upload-actions">
-            <label for="camera-input" class="upload-action upload-action-dark">
-              <span class="upload-action-icon" aria-hidden="true">
-                <svg viewBox="0 0 24 24">
-                  <path d="M4 7h3l1.5-2h7L17 7h3v11H4z" />
-                  <circle cx="12" cy="13" r="4" />
-                </svg>
-              </span>
-              <span class="upload-action-text">
-                <strong>Foto</strong>
-                <small>Scatta ora</small>
-              </span>
-            </label>
-
-            <label for="gallery-input" class="upload-action">
-              <span class="upload-action-icon" aria-hidden="true">
-                <svg viewBox="0 0 24 24">
-                  <rect x="4" y="5" width="16" height="14" rx="3" />
-                  <path d="M8 14l2.5-2.5 2.5 2.5 3.5-4 3.5 4.5" />
-                  <circle cx="9" cy="9" r="1.2" />
-                </svg>
-              </span>
-              <span class="upload-action-text">
-                <strong>Galleria</strong>
-                <small>Scegli dal telefono</small>
-              </span>
-            </label>
-
-            <button id="upload-btn" class="upload-action upload-action-accent" type="button" disabled>
-              <span class="upload-action-icon" aria-hidden="true">
-                <svg viewBox="0 0 24 24">
-                  <path d="M12 16V6" />
-                  <path d="M8.5 9.5 12 6l3.5 3.5" />
-                  <path d="M5 18.5h14" />
-                </svg>
-              </span>
-              <span class="upload-action-text">
-                <strong>Invia foto</strong>
-                <small>Carica nella gallery</small>
-              </span>
-            </button>
-          </div>
-
+      <div class="upload-dock-wrap">
+        <section class="upload-dock" aria-label="Azioni caricamento foto">
           <input id="camera-input" class="sr-only" type="file" accept="image/*" capture="environment" />
           <input id="gallery-input" class="sr-only" type="file" accept="image/*" multiple />
 
-          <div class="upload-status-card">
-            <p class="upload-status-label">Selezione attuale</p>
-            <p id="selected-files" class="upload-status-text">Nessuna foto selezionata.</p>
-          </div>
+          <label for="camera-input" class="dock-action dock-action-secondary">
+            <span class="dock-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24">
+                <path d="M4 7h3l1.5-2h7L17 7h3v11H4z" />
+                <circle cx="12" cy="13" r="4" />
+              </svg>
+            </span>
+            <span class="dock-label">Foto</span>
+          </label>
+
+          <label for="gallery-input" class="dock-action dock-action-secondary">
+            <span class="dock-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24">
+                <rect x="4" y="5" width="16" height="14" rx="3" />
+                <path d="M8 14l2.5-2.5 2.5 2.5 3.5-4 3.5 4.5" />
+                <circle cx="9" cy="9" r="1.2" />
+              </svg>
+            </span>
+            <span class="dock-label">Galleria</span>
+          </label>
+
+          <button id="upload-btn" class="dock-action dock-action-primary" type="button" disabled>
+            <span class="dock-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24">
+                <path d="M12 16V6" />
+                <path d="M8.5 9.5 12 6l3.5 3.5" />
+                <path d="M5 18.5h14" />
+              </svg>
+            </span>
+            <span class="dock-label dock-label-strong">Invia foto</span>
+          </button>
         </section>
+
+        <div class="dock-status-pill" aria-live="polite">
+          <span class="dock-status-dot"></span>
+          <p id="selected-files" class="dock-status-text">Nessuna foto selezionata. Tocca Foto o Galleria.</p>
+        </div>
       </div>
     </main>
 
@@ -157,7 +123,7 @@
 
       function updateSelectedFilesUI() {
         if (!selectedFiles.length) {
-          selectedFilesText.textContent = "Nessuna foto selezionata. Tocca Foto o Galleria per iniziare.";
+          selectedFilesText.textContent = "Nessuna foto selezionata. Tocca Foto o Galleria.";
           uploadBtn.disabled = true;
           return;
         }
@@ -322,7 +288,6 @@
             return;
           }
 
-          currentPage = 1;
           renderGallery();
           showMessage("");
         } catch {
@@ -400,12 +365,12 @@
   html, body {
     margin: 0;
     padding: 0;
-    background: #e8eef1;
+    background: #edf2f5;
   }
 
   body {
     font-family: Montserrat, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-    color: var(--color-text-dark, #221b18);
+    color: #221b18;
   }
 
   *, *::before, *::after {
@@ -414,118 +379,39 @@
 
   .photo-page {
     min-height: 100vh;
-    padding: 16px 12px 36px;
-    background:
-      radial-gradient(circle at top left, rgba(198, 218, 228, 0.95), transparent 42%),
-      linear-gradient(180deg, #dbe8ee 0%, #edf3f6 42%, #f3f6f8 100%);
+    padding: 10px 10px 156px;
+    background: linear-gradient(180deg, #e4edf1 0%, #eef3f6 50%, #f5f7f8 100%);
   }
 
   .app-shell {
     width: min(100%, 960px);
     margin: 0 auto;
-    display: grid;
-    gap: 18px;
   }
 
-  .app-hero,
-  .upload-panel {
-    position: relative;
+  .gallery-panel {
     border-radius: 28px;
-    border: 1px solid rgba(255, 255, 255, 0.7);
-    background: rgba(255, 255, 255, 0.56);
-    box-shadow: 0 24px 60px rgba(94, 118, 132, 0.12);
-    backdrop-filter: blur(12px);
+    background: rgba(255, 255, 255, 0.72);
+    border: 1px solid rgba(255, 255, 255, 0.92);
+    box-shadow: 0 20px 44px rgba(103, 126, 138, 0.12);
+    backdrop-filter: blur(14px);
+    padding: 14px;
   }
 
-  .app-hero {
-    padding: 18px;
-  }
-
-  .upload-panel {
-    padding: 18px;
-  }
-
-  .app-hero-top,
-  .upload-panel-head,
-  .gallery-card-head {
+  .gallery-header {
     display: flex;
-    align-items: flex-start;
+    align-items: center;
     justify-content: space-between;
     gap: 12px;
+    margin-bottom: 10px;
   }
 
-  .app-kicker,
-  .gallery-label,
-  .upload-status-label {
+  .gallery-title {
     margin: 0;
-    font-size: 11px;
-    letter-spacing: 0.32em;
-    text-transform: uppercase;
-    opacity: 0.65;
-  }
-
-  .app-title,
-  .upload-title {
-    margin: 8px 0 0;
-    font-size: clamp(2rem, 6vw, 3.4rem);
-    line-height: 0.92;
-    text-transform: uppercase;
-    letter-spacing: -0.05em;
-    color: var(--color-text-dark, #221b18);
-  }
-
-  .upload-title {
-    font-size: clamp(1.45rem, 4vw, 2rem);
-    line-height: 1;
-  }
-
-  .app-subtitle,
-  .gallery-caption,
-  .upload-copy,
-  .gallery-message,
-  .upload-status-text,
-  .gallery-item-meta,
-  .photo-lightbox-caption {
-    margin: 0;
-    font-size: 14px;
-    line-height: 1.55;
-    color: rgba(34, 27, 24, 0.78);
-  }
-
-  .app-subtitle {
-    margin-top: 10px;
-    max-width: 34ch;
-  }
-
-  .app-live-pill {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    padding: 10px 12px;
-    border-radius: 999px;
-    background: rgba(34, 27, 24, 0.08);
-    color: var(--color-text-dark, #221b18);
-    font-size: 11px;
+    font-size: 13px;
     font-weight: 700;
-    letter-spacing: 0.18em;
+    letter-spacing: 0.28em;
     text-transform: uppercase;
-    white-space: nowrap;
-  }
-
-  .app-live-dot {
-    width: 8px;
-    height: 8px;
-    border-radius: 999px;
-    background: #86aebf;
-    box-shadow: 0 0 0 6px rgba(134, 174, 191, 0.16);
-  }
-
-  .gallery-card {
-    margin-top: 18px;
-    padding: 16px;
-    border-radius: 24px;
-    background: linear-gradient(180deg, rgba(182, 206, 218, 0.48) 0%, rgba(243, 247, 249, 0.8) 100%);
-    border: 1px solid rgba(255, 255, 255, 0.78);
+    color: rgba(34, 27, 24, 0.82);
   }
 
   .gallery-tools {
@@ -537,16 +423,16 @@
   .gallery-count,
   .gallery-refresh,
   .gallery-page-btn {
-    min-width: 38px;
-    height: 38px;
+    min-width: 36px;
+    height: 36px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
     padding: 0 12px;
     border-radius: 999px;
-    border: 1px solid rgba(34, 27, 24, 0.08);
-    background: rgba(255, 255, 255, 0.92);
-    color: var(--color-text-dark, #221b18);
+    border: 1px solid rgba(34, 27, 24, 0.07);
+    background: rgba(255, 255, 255, 0.95);
+    color: #221b18;
     font-size: 11px;
     font-weight: 700;
     line-height: 1;
@@ -554,14 +440,14 @@
 
   .gallery-refresh,
   .gallery-page-btn,
-  .upload-action,
+  .gallery-item-button,
   .photo-lightbox-close,
-  .gallery-item-button {
+  .dock-action {
     cursor: pointer;
   }
 
   .gallery-refresh svg,
-  .upload-action-icon svg {
+  .dock-icon svg {
     width: 18px;
     height: 18px;
     fill: none;
@@ -572,8 +458,10 @@
   }
 
   .gallery-message {
-    margin-top: 10px;
-    margin-bottom: 6px;
+    margin: 0 0 10px;
+    font-size: 13px;
+    line-height: 1.45;
+    color: rgba(34, 27, 24, 0.66);
   }
 
   .gallery-message:empty,
@@ -589,16 +477,13 @@
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 10px;
-    margin-top: 14px;
   }
 
   .gallery-item {
     overflow: hidden;
     min-width: 0;
     border-radius: 18px;
-    background: rgba(255, 255, 255, 0.66);
-    border: 1px solid rgba(255, 255, 255, 0.85);
-    box-shadow: 0 10px 22px rgba(126, 153, 167, 0.12);
+    background: rgba(255, 255, 255, 0.92);
   }
 
   .gallery-item-button {
@@ -614,7 +499,7 @@
     width: 100%;
     aspect-ratio: 1 / 1;
     overflow: hidden;
-    background: rgba(255, 255, 255, 0.5);
+    background: #dfe8ec;
   }
 
   .gallery-image-wrap img {
@@ -624,20 +509,27 @@
     height: 100%;
     object-fit: cover;
     object-position: center;
+    transition: transform 180ms ease;
+  }
+
+  .gallery-item-button:hover .gallery-image-wrap img,
+  .gallery-item-button:focus-visible .gallery-image-wrap img {
+    transform: scale(1.03);
   }
 
   .gallery-item-meta {
-    padding: 8px 10px 10px;
-    font-size: 10px;
+    padding: 8px 8px 2px;
+    font-size: 9px;
     letter-spacing: 0.14em;
     text-transform: uppercase;
+    color: rgba(34, 27, 24, 0.52);
   }
 
   .gallery-pagination {
     display: flex;
     flex-wrap: wrap;
     gap: 8px;
-    margin-top: 16px;
+    margin-top: 14px;
   }
 
   .gallery-pagination[hidden] {
@@ -652,111 +544,123 @@
 
   .gallery-page-dots {
     min-width: 20px;
-    height: 38px;
+    height: 36px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
     font-size: 14px;
     font-weight: 700;
-    color: rgba(34, 27, 24, 0.52);
+    color: rgba(34, 27, 24, 0.46);
   }
 
-  .upload-copy {
-    max-width: 18ch;
-    text-align: right;
+  .upload-dock-wrap {
+    position: fixed;
+    left: 50%;
+    bottom: calc(env(safe-area-inset-bottom, 0px) + 10px);
+    transform: translateX(-50%);
+    width: min(calc(100% - 20px), 760px);
+    z-index: 40;
   }
 
-  .upload-actions {
-    margin-top: 18px;
+  .upload-dock {
     display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 12px;
+    grid-template-columns: 1fr 1fr 1.2fr;
+    gap: 8px;
+    padding: 8px;
+    border-radius: 26px;
+    background: rgba(255, 255, 255, 0.82);
+    border: 1px solid rgba(255, 255, 255, 0.96);
+    box-shadow: 0 18px 38px rgba(74, 94, 105, 0.18);
+    backdrop-filter: blur(20px);
   }
 
-  .upload-action {
+  .dock-action {
     appearance: none;
-    width: 100%;
     border: 0;
-    min-height: 124px;
-    padding: 16px 14px;
-    border-radius: 24px;
-    background: rgba(255, 255, 255, 0.9);
-    box-shadow: inset 0 0 0 1px rgba(34, 27, 24, 0.06);
+    min-height: 64px;
+    padding: 10px 12px;
+    border-radius: 20px;
     display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    justify-content: space-between;
-    gap: 14px;
-    color: var(--color-text-dark, #221b18);
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    text-decoration: none;
+    color: #221b18;
   }
 
-  .upload-action-dark {
-    background: rgba(34, 27, 24, 0.92);
+  .dock-action-secondary {
+    background: rgba(255, 255, 255, 0.94);
+    box-shadow: inset 0 0 0 1px rgba(34, 27, 24, 0.05);
+  }
+
+  .dock-action-primary {
+    background: #221b18;
     color: #ffffff;
-    box-shadow: none;
+    box-shadow: 0 10px 18px rgba(34, 27, 24, 0.16);
   }
 
-  .upload-action-accent {
-    background: linear-gradient(180deg, #d7e6ed 0%, #c4d9e3 100%);
-    color: var(--color-text-dark, #221b18);
-    box-shadow: inset 0 0 0 1px rgba(134, 174, 191, 0.25);
-  }
-
-  .upload-action:disabled {
+  .dock-action:disabled {
     opacity: 0.55;
     cursor: not-allowed;
   }
 
-  .upload-action-icon {
-    width: 46px;
-    height: 46px;
-    border-radius: 16px;
+  .dock-icon {
+    width: 38px;
+    height: 38px;
+    border-radius: 13px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    background: rgba(34, 27, 24, 0.08);
+    background: rgba(34, 27, 24, 0.06);
+    flex: 0 0 auto;
   }
 
-  .upload-action-dark .upload-action-icon {
+  .dock-action-primary .dock-icon {
     background: rgba(255, 255, 255, 0.12);
   }
 
-  .upload-action-accent .upload-action-icon {
-    background: rgba(255, 255, 255, 0.66);
-  }
-
-  .upload-action-text {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-    align-items: flex-start;
-  }
-
-  .upload-action-text strong {
-    font-size: 15px;
-    line-height: 1.1;
-    letter-spacing: -0.02em;
-  }
-
-  .upload-action-text small {
-    font-size: 11px;
-    line-height: 1.4;
-    letter-spacing: 0.08em;
+  .dock-label {
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
     text-transform: uppercase;
-    opacity: 0.72;
+    line-height: 1.2;
   }
 
-  .upload-status-card {
-    margin-top: 14px;
-    padding: 14px 16px;
-    border-radius: 20px;
-    background: rgba(255, 255, 255, 0.82);
-    box-shadow: inset 0 0 0 1px rgba(34, 27, 24, 0.05);
+  .dock-label-strong {
+    letter-spacing: 0.04em;
   }
 
-  .upload-status-text {
+  .dock-status-pill {
     margin-top: 8px;
-    word-break: break-word;
+    padding: 10px 14px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.8);
+    border: 1px solid rgba(255, 255, 255, 0.94);
+    backdrop-filter: blur(16px);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    box-shadow: 0 10px 24px rgba(75, 95, 108, 0.12);
+  }
+
+  .dock-status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 999px;
+    background: #86aebf;
+    flex: 0 0 auto;
+    box-shadow: 0 0 0 5px rgba(134, 174, 191, 0.16);
+  }
+
+  .dock-status-text {
+    margin: 0;
+    font-size: 12px;
+    line-height: 1.4;
+    color: rgba(34, 27, 24, 0.72);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   .photo-lightbox {
@@ -814,10 +718,10 @@
 
   .gallery-refresh:focus-visible,
   .gallery-page-btn:focus-visible,
-  .upload-action:focus-visible,
+  .dock-action:focus-visible,
   .gallery-item-button:focus-visible,
   .photo-lightbox-close:focus-visible {
-    outline: 3px solid rgba(134, 174, 191, 0.45);
+    outline: 3px solid rgba(134, 174, 191, 0.4);
     outline-offset: 3px;
   }
 
@@ -842,30 +746,12 @@
 
   @media (max-width: 760px) {
     .photo-page {
-      padding: 12px 10px 28px;
+      padding: 10px 8px 154px;
     }
 
-    .app-hero-top,
-    .upload-panel-head,
-    .gallery-card-head {
-      flex-direction: column;
-      align-items: flex-start;
-    }
-
-    .upload-copy {
-      text-align: left;
-      max-width: none;
-    }
-
-    .upload-actions {
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 10px;
-    }
-
-    .upload-action {
-      min-height: 116px;
-      padding: 14px 12px;
-      border-radius: 20px;
+    .upload-dock-wrap {
+      width: calc(100% - 16px);
+      bottom: calc(env(safe-area-inset-bottom, 0px) + 8px);
     }
   }
 
@@ -876,8 +762,8 @@
     }
 
     .gallery-item-meta {
-      font-size: 9px;
-      padding: 7px 8px 9px;
+      font-size: 8px;
+      padding: 7px 6px 2px;
     }
 
     .gallery-count,
@@ -893,23 +779,40 @@
       height: 34px;
     }
 
-    .upload-actions {
-      grid-template-columns: repeat(3, minmax(0, 1fr));
+    .dock-label {
+      display: none;
     }
 
-    .upload-action-text strong {
-      font-size: 13px;
+    .dock-action {
+      min-height: 60px;
+      padding: 10px 8px;
     }
 
-    .upload-action-text small {
-      font-size: 10px;
-      letter-spacing: 0.06em;
+    .dock-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 12px;
     }
 
-    .upload-action-icon {
-      width: 42px;
-      height: 42px;
-      border-radius: 14px;
+    .dock-action-primary::after {
+      content: "Invia";
+      position: absolute;
+      bottom: 5px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #ffffff;
+    }
+
+    .dock-action-primary {
+      position: relative;
+    }
+
+    .dock-status-text {
+      font-size: 11px;
     }
   }
 </style>
