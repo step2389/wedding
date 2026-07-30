@@ -7,10 +7,10 @@
   </head>
   <body>
     <main class="photo-page font-montserrat">
-      <section class="gallery-shell" aria-label="I Vostri Ricordi">
+      <section class="gallery-shell" aria-label="Wedding Gallery">
         <header class="gallery-topbar">
           <div class="gallery-topbar-inner">
-            <p class="gallery-title">I Vostri Ricordi</p>
+            <p class="gallery-title">Wedding Gallery</p>
 
             <div class="gallery-tools">
               <span id="new-badge" class="gallery-new-badge" hidden>Nuovi scatti</span>
@@ -483,14 +483,16 @@
 
   .gallery-topbar {
     position: sticky;
-    top: 0;
+    top: max(16px, env(safe-area-inset-top, 16px));
     z-index: 30;
-    padding-top: max(8px, env(safe-area-inset-top, 0px));
-    background: linear-gradient(180deg, rgba(255, 255, 255, 0.7) 0%, rgba(255, 255, 255, 0.4) 100%);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.4);
-    box-shadow: 0 4px 20px rgba(110, 151, 170, 0.05);
+    margin: 0 auto 16px auto;
+    width: min(calc(100% - 24px), 980px);
+    border-radius: 999px;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.85) 0%, rgba(255, 255, 255, 0.6) 100%);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.8);
+    box-shadow: 0 8px 32px rgba(110, 151, 170, 0.12), 0 2px 8px rgba(110, 151, 170, 0.05);
   }
 
   .gallery-topbar-inner {
@@ -498,16 +500,17 @@
     align-items: center;
     justify-content: space-between;
     gap: 12px;
-    padding: 14px 12px 14px;
-    width: min(100%, 980px);
+    padding: 10px 12px;
+    width: 100%;
     margin: 0 auto;
   }
 
   .gallery-title {
     margin: 0;
+    padding-left: 8px;
     font-size: 14px;
     font-weight: 400;
-    letter-spacing: 0.32em;
+    letter-spacing: 0.28em;
     text-transform: uppercase;
     color: #4a5c66;
     text-shadow: 0 1px 2px rgba(255, 255, 255, 0.9);
