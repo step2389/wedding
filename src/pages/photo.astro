@@ -463,28 +463,30 @@ import Footer from "../components/Footer.astro";
         if (event) event.preventDefault();
         if (!lightboxImage.src) return;
         const photoUrl = lightboxImage.src;
-        const btnSpan = lightboxDownload.querySelector("span");
+        // Usa il proxy Worker per bypassare il blocco CORS di photo.penz23.org
+        const proxyUrl = `${workerBase}/photo/${new URL(photoUrl).pathname.slice(1)}`;
+        const btnSpan = lightboxDownload?.querySelector("span");
         const originalText = btnSpan ? btnSpan.textContent : "Scarica";
+        if (btnSpan) btnSpan.textContent = "Salvataggio...";
 
         try {
-          if (btnSpan) btnSpan.textContent = "Download...";
-          const response = await fetch(photoUrl, { mode: "cors" });
+          const response = await fetch(proxyUrl);
+          if (!response.ok) throw new Error("fetch fallito");
           const blob = await response.blob();
           const localUrl = URL.createObjectURL(blob);
-
           const a = document.createElement("a");
           a.href = localUrl;
-          const fileName = `foto-matrimonio-anna-stefano-${currentPhotoIndex >= 0 ? currentPhotoIndex + 1 : "foto"}.jpg`;
-          a.download = fileName;
+          a.download = `foto-matrimonio-anna-stefano-${currentPhotoIndex >= 0 ? currentPhotoIndex + 1 : "foto"}.jpg`;
           document.body.appendChild(a);
           a.click();
           document.body.removeChild(a);
-          URL.revokeObjectURL(localUrl);
-
-          showMessage("Foto scaricata sul dispositivo!", false);
+          setTimeout(() => URL.revokeObjectURL(localUrl), 3000);
+          showMessage("Foto salvata nel dispositivo! ✓", false);
           setTimeout(() => showMessage(""), 3000);
-        } catch (err) {
+        } catch {
           window.open(photoUrl, "_blank");
+          showMessage("Tieni premuto sulla foto per salvarla!", false);
+          setTimeout(() => showMessage(""), 4000);
         } finally {
           if (btnSpan) btnSpan.textContent = originalText;
         }
@@ -493,26 +495,48 @@ import Footer from "../components/Footer.astro";
       async function sharePhoto() {
         if (!lightboxImage.src) return;
         const photoUrl = lightboxImage.src;
-        const shareData = {
-          title: "Foto Matrimonio Anna & Stefano",
-          text: "Guarda questa foto del matrimonio di Anna & Stefano!",
-          url: photoUrl,
-        };
+        // Usa il proxy Worker per bypassare il blocco CORS di photo.penz23.org
+        const proxyUrl = `${workerBase}/photo/${new URL(photoUrl).pathname.slice(1)}`;
+        const btnSpan = lightboxShare?.querySelector("span");
+        const originalText = btnSpan ? btnSpan.textContent : "Condividi";
+        if (btnSpan) btnSpan.textContent = "Preparazione...";
 
-        if (navigator.share) {
-          try {
-            await navigator.share(shareData);
-          } catch (err) {
-            // Annullato dall'utente
-          }
-        } else {
-          try {
+        try {
+          const response = await fetch(proxyUrl);
+          if (!response.ok) throw new Error("fetch fallito");
+          const blob = await response.blob();
+          const file = new File(
+            [blob],
+            `foto-matrimonio-${currentPhotoIndex >= 0 ? currentPhotoIndex + 1 : "foto"}.jpg`,
+            { type: "image/jpeg" },
+          );
+
+          if (navigator.canShare && navigator.canShare({ files: [file] })) {
+            await navigator.share({
+              title: "Foto Matrimonio Anna & Stefano",
+              text: "Guarda questa foto del matrimonio di Anna & Stefano!",
+              files: [file],
+            });
+          } else if (navigator.share) {
+            await navigator.share({
+              title: "Foto Matrimonio Anna & Stefano",
+              text: "Guarda questa foto del matrimonio di Anna & Stefano!",
+              url: photoUrl,
+            });
+          } else {
             await navigator.clipboard.writeText(photoUrl);
             showMessage("Link della foto copiato negli appunti!", false);
             setTimeout(() => showMessage(""), 3500);
-          } catch {
-            showMessage("Impossibile condividere automaticamente", true);
           }
+        } catch (err) {
+          if (err.name === "AbortError") return;
+          // Fallback: condivisione URL nativa senza file allegato
+          if (navigator.share) {
+            try { await navigator.share({ title: "Foto Matrimonio Anna & Stefano", url: photoUrl }); }
+            catch { /* annullato */ }
+          }
+        } finally {
+          if (btnSpan) btnSpan.textContent = originalText;
         }
       }
 
