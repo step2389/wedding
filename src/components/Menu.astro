@@ -1,5 +1,10 @@
 ---
 // src/components/Menu.astro
+const isDev = import.meta.env.DEV;
+const weddingDate = new Date("2026-09-12T00:00:00+02:00");
+const now = new Date();
+const showGalleryServer = isDev || now >= weddingDate;
+
 const links = [
   { href: "/", label: "Home" },
   { href: "/#schedule1", label: "Evento" },
@@ -13,6 +18,7 @@ const links = [
   id="menu-open" 
   class="fixed top-6 right-6 z-[999] p-3 rounded-full backdrop-blur-md shadow-lg border border-white/30"
   style="background: linear-gradient(135deg, rgba(253, 249, 243, 0.9) 0%, rgba(185, 216, 235, 0.9) 100%);"
+  aria-label="Apri menu"
 >
   <div class="flex flex-col gap-1.5 w-6 pointer-events-none">
     <span class="w-full h-0.5 rounded-full" style="background-color: var(--color-secondary);"></span>
@@ -31,7 +37,7 @@ const links = [
 >
   <div class="flex flex-col h-full">
     <div class="flex justify-end p-6">
-      <button id="menu-close" class="p-2 text-4xl font-light cursor-pointer" style="color: var(--color-secondary);">&times;</button>
+      <button id="menu-close" class="p-2 text-4xl font-light cursor-pointer" style="color: var(--color-secondary);" aria-label="Chiudi menu">&times;</button>
     </div>
 
     <nav class="flex flex-col px-8 gap-8 mt-4">
@@ -40,11 +46,34 @@ const links = [
           {link.label}
         </a>
       ))}
+
+      <!-- Link Galleria (visibile solo su localhost o dal 12.09.2026) -->
+      <a 
+        id="gallery-menu-link"
+        href="/photo" 
+        class="menu-link text-[11px] uppercase tracking-[0.2em] font-bold border-b pb-4"
+        style={`color: var(--color-secondary); border-color: color-mix(in srgb, var(--color-muted), transparent 50%); display: ${showGalleryServer ? 'block' : 'none'};`}
+      >
+        Galleria
+      </a>
     </nav>
   </div>
 </div>
 
 <script is:inline>
+  function checkGalleryVisibility() {
+    const galleryLink = document.getElementById('gallery-menu-link');
+    if (!galleryLink) return;
+    const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+    const targetDate = new Date('2026-09-12T00:00:00');
+    const isMatrimonioDay = new Date() >= targetDate;
+    if (isLocalhost || isMatrimonioDay) {
+      galleryLink.style.display = 'block';
+    } else {
+      galleryLink.style.display = 'none';
+    }
+  }
+
   // Funzione unica di chiusura
   function closeWeddingMenu() {
     const sideMenu = document.getElementById('side-menu');
@@ -79,6 +108,9 @@ const links = [
     }
   });
 
-  // Per sicurezza, assicuriamoci che il menu sia chiuso al cambio pagina
-  document.addEventListener('astro:after-swap', closeWeddingMenu);
+  checkGalleryVisibility();
+  document.addEventListener('astro:after-swap', () => {
+    closeWeddingMenu();
+    checkGalleryVisibility();
+  });
 </script>
