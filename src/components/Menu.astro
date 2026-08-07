@@ -14,45 +14,66 @@ const links = [
 ---
 
 <!-- Tasto Hamburger Fluttuante -->
-<button 
-  id="menu-open" 
+<button
+  id="menu-open"
   class="fixed top-6 right-6 z-[999] p-3 rounded-full backdrop-blur-md shadow-lg border border-white/30"
   style="background: linear-gradient(135deg, rgba(253, 249, 243, 0.9) 0%, rgba(185, 216, 235, 0.9) 100%);"
   aria-label="Apri menu"
 >
   <div class="flex flex-col gap-1.5 w-6 pointer-events-none">
-    <span class="w-full h-0.5 rounded-full" style="background-color: var(--color-secondary);"></span>
-    <span class="w-full h-0.5 rounded-full" style="background-color: var(--color-secondary);"></span>
-    <span class="w-full h-0.5 rounded-full" style="background-color: var(--color-secondary);"></span>
+    <span
+      class="w-full h-0.5 rounded-full"
+      style="background-color: var(--color-secondary);"></span>
+    <span
+      class="w-full h-0.5 rounded-full"
+      style="background-color: var(--color-secondary);"></span>
+    <span
+      class="w-full h-0.5 rounded-full"
+      style="background-color: var(--color-secondary);"></span>
   </div>
 </button>
 
 <!-- Overlay e Sidebar -->
-<div id="menu-overlay" class="fixed inset-0 bg-black/20 z-[1000] hidden backdrop-blur-sm"></div>
+<div
+  id="menu-overlay"
+  class="fixed inset-0 bg-black/20 z-[1000] hidden backdrop-blur-sm"
+>
+</div>
 
-<div 
-  id="side-menu" 
+<div
+  id="side-menu"
   class="fixed top-0 right-0 h-full w-[230px] z-[1001] translate-x-full transition-transform duration-500 ease-in-out shadow-2xl"
   style="background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-watercolor) 100%);"
 >
   <div class="flex flex-col h-full">
     <div class="flex justify-end p-6">
-      <button id="menu-close" class="p-2 text-4xl font-light cursor-pointer" style="color: var(--color-secondary);" aria-label="Chiudi menu">&times;</button>
+      <button
+        id="menu-close"
+        class="p-2 text-4xl font-light cursor-pointer"
+        style="color: var(--color-secondary);"
+        aria-label="Chiudi menu">&times;</button
+      >
     </div>
 
     <nav class="flex flex-col px-8 gap-8 mt-4">
-      {links.map((link) => (
-        <a href={link.href} class="menu-link text-[11px] uppercase tracking-[0.2em] font-bold border-b pb-4" style="color: var(--color-secondary); border-color: color-mix(in srgb, var(--color-muted), transparent 50%);">
-          {link.label}
-        </a>
-      ))}
+      {
+        links.map((link) => (
+          <a
+            href={link.href}
+            class="menu-link text-[11px] uppercase tracking-[0.2em] font-bold border-b pb-4"
+            style="color: var(--color-secondary); border-color: color-mix(in srgb, var(--color-muted), transparent 50%);"
+          >
+            {link.label}
+          </a>
+        ))
+      }
 
       <!-- Link Galleria (visibile solo su localhost o dal 12.09.2026) -->
-      <a 
+      <a
         id="gallery-menu-link"
-        href="/photo" 
+        href="/photo"
         class="menu-link text-[11px] uppercase tracking-[0.2em] font-bold border-b pb-4"
-        style={`color: var(--color-secondary); border-color: color-mix(in srgb, var(--color-muted), transparent 50%); display: ${showGalleryServer ? 'block' : 'none'};`}
+        style={`color: var(--color-secondary); border-color: color-mix(in srgb, var(--color-muted), transparent 50%); display: ${showGalleryServer ? "block" : "none"};`}
       >
         Galleria
       </a>
@@ -62,54 +83,60 @@ const links = [
 
 <script is:inline>
   function checkGalleryVisibility() {
-    const galleryLink = document.getElementById('gallery-menu-link');
+    const galleryLink = document.getElementById("gallery-menu-link");
     if (!galleryLink) return;
-    const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-    const targetDate = new Date('2026-09-12T00:00:00');
+    const isLocalhost =
+      window.location.hostname === "localhost" ||
+      window.location.hostname === "127.0.0.1";
+    const targetDate = new Date("2026-09-12T00:00:00");
     const isMatrimonioDay = new Date() >= targetDate;
     if (isLocalhost || isMatrimonioDay) {
-      galleryLink.style.display = 'block';
+      galleryLink.style.display = "block";
     } else {
-      galleryLink.style.display = 'none';
+      galleryLink.style.display = "none";
     }
   }
 
   // Funzione unica di chiusura
   function closeWeddingMenu() {
-    const sideMenu = document.getElementById('side-menu');
-    const overlay = document.getElementById('menu-overlay');
-    if (sideMenu) sideMenu.classList.add('translate-x-full');
-    if (overlay) overlay.classList.add('hidden');
-    document.body.style.overflow = '';
+    const sideMenu = document.getElementById("side-menu");
+    const overlay = document.getElementById("menu-overlay");
+    if (sideMenu) sideMenu.classList.add("translate-x-full");
+    if (overlay) overlay.classList.add("hidden");
+    document.body.style.overflow = "";
   }
 
   // Funzione unica di apertura
   function openWeddingMenu() {
-    const sideMenu = document.getElementById('side-menu');
-    const overlay = document.getElementById('menu-overlay');
-    if (sideMenu) sideMenu.classList.remove('translate-x-full');
-    if (overlay) overlay.classList.remove('hidden');
-    document.body.style.overflow = 'hidden';
+    const sideMenu = document.getElementById("side-menu");
+    const overlay = document.getElementById("menu-overlay");
+    if (sideMenu) sideMenu.classList.remove("translate-x-full");
+    if (overlay) overlay.classList.remove("hidden");
+    document.body.style.overflow = "hidden";
   }
 
   // Delegazione degli eventi: ascoltiamo tutto il documento una sola volta
-  document.addEventListener('click', (event) => {
+  document.addEventListener("click", (event) => {
     const target = event.target;
 
     // Se clicco il tasto apri
-    if (target.closest('#menu-open')) {
+    if (target.closest("#menu-open")) {
       openWeddingMenu();
       return;
     }
 
     // Se clicco il tasto chiudi, l'overlay o un link del menu
-    if (target.closest('#menu-close') || target.closest('#menu-overlay') || target.closest('.menu-link')) {
+    if (
+      target.closest("#menu-close") ||
+      target.closest("#menu-overlay") ||
+      target.closest(".menu-link")
+    ) {
       closeWeddingMenu();
     }
   });
 
   checkGalleryVisibility();
-  document.addEventListener('astro:after-swap', () => {
+  document.addEventListener("astro:after-swap", () => {
     closeWeddingMenu();
     checkGalleryVisibility();
   });
