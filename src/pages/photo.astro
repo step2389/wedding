@@ -387,29 +387,86 @@ import Footer from "../components/Footer.astro";
         }
       }
 
+      async function downloadPhoto(event) {
+        if (event) event.preventDefault();
+        if (!lightboxImage.src) return;
+        const photoUrl = lightboxImage.src;
+        const btnSpan = lightboxDownload.querySelector("span");
+        const originalText = btnSpan ? btnSpan.textContent : "Scarica";
+
+        try {
+          if (btnSpan) btnSpan.textContent = "Download...";
+          const response = await fetch(photoUrl, { mode: "cors" });
+          const blob = await response.blob();
+          const localUrl = URL.createObjectURL(blob);
+
+          const a = document.createElement("a");
+          a.href = localUrl;
+          const fileName = `foto-matrimonio-anna-stefano-${currentPhotoIndex >= 0 ? currentPhotoIndex + 1 : "foto"}.jpg`;
+          a.download = fileName;
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          URL.revokeObjectURL(localUrl);
+
+          showMessage("Foto scaricata sul dispositivo!", false);
+          setTimeout(() => showMessage(""), 3000);
+        } catch (err) {
+          window.open(photoUrl, "_blank");
+        } finally {
+          if (btnSpan) btnSpan.textContent = originalText;
+        }
+      }
+
       async function sharePhoto() {
         if (!lightboxImage.src) return;
         const photoUrl = lightboxImage.src;
-        const shareData = {
-          title: "Foto Matrimonio Anna & Stefano",
-          text: "Guarda questa foto del matrimonio di Anna & Stefano!",
-          url: photoUrl,
-        };
+        const btnSpan = lightboxShare.querySelector("span");
+        const originalText = btnSpan ? btnSpan.textContent : "Condividi";
 
-        if (navigator.share) {
-          try {
-            await navigator.share(shareData);
-          } catch (err) {
-            // Condivisione annullata
+        try {
+          if (btnSpan) btnSpan.textContent = "Preparazione...";
+          const response = await fetch(photoUrl, { mode: "cors" });
+          const blob = await response.blob();
+          const file = new File(
+            [blob],
+            `foto-matrimonio-${currentPhotoIndex >= 0 ? currentPhotoIndex + 1 : "foto"}.jpg`,
+            { type: blob.type || "image/jpeg" },
+          );
+
+          if (navigator.canShare && navigator.canShare({ files: [file] })) {
+            await navigator.share({
+              title: "Foto Matrimonio Anna & Stefano",
+              text: "Guarda questa foto del matrimonio di Anna & Stefano!",
+              files: [file],
+            });
+            return;
           }
-        } else {
-          try {
-            await navigator.clipboard.writeText(photoUrl);
-            showMessage("Link della foto copiato negli appunti!", false);
-            setTimeout(() => showMessage(""), 3500);
-          } catch {
-            showMessage("Impossibile condividere automaticamente", true);
+
+          if (navigator.share) {
+            await navigator.share({
+              title: "Foto Matrimonio Anna & Stefano",
+              text: "Guarda questa foto del matrimonio di Anna & Stefano!",
+              url: photoUrl,
+            });
+            return;
           }
+
+          await navigator.clipboard.writeText(photoUrl);
+          showMessage("Link della foto copiato negli appunti!", false);
+          setTimeout(() => showMessage(""), 3500);
+        } catch (err) {
+          if (err.name !== "AbortError") {
+            try {
+              await navigator.clipboard.writeText(photoUrl);
+              showMessage("Link della foto copiato negli appunti!", false);
+              setTimeout(() => showMessage(""), 3500);
+            } catch {
+              showMessage("Impossibile condividere automaticamente", true);
+            }
+          }
+        } finally {
+          if (btnSpan) btnSpan.textContent = originalText;
         }
       }
 
@@ -602,6 +659,7 @@ import Footer from "../components/Footer.astro";
       lightboxPrev?.addEventListener("click", () => navigateLightbox(-1));
       lightboxNext?.addEventListener("click", () => navigateLightbox(1));
       lightboxShare?.addEventListener("click", sharePhoto);
+      lightboxDownload?.addEventListener("click", downloadPhoto);
 
       window.addEventListener("keydown", (event) => {
         if (!lightbox?.open) return;
