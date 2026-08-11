@@ -409,11 +409,6 @@ import Footer from "../components/Footer.astro";
         showMessage("");
       }
 
-      function getPhotoTimestamp(photo) {
-        if (!photo?.uploaded) return 0;
-        const value = new Date(photo.uploaded).getTime();
-        return Number.isNaN(value) ? 0 : value;
-      }
 
       function formatUploadedLabel(uploaded) {
         const date = uploaded ? new Date(uploaded) : null;
@@ -546,7 +541,6 @@ import Footer from "../components/Footer.astro";
       function createPhotoCard(photo, index) {
         const card = document.createElement("article");
         card.className = "gallery-item";
-        card.dataset.timestamp = String(getPhotoTimestamp(photo));
 
         const button = document.createElement("button");
         button.type = "button";
@@ -844,6 +838,48 @@ import Footer from "../components/Footer.astro";
       await loadInitialPhotos();
       setupInfiniteScroll();
       startPolling();
+
+      // ── Header colore dinamico in base allo scroll ────────────────────────
+      // Il gradiente CSS è linear-gradient(135deg, #f2e9e1 30%, #b9d8eb 100%)
+      // Per 135deg: t = (x + y) / (W + H)  →  formula esatta CSS
+      const topbarEl = document.querySelector(".gallery-topbar");
+      const colorTop = { r: 242, g: 233, b: 225 }; // #f2e9e1 sabbia
+      const colorBot = { r: 185, g: 216, b: 235 }; // #b9d8eb azzurro
+
+      function lerp(a, b, t) { return Math.round(a + (b - a) * t); }
+
+      function updateHeaderColor() {
+        if (!topbarEl) return;
+        const W = document.documentElement.clientWidth;
+        const H = document.documentElement.scrollHeight;
+        if (W + H === 0) return;
+
+        // Punto centrale della header nella coordinata della pagina
+        const centerX = W / 2;
+        const y = window.scrollY;
+
+        // t lungo il gradiente 135deg (formula esatta per CSS linear-gradient)
+        let t = (centerX + y) / (W + H);
+        t = Math.min(1, Math.max(0, t));
+
+        // I color-stop sono: sabbia al 30%, azzurro al 100%
+        // Rimappo t nei color-stop del gradiente
+        let colorT;
+        if (t <= 0.30) {
+          colorT = 0; // prima del primo stop → colore pieno sabbia
+        } else {
+          colorT = (t - 0.30) / 0.70;
+        }
+        colorT = Math.min(1, Math.max(0, colorT));
+
+        const r = lerp(colorTop.r, colorBot.r, colorT);
+        const g = lerp(colorTop.g, colorBot.g, colorT);
+        const b = lerp(colorTop.b, colorBot.b, colorT);
+        topbarEl.style.background = `rgb(${r}, ${g}, ${b})`;
+      }
+
+      window.addEventListener("scroll", updateHeaderColor, { passive: true });
+      updateHeaderColor(); // imposta colore iniziale
     </script>
   </body>
 </html>
@@ -907,11 +943,9 @@ import Footer from "../components/Footer.astro";
     z-index: 30;
     padding-top: max(14px, env(safe-area-inset-top, 0px));
     padding-bottom: 12px;
-    background: color-mix(in srgb, var(--color-primary) 85%, transparent);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
+    background: var(--color-primary); /* aggiornato da JS */
     border-bottom: none;
-    transition: background 0.3s ease;
+    transition: background 0.08s linear;
   }
 
   .gallery-topbar-inner {
