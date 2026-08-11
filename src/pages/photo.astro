@@ -50,6 +50,7 @@ import Footer from "../components/Footer.astro";
                   class="gallery-count"
                   aria-label="Numero totale foto">0</span
                 >
+                <span id="new-dot" class="new-dot" hidden aria-label="Nuove foto disponibili"></span>
               </div>
             </div>
           </div>
@@ -195,6 +196,8 @@ import Footer from "../components/Footer.astro";
     <div class="photo-footer-wrap">
       <Footer />
     </div>
+
+
 
     <dialog id="lightbox" class="photo-lightbox" aria-label="Foto ingrandita">
       <div class="photo-lightbox-inner">
@@ -675,6 +678,75 @@ import Footer from "../components/Footer.astro";
         observer.observe(loadMoreBtn);
       }
 
+      // ── Auto-refresh polling ─────────────────────────────────────────────
+      const POLL_INTERVAL_MS = 60_000; // 1 minuto
+      let pollTimer = null;
+
+      function showNewDot() {
+        const dot = document.getElementById("new-dot");
+        if (!dot) return;
+        dot.hidden = false;
+        // Nasconde il pallino dopo 10 secondi o al primo scroll
+        const hide = () => { dot.hidden = true; window.removeEventListener("scroll", hide, { capture: true }); };
+        setTimeout(hide, 10_000);
+        window.addEventListener("scroll", hide, { once: true, capture: true });
+      }
+
+      async function pollForNewPhotos() {
+        // Non fare polling se la tab è in background
+        if (document.visibilityState !== "visible") return;
+        // Non fare polling durante un upload attivo
+        if (isUploading) return;
+
+        try {
+          const fresh = await fetchAllPhotos();
+          if (fresh.length > allPhotos.length) {
+            const newCount = fresh.length - allPhotos.length;
+            // Trova le foto nuove (quelle non già presenti per URL)
+            const existingUrls = new Set(allPhotos.map((p) => p.url));
+            const newPhotos = fresh.filter((p) => !existingUrls.has(p.url));
+
+            // Prepend in cima alla griglia senza resettare tutto
+            const fragment = document.createDocumentFragment();
+            newPhotos.forEach((photo, i) => {
+              fragment.appendChild(createPhotoCard(photo, i));
+            });
+            gallery.prepend(fragment);
+
+            // Ricalibra gli indici lightbox
+            allPhotos = fresh;
+            renderedCount = renderedCount + newPhotos.length;
+            updatePhotoCount();
+            showNewDot();
+          }
+        } catch {
+          // Silenzioso: non disturbare l'utente per errori di poll
+        }
+      }
+
+      function startPolling() {
+        if (pollTimer) clearInterval(pollTimer);
+        pollTimer = setInterval(pollForNewPhotos, POLL_INTERVAL_MS);
+      }
+
+      function stopPolling() {
+        if (pollTimer) {
+          clearInterval(pollTimer);
+          pollTimer = null;
+        }
+      }
+
+      // Pausa il poll quando la tab va in background, riprende quando torna visibile
+      document.addEventListener("visibilitychange", () => {
+        if (document.visibilityState === "visible") {
+          // Controlla subito al ritorno in primo piano, poi riprende il timer
+          pollForNewPhotos();
+          startPolling();
+        } else {
+          stopPolling();
+        }
+      });
+
       async function uploadFiles() {
         if (!selectedFiles.length || isUploading) return;
 
@@ -771,6 +843,7 @@ import Footer from "../components/Footer.astro";
       updateSelectedFilesUI();
       await loadInitialPhotos();
       setupInfiniteScroll();
+      startPolling();
     </script>
   </body>
 </html>
@@ -1434,5 +1507,22 @@ import Footer from "../components/Footer.astro";
       top: -42px;
       right: 4px;
     }
+  }
+
+  /* ── Pallino nuove foto ────────────────────────────── */
+  .new-dot {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #22c55e;
+    box-shadow: 0 0 0 2px rgba(34, 197, 94, 0.35);
+    animation: dot-pulse 1.8s ease-in-out infinite;
+    flex-shrink: 0;
+  }
+
+  @keyframes dot-pulse {
+    0%, 100% { box-shadow: 0 0 0 2px rgba(34, 197, 94, 0.35); }
+    50%       { box-shadow: 0 0 0 5px rgba(34, 197, 94, 0.0); }
   }
 </style>
