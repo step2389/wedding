@@ -24,7 +24,6 @@ import Footer from "../components/Footer.astro";
       <section class="gallery-shell" aria-label="I vostri scatti">
         <header class="gallery-topbar">
           <div class="gallery-topbar-inner">
-
             <a href="/" class="brand-link" title="Torna alla Home">
               <span class="gallery-subtitle">A & S</span>
             </a>
@@ -45,10 +44,13 @@ import Footer from "../components/Footer.astro";
                   class="gallery-count"
                   aria-label="Numero totale foto">0</span
                 >
-                <span id="new-dot" class="new-dot" hidden aria-label="Nuove foto disponibili"></span>
+                <span
+                  id="new-dot"
+                  class="new-dot"
+                  hidden
+                  aria-label="Nuove foto disponibili"></span>
               </div>
             </div>
-
           </div>
         </header>
 
@@ -60,8 +62,9 @@ import Footer from "../components/Footer.astro";
         >
         </p>
 
-
-        <p class="gallery-tagline">Condividi un ricordo speciale di questa giornata</p>
+        <p class="gallery-tagline">
+          Condividi un ricordo speciale di questa giornata!
+        </p>
 
         <div class="gallery-grid-wrap">
           <div id="gallery-grid" class="gallery-grid"></div>
@@ -195,8 +198,6 @@ import Footer from "../components/Footer.astro";
     <div class="photo-footer-wrap">
       <Footer />
     </div>
-
-
 
     <dialog id="lightbox" class="photo-lightbox" aria-label="Foto ingrandita">
       <div class="photo-lightbox-inner">
@@ -408,7 +409,6 @@ import Footer from "../components/Footer.astro";
         showMessage("");
       }
 
-
       function formatUploadedLabel(uploaded) {
         const date = uploaded ? new Date(uploaded) : null;
         return date && !Number.isNaN(date.getTime())
@@ -529,8 +529,14 @@ import Footer from "../components/Footer.astro";
           if (err.name === "AbortError") return;
           // Fallback: condivisione URL nativa senza file allegato
           if (navigator.share) {
-            try { await navigator.share({ title: "Foto Matrimonio Anna & Stefano", url: photoUrl }); }
-            catch { /* annullato */ }
+            try {
+              await navigator.share({
+                title: "Foto Matrimonio Anna & Stefano",
+                url: photoUrl,
+              });
+            } catch {
+              /* annullato */
+            }
           }
         } finally {
           if (btnSpan) btnSpan.textContent = originalText;
@@ -680,7 +686,10 @@ import Footer from "../components/Footer.astro";
         if (!dot) return;
         dot.hidden = false;
         // Nasconde il pallino dopo 10 secondi o al primo scroll
-        const hide = () => { dot.hidden = true; window.removeEventListener("scroll", hide, { capture: true }); };
+        const hide = () => {
+          dot.hidden = true;
+          window.removeEventListener("scroll", hide, { capture: true });
+        };
         setTimeout(hide, 10_000);
         window.addEventListener("scroll", hide, { once: true, capture: true });
       }
@@ -845,7 +854,9 @@ import Footer from "../components/Footer.astro";
       const colorTop = { r: 242, g: 233, b: 225 }; // #f2e9e1 sabbia
       const colorBot = { r: 185, g: 216, b: 235 }; // #b9d8eb azzurro
 
-      function lerp(a, b, t) { return Math.round(a + (b - a) * t); }
+      function lerp(a, b, t) {
+        return Math.round(a + (b - a) * t);
+      }
 
       function updateHeaderColor() {
         if (!topbarEl) return;
@@ -864,10 +875,10 @@ import Footer from "../components/Footer.astro";
         // I color-stop sono: sabbia al 30%, azzurro al 100%
         // Rimappo t nei color-stop del gradiente
         let colorT;
-        if (t <= 0.30) {
+        if (t <= 0.3) {
           colorT = 0; // prima del primo stop → colore pieno sabbia
         } else {
-          colorT = (t - 0.30) / 0.70;
+          colorT = (t - 0.3) / 0.7;
         }
         colorT = Math.min(1, Math.max(0, colorT));
 
@@ -977,7 +988,7 @@ import Footer from "../components/Footer.astro";
     font-size: clamp(22px, 3.5vw, 28px);
     font-style: normal;
     letter-spacing: 0.02em;
-    color: #3A5A5C;
+    color: #3a5a5c;
     text-transform: none;
     line-height: 1.5;
     overflow: visible;
@@ -992,7 +1003,7 @@ import Footer from "../components/Footer.astro";
     letter-spacing: 0.12em;
     text-transform: uppercase;
     line-height: 1.1;
-    color: #3A5A5C;
+    color: #3a5a5c;
     opacity: 0.9;
   }
 
@@ -1039,7 +1050,7 @@ import Footer from "../components/Footer.astro";
     font-family: "Cormorant Garamond", serif;
     font-style: italic;
     font-size: clamp(16px, 3vw, 22px);
-    color: #3A5A5C;
+    color: #3a5a5c;
     opacity: 0.78;
     letter-spacing: 0.03em;
     padding-bottom: 6px;
@@ -1564,7 +1575,12 @@ import Footer from "../components/Footer.astro";
   }
 
   @keyframes dot-pulse {
-    0%, 100% { box-shadow: 0 0 0 2px rgba(34, 197, 94, 0.35); }
-    50%       { box-shadow: 0 0 0 5px rgba(34, 197, 94, 0.0); }
+    0%,
+    100% {
+      box-shadow: 0 0 0 2px rgba(34, 197, 94, 0.35);
+    }
+    50% {
+      box-shadow: 0 0 0 5px rgba(34, 197, 94, 0);
+    }
   }
 </style>
