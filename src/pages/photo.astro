@@ -24,15 +24,10 @@ import Footer from "../components/Footer.astro";
       <section class="gallery-shell" aria-label="I vostri scatti">
         <header class="gallery-topbar">
           <div class="gallery-topbar-inner">
-            <div class="gallery-topbar-left">
-              <h1 class="gallery-title">Galleria</h1>
-            </div>
 
-            <div class="gallery-topbar-center">
-              <a href="/" class="brand-link" title="Torna alla Home">
-                <span class="gallery-subtitle">A & S</span>
-              </a>
-            </div>
+            <a href="/" class="brand-link" title="Torna alla Home">
+              <span class="gallery-subtitle">A & S</span>
+            </a>
 
             <div class="gallery-tools">
               <div class="gallery-count-badge" title="Foto totali">
@@ -53,6 +48,7 @@ import Footer from "../components/Footer.astro";
                 <span id="new-dot" class="new-dot" hidden aria-label="Nuove foto disponibili"></span>
               </div>
             </div>
+
           </div>
         </header>
 
@@ -63,6 +59,9 @@ import Footer from "../components/Footer.astro";
           aria-live="polite"
         >
         </p>
+
+
+        <p class="gallery-tagline">Condividi un ricordo speciale di questa giornata</p>
 
         <div class="gallery-grid-wrap">
           <div id="gallery-grid" class="gallery-grid"></div>
@@ -936,36 +935,30 @@ import Footer from "../components/Footer.astro";
     padding: 0 16px;
   }
 
-  /* TOPBAR & HEADER ARMONIOSO COORDINATO */
+  /* TOPBAR — navbar compatta, tutta larghezza */
   .gallery-topbar {
     position: sticky;
     top: 0;
     z-index: 30;
-    padding-top: max(14px, env(safe-area-inset-top, 0px));
-    padding-bottom: 12px;
-    background: var(--color-primary); /* aggiornato da JS */
+    /* breakout dal contenitore centrato */
+    margin-left: -16px;
+    margin-right: -16px;
+    padding-left: 16px;
+    padding-right: 16px;
+    padding-top: max(18px, env(safe-area-inset-top, 0px));
+    padding-bottom: 10px;
+    background: var(--color-primary);
     border-bottom: none;
     transition: background 0.08s linear;
+    overflow: visible;
   }
 
   .gallery-topbar-inner {
-    display: grid;
-    grid-template-columns: auto 1fr auto;
+    display: flex;
     align-items: center;
+    justify-content: space-between;
     gap: 12px;
-    padding: 4px 8px;
-  }
-
-  .gallery-topbar-left {
-    display: flex;
-    align-items: center;
-  }
-
-  .gallery-topbar-center {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
+    padding: 2px 14px;
   }
 
   .brand-link {
@@ -979,13 +972,16 @@ import Footer from "../components/Footer.astro";
   }
 
   .gallery-subtitle {
+    display: block;
     font-family: "Burgues Script", cursive, serif;
-    font-size: clamp(30px, 5vw, 40px);
+    font-size: clamp(22px, 3.5vw, 28px);
     font-style: normal;
     letter-spacing: 0.02em;
-    color: #3b7a9e;
+    color: #3A5A5C;
     text-transform: none;
-    line-height: 1;
+    line-height: 1.5;
+    overflow: visible;
+    padding-top: 4px;
   }
 
   .gallery-title {
@@ -996,7 +992,7 @@ import Footer from "../components/Footer.astro";
     letter-spacing: 0.12em;
     text-transform: uppercase;
     line-height: 1.1;
-    color: #234e68;
+    color: #3A5A5C;
     opacity: 0.9;
   }
 
@@ -1035,6 +1031,18 @@ import Footer from "../components/Footer.astro";
     font-size: 13px;
     font-weight: 500;
     color: #234e68;
+  }
+
+  .gallery-tagline {
+    margin: 18px 0 8px;
+    text-align: center;
+    font-family: "Cormorant Garamond", serif;
+    font-style: italic;
+    font-size: clamp(16px, 3vw, 22px);
+    color: #3A5A5C;
+    opacity: 0.78;
+    letter-spacing: 0.03em;
+    padding-bottom: 6px;
   }
 
   .gallery-message:empty,
